@@ -1,11 +1,7 @@
 {
-    "name": "laravel/laravel",
+    "name": "storysm/storysm-laravel",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": [
-        "laravel",
-        "framework"
-    ],
+    "description": "The Storysm Laravel.",
     "license": "MIT",
     "require": {
         "php": "^8.2",

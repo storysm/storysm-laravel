@@ -1,10 +1,4 @@
-# Starter Kit Laravel
-
-> **WARNING**: This starter kit is still in development. Do not use it in production.
-
-## Universal Starter Kit
-
-This starter kit is meant to be used with [Starter Kit WebView Android](https://github.com/spektasoft/starter-kit-webview-android).
+# Storysm Laravel
 
 ## Important Notice
 
@@ -110,8 +104,8 @@ To develop a universal app, follow the additional instructions below:
 
 ## Upstream
 
-Apply any changes available from the Laravel [12.x branch](https://github.com/laravel/laravel/compare/979202df1c2fe3547709a20a59a84bcefaf15f4f...12.x).
+Apply any changes available from the Starter Kit Laravel [main branch](https://github.com/spektasoft/starter-kit-laravel/compare/9941c49d8b7bd90516df194ce7c66fda55415d15...main).
 
 ## License
 
-The starter kit is open-sourced software licensed under the [MIT license](LICENSE).
+The Storysm Laravel is open-sourced software licensed under the [MIT license](LICENSE).
