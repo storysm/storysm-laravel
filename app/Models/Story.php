@@ -6,7 +6,7 @@ use App\Concerns\HasCreatorAttribute;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
 use Spatie\Translatable\HasTranslations;
 
@@ -46,11 +46,16 @@ class Story extends Model
     ];
 
     /**
-     * @return HasOne<Media, $this>
+     * @var array<int, string>
      */
-    public function coverMedia(): HasOne
+    protected $guarded = [];
+
+    /**
+     * @return BelongsTo<Media, $this>
+     */
+    public function coverMedia(): BelongsTo
     {
-        return $this->hasOne(Media::class, 'cover_media_id');
+        return $this->belongsTo(Media::class, 'cover_media_id');
     }
 
     public function isReferenced(): bool

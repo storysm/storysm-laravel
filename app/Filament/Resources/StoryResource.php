@@ -4,16 +4,22 @@ namespace App\Filament\Resources;
 
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\StoryResource\Pages;
+use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\Story;
+use App\Utils\Locale;
+use Awcodes\Curator\Components\Forms\CuratorPicker;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
+use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Builder;
+use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class StoryResource extends Resource implements HasShieldPermissions
 {
@@ -30,19 +36,57 @@ class StoryResource extends Resource implements HasShieldPermissions
     {
         return $form
             ->schema([
-                Forms\Components\Select::make('creator_id')
-                    ->relationship('creator', 'name')
-                    ->required(),
-                Forms\Components\TextInput::make('cover_media_id')
-                    ->maxLength(26)
-                    ->default(null),
-                Forms\Components\Textarea::make('title')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\Textarea::make('content')
-                    ->required()
-                    ->columnSpanFull(),
-                Forms\Components\DateTimePicker::make('published_at'),
+                Forms\Components\Grid::make([
+                    'default' => 1,
+                    'md' => 6,
+                ])->schema([
+                    Forms\Components\Group::make([
+                        Translate::make()
+                            ->schema(function (Get $get) {
+                                /** @var array<?string> */
+                                $titles = $get('title');
+                                $required = collect($titles)->every(fn ($item) => $item === null || trim($item) === '');
+
+                                return [
+                                    Forms\Components\Textarea::make('title')
+                                        ->label(__('story.resource.title'))
+                                        ->lazy()
+                                        ->required($required),
+                                ];
+                            })
+                            ->columnSpanFull()
+                            ->locales(Locale::getSortedLocales())
+                            ->suffixLocaleLabel(),
+                        Translate::make()
+                            ->schema([
+                                TiptapEditor::make('content')
+                                    ->label(__('story.resource.content')),
+                            ])
+                            ->columnSpanFull()
+                            ->locales(Locale::getSortedLocales())
+                            ->suffixLocaleLabel(),
+                    ])->columnSpan([
+                        'default' => 1,
+                        'sm' => 4,
+                    ]),
+                    Forms\Components\Group::make([
+                        Forms\Components\Section::make([
+                            Forms\Components\DateTimePicker::make('published_at')
+                                ->default(now()),
+                        ]),
+                        Forms\Components\Section::make([
+                            CuratorPicker::make('cover_media_id')
+                                ->buttonLabel(__('story.resource.select_cover_media'))
+                                ->extraAttributes(['class' => 'sm:w-fit'])
+                                ->label(__('story.resource.cover_media'))
+                                ->relationship('coverMedia', 'name'),
+                        ]),
+                        Creator::getComponent(static::canViewAll()),
+                    ])->columnSpan([
+                        'default' => 1,
+                        'sm' => 2,
+                    ]),
+                ]),
             ]);
     }
 

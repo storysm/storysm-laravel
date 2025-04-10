@@ -46,6 +46,15 @@ class Page extends Model {
     public $translatable = ['title', 'description'];
     ```
 
+## Mass Assignment
+
+-   **`$guarded` Property:** To allow mass assignment, the `$guarded` property should be defined as a protected array. If you want to allow all fields to be mass-assigned, set it to an empty array.
+
+    ```php
+    /** @var array<int, string> */
+    protected $guarded = [];
+    ```
+
 ## Relationship Return Types
 
 -   **Explicit Return Types:** Use explicit return types for relationship methods (e.g., `BelongsTo`, `HasOne`).
