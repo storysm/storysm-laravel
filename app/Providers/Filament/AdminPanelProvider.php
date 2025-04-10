@@ -28,6 +28,7 @@ use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Jetstream\Features;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -90,7 +91,7 @@ class AdminPanelProvider extends PanelProvider
                 \ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class),
             ])
-            ->userMenuItems([
+            ->userMenuItems(array_filter([
                 MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.home'))
                     ->icon('heroicon-o-home')
@@ -99,11 +100,11 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn () => __('navigation-menu.menu.profile'))
                     ->icon('heroicon-o-user')
                     ->url(fn () => route('profile.show')),
-                MenuItem::make()
+                Features::hasApiFeatures() ? MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.api_tokens'))
                     ->icon('heroicon-o-key')
-                    ->url(fn () => route('api-tokens.index')),
-            ])
+                    ->url(fn () => route('api-tokens.index')) : null,
+            ]))
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
             @vite('resources/ts/app.ts')
             BLADE))
