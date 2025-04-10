@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Story\Status;
 use App\Models\Media;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -29,7 +30,8 @@ class StoryFactory extends Factory
                 'en' => fake()->paragraph(),
                 'fr' => fake()->paragraph(),
             ],
-            'published_at' => fake()->dateTime(),
+            'status' => Status::Draft,
+            'published_at' => $this->faker->dateTimeThisMonth,
         ];
     }
 }

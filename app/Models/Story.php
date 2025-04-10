@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\HasCreatorAttribute;
 use App\Enums\Story\Status;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -64,5 +65,23 @@ class Story extends Model
     public function isReferenced(): bool
     {
         return false;
+    }
+
+    /**
+     * @param  Builder<Story>  $query
+     */
+    public function scopePending(Builder $query): void
+    {
+        $query->where('status', Status::Publish)
+            ->where('published_at', '>', now());
+    }
+
+    /**
+     * @param  Builder<Story>  $query
+     */
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('status', Status::Publish)
+            ->where('published_at', '<=', now());
     }
 }
