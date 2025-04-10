@@ -32,8 +32,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         FilamentColor::register([
-            'primary' => Color::Vermilion,
-            'secondary' => Color::WebOrange,
+            'primary' => Color::Driftwood,
+            'secondary' => Color::Terracotta,
         ]);
         FilamentView::spa();
         Table::configureUsing(function (Table $table): void {

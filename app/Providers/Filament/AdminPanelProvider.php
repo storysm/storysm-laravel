@@ -9,7 +9,6 @@ use App\Filament\Resources\PermissionResource;
 use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\UserResource;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
-use Blade;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -26,6 +25,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
 
@@ -43,8 +43,8 @@ class AdminPanelProvider extends PanelProvider
                 ]),
             ]))
             ->colors([
-                'primary' => Color::Vermilion,
-                'secondary' => Color::WebOrange,
+                'primary' => Color::Driftwood,
+                'secondary' => Color::Terracotta,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -109,6 +109,7 @@ class AdminPanelProvider extends PanelProvider
             BLADE))
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => Blade::render(<<<'BLADE'
             @googlefonts('sans')
+            @googlefonts('logo')
             BLADE))
             ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
             ->spa()

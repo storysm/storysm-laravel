@@ -23,11 +23,12 @@ export default {
     theme: {
         extend: {
             colors: {
-                primary: colors.vermilion,
-                secondary: colors["web-orange"],
+                primary: colors.driftwood,
+                secondary: colors.terracotta,
             },
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
+                logo: ["Grandstander", ...defaultTheme.fontFamily.serif],
             },
         },
     },
