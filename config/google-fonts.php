@@ -8,6 +8,7 @@ return [
      */
     'fonts' => [
         'sans' => 'https://fonts.googleapis.com/css2?family=Figtree:ital,wght@0,300..900;1,300..900&display=swap',
+        'logo' => 'https://fonts.googleapis.com/css2?family=Grandstander:ital,wght@0,100..900;1,100..900&display=swap',
     ],
 
     /*

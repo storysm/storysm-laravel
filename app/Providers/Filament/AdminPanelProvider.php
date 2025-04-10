@@ -9,7 +9,6 @@ use App\Filament\Resources\PermissionResource;
 use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\UserResource;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
-use Blade;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -26,8 +25,10 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\View\ComponentAttributeBag;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Laravel\Jetstream\Features;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -43,8 +44,8 @@ class AdminPanelProvider extends PanelProvider
                 ]),
             ]))
             ->colors([
-                'primary' => Color::Vermilion,
-                'secondary' => Color::WebOrange,
+                'primary' => Color::Driftwood,
+                'secondary' => Color::Terracotta,
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\\Filament\\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\\Filament\\Pages')
@@ -90,7 +91,7 @@ class AdminPanelProvider extends PanelProvider
                 \ShuvroRoy\FilamentSpatieLaravelBackup\FilamentSpatieLaravelBackupPlugin::make()
                     ->usingPage(Backups::class),
             ])
-            ->userMenuItems([
+            ->userMenuItems(array_filter([
                 MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.home'))
                     ->icon('heroicon-o-home')
@@ -99,16 +100,17 @@ class AdminPanelProvider extends PanelProvider
                     ->label(fn () => __('navigation-menu.menu.profile'))
                     ->icon('heroicon-o-user')
                     ->url(fn () => route('profile.show')),
-                MenuItem::make()
+                Features::hasApiFeatures() ? MenuItem::make()
                     ->label(fn () => __('navigation-menu.menu.api_tokens'))
                     ->icon('heroicon-o-key')
-                    ->url(fn () => route('api-tokens.index')),
-            ])
+                    ->url(fn () => route('api-tokens.index')) : null,
+            ]))
             ->renderHook(PanelsRenderHook::SCRIPTS_AFTER, fn () => Blade::render(<<<'BLADE'
             @vite('resources/ts/app.ts')
             BLADE))
             ->renderHook(PanelsRenderHook::STYLES_AFTER, fn () => Blade::render(<<<'BLADE'
             @googlefonts('sans')
+            @googlefonts('logo')
             BLADE))
             ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
             ->spa()
