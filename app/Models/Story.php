@@ -52,4 +52,9 @@ class Story extends Model
     {
         return $this->hasOne(Media::class, 'cover_media_id');
     }
+
+    public function isReferenced(): bool
+    {
+        return false;
+    }
 }

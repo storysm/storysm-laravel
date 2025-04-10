@@ -4,17 +4,25 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\StoryResource\Pages;
 use App\Models\Story;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
-class StoryResource extends Resource
+class StoryResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Story::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    public static function canViewAll(): bool
+    {
+        return static::can('viewAll');
+    }
 
     public static function form(Form $form): Form
     {
@@ -48,6 +56,30 @@ class StoryResource extends Resource
             'create' => Pages\CreateStory::route('/create'),
             'edit' => Pages\EditStory::route('/{record}/edit'),
         ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view_all',
+        ];
+    }
+
+    /**
+     * @return Builder<Story>
+     */
+    public static function getEloquentQuery(): Builder
+    {
+        $query = parent::getEloquentQuery();
+
+        if (! static::canViewAll()) {
+            $query->where('creator_id', Filament::auth()->id());
+        }
+
+        return $query;
     }
 
     public static function getPluralModelLabel(): string
