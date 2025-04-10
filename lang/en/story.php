@@ -11,6 +11,7 @@ return [
         'select_cover_media' => 'Select Cover Media',
         'status' => [
             'draft' => 'Draft',
+            'pending' => 'Pending',
             'publish' => 'Publish',
         ],
         'title' => 'Title',

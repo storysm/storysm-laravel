@@ -11,6 +11,7 @@ return [
         'select_cover_media' => 'Pilih Media Sampul',
         'status' => [
             'draft' => 'Konsep',
+            'pending' => 'Tunda',
             'publish' => 'Terbit',
         ],
         'title' => 'Judul',

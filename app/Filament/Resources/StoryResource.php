@@ -151,7 +151,13 @@ class StoryResource extends Resource implements HasShieldPermissions
                     ->label(__('story.resource.title'))
                     ->limit(30),
                 Tables\Columns\TextColumn::make('status')
-                    ->badge(),
+                    ->badge()
+                    ->formatStateUsing(function (Story $record, $state) {
+                        return match ($record->status) {
+                            Status::Publish => $record->published_at > now() ? __('story.resource.status.pending') : $state,
+                            default => $state,
+                        };
+                    }),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator'))) : null,
                 Tables\Columns\TextColumn::make('published_at')
