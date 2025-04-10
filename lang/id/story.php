@@ -7,6 +7,7 @@ return [
         'content' => 'Konten',
         'cover_media' => 'Media Sampul',
         'model_label' => 'Cerita|Cerita',
+        'published_at' => 'Tanggal Terbit',
         'select_cover_media' => 'Pilih Media Sampul',
         'title' => 'Judul',
     ],

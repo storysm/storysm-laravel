@@ -8,6 +8,7 @@ use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\Story;
 use App\Utils\Locale;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
+use Awcodes\Curator\Components\Tables\CuratorColumn;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -15,7 +16,6 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
-use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Builder;
@@ -25,7 +25,7 @@ class StoryResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Story::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
     public static function canViewAll(): bool
     {
@@ -136,29 +136,35 @@ class StoryResource extends Resource implements HasShieldPermissions
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([
-                Tables\Columns\TextColumn::make('id')
-                    ->label('ID')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('creator.name')
-                    ->searchable(),
-                Tables\Columns\TextColumn::make('cover_media_id')
-                    ->searchable(),
+            ->columns(array_filter([
+                CuratorColumn::make('cover_media_id')
+                    ->label(__('story.resource.cover_media'))
+                    ->size(40),
+                Tables\Columns\TextColumn::make('title')
+                    ->label(__('story.resource.title'))
+                    ->limit(30),
+                static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
+                    ->label(ucfirst(__('validation.attributes.creator'))) : null,
                 Tables\Columns\TextColumn::make('published_at')
                     ->dateTime()
+                    ->label(__('story.resource.published_at'))
+                    ->toggleable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
+                    ->label(ucfirst(__('validation.attributes.created_at')))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime()
+                    ->label(ucfirst(__('validation.attributes.updated_at')))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ])
+            ]))
             ->actions([
-                ActionGroup::make([
+                Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
