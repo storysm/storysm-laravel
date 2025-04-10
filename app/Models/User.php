@@ -167,6 +167,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         if ($this->pages()->exists()) {
             return true;
         }
+        if ($this->stories()->exists()) {
+            return true;
+        }
 
         return false;
     }
@@ -209,5 +212,13 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function profilePhotoMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'profile_photo_media_id');
+    }
+
+    /**
+     * @return HasMany<Story, $this>
+     */
+    public function stories(): HasMany
+    {
+        return $this->hasMany(Story::class, 'creator_id');
     }
 }

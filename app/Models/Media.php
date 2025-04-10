@@ -87,11 +87,22 @@ class Media extends CuratorMedia
 
     public function isReferenced(): bool
     {
+        if ($this->stories()->exists()) {
+            return true;
+        }
         if ($this->usersWithThisAsProfilePhoto()->exists()) {
             return true;
         }
 
         return false;
+    }
+
+    /**
+     * @return HasMany<Story, $this>
+     */
+    public function stories(): HasMany
+    {
+        return $this->hasMany(Story::class, 'cover_media_id');
     }
 
     /**
