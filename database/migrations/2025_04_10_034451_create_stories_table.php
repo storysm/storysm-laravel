@@ -20,6 +20,7 @@ return new class extends Migration
                 ->constrained('media');
             $table->json('title');
             $table->json('content');
+            $table->string('status');
             $table->dateTime('published_at')->nullable()->index();
             $table->timestamps();
         });

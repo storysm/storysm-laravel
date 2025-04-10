@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasCreatorAttribute;
+use App\Enums\Story\Status;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -16,6 +17,7 @@ use Spatie\Translatable\HasTranslations;
  * @property ?string $cover_media_id
  * @property string $title
  * @property string $content
+ * @property Status $status
  * @property ?Carbon $published_at
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
@@ -43,6 +45,7 @@ class Story extends Model
     protected $casts = [
         'id' => 'string',
         'published_at' => 'datetime',
+        'status' => Status::class,
     ];
 
     /**

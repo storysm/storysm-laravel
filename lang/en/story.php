@@ -9,6 +9,10 @@ return [
         'model_label' => 'Story|Stories',
         'published_at' => 'Published at',
         'select_cover_media' => 'Select Cover Media',
+        'status' => [
+            'draft' => 'Draft',
+            'publish' => 'Publish',
+        ],
         'title' => 'Title',
     ],
 ];

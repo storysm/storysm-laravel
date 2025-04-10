@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Story\Status;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\StoryResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
@@ -70,6 +71,12 @@ class StoryResource extends Resource implements HasShieldPermissions
                         'sm' => 4,
                     ]),
                     Forms\Components\Group::make([
+                        Forms\Components\Section::make([
+                            Forms\Components\Radio::make('status')
+                                ->default(Status::Draft)
+                                ->options(Status::class)
+                                ->required(),
+                        ]),
                         Forms\Components\Section::make([
                             Forms\Components\DateTimePicker::make('published_at')
                                 ->default(now()),
@@ -143,6 +150,8 @@ class StoryResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('title')
                     ->label(__('story.resource.title'))
                     ->limit(30),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge(),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator'))) : null,
                 Tables\Columns\TextColumn::make('published_at')

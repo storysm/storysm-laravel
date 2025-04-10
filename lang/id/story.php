@@ -9,6 +9,10 @@ return [
         'model_label' => 'Cerita|Cerita',
         'published_at' => 'Tanggal Terbit',
         'select_cover_media' => 'Pilih Media Sampul',
+        'status' => [
+            'draft' => 'Konsep',
+            'publish' => 'Terbit',
+        ],
         'title' => 'Judul',
     ],
 ];
