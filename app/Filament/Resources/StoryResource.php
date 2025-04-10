@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\StoryResource\Pages;
 use App\Models\Story;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
@@ -10,6 +11,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -111,11 +113,13 @@ class StoryResource extends Resource implements HasShieldPermissions
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    ReferenceAwareDeleteBulkAction::make(),
                 ]),
             ]);
     }

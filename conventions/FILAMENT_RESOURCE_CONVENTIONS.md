@@ -2,6 +2,10 @@
 
 These conventions aim to improve code clarity and static analysis using PHPStan.
 
+## Imports
+
+-   **Top-Level Imports:** Use top-level imports for classes and interfaces.
+
 ## Model Labels and Plural Model Labels
 
 -   Each Filament Resource should override the `getModelLabel()` and `getPluralModelLabel()` methods.
@@ -54,6 +58,8 @@ These conventions aim to improve code clarity and static analysis using PHPStan.
 
     Where `{permissions}` is the permissions associated with the Filament Resource (e.g., `view_all`).
 
-## Imports
+## Table and Bulk Actions
 
--   **Top-Level Imports:** Use top-level imports for classes and interfaces.
+-   **Table Actions Grouping:** All individual actions displayed in the table row (e.g., Edit, View, Delete) must be grouped together within a `Tables\Actions\ActionGroup`.
+-   **Bulk Actions Grouping:** All bulk actions (actions that apply to multiple selected rows) must be grouped together within a `Tables\Actions\BulkActionGroup`.
+-   **Deletion Handling:** When implementing a bulk delete action, always use `ReferenceAwareDeleteBulkAction` instead of the standard `Tables\Actions\DeleteBulkAction`. This ensures proper handling of potential data integrity issues related to foreign key constraints or other data dependencies.
