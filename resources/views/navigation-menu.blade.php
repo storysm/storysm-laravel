@@ -79,6 +79,13 @@
                         </span>
                     </x-nav-link>
                 @endauth
+                <x-menu-border />
+                <x-nav-link wire:navigate href="{{ route('stories.index') }}" :active="request()->routeIs('stories.index')"
+                    icon="heroicon-o-document-text">
+                    <span class="flex items-center gap-2">
+                        {{ trans_choice('story.resource.model_label', 2) }}
+                    </span>
+                </x-nav-link>
                 @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
                     <x-menu-border />
                     <x-nav-link wire:navigate href="{{ route('terms.show') }}" :active="request()->routeIs('terms.show')"

@@ -11,6 +11,7 @@ Route::get('/', function () {
 })->name('home');
 
 require __DIR__.'/resources/page.php';
+require __DIR__.'/resources/story.php';
 
 Route::group(['middleware' => ['auth:sanctum', 'json']], function () {
     require __DIR__.'/resources/user.php';
