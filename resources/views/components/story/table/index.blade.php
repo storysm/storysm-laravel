@@ -1,5 +1,5 @@
 @php
-    $record = $getRecord();
+    $story = $getRecord();
 @endphp
 
 {{-- Card Container --}}
@@ -11,39 +11,44 @@
 
         {{-- Left: Cover Media (1/3 width) --}}
         <div class="flex-shrink-0 overflow-hidden basis-1/3">
-            @if ($record->coverMedia)
-                <img src="{{ $record->coverMedia->url }}" alt="{{ $record->coverMedia->alt }}"
-                    class="object-cover w-full h-full">
-            @else
-                {{-- Placeholder if no cover media --}}
-                <div class="flex flex-col items-center justify-center h-full bg-gray-300 dark:bg-gray-700 rounded-l-xl">
-                    <x-filament::icon alias="story-card.cover-media" class="w-6 h-6 text-gray-500 dark:text-gray-400"
-                        icon="heroicon-o-eye-slash" />
-                </div>
-            @endif
+            <a wire:navigate href="{{ route('stories.show', ['story' => $story]) }}">
+                @if ($story->coverMedia)
+                    <img src="{{ $story->coverMedia->url }}" alt="{{ $story->coverMedia->alt }}"
+                        class="object-cover w-full h-full">
+                @else
+                    {{-- Placeholder if no cover media --}}
+                    <div
+                        class="flex flex-col items-center justify-center h-full bg-gray-300 dark:bg-gray-700 rounded-l-xl">
+                        <x-filament::icon alias="story-card.cover-media" class="w-6 h-6 text-gray-500 dark:text-gray-400"
+                            icon="heroicon-o-eye-slash" />
+                    </div>
+                @endif
+            </a>
         </div>
 
         {{-- Right: Content (2/3 width) --}}
         <div class="flex flex-col justify-between p-2 space-y-1 basis-2/3">
             <div class="flex flex-row">
                 {{-- Title --}}
-                <p class="text-lg font-semibold line-clamp-2" title="{{ $record->title }}">
-                    {{ $record->title }}
-                </p>
-                <livewire:story.actions :class="'-mt-2 -mr-2'" :story="$record" />
+                <a wire:navigate href="{{ route('stories.show', ['story' => $story]) }}">
+                    <p class="text-lg font-semibold line-clamp-2" title="{{ $story->title }}">
+                        {{ $story->title }}
+                    </p>
+                </a>
+                <livewire:story.actions :class="'-mt-2 -mr-2'" :story="$story" />
             </div>
 
             {{-- Creator --}}
-            <x-story.meta icon="heroicon-m-user" title="{{ $record->creator->name }}">
-                {{ $record->creator->name }}
+            <x-story.meta icon="heroicon-m-user" title="{{ $story->creator->name }}">
+                {{ $story->creator->name }}
             </x-story.meta>
 
             <span class="flex-grow"></span>
 
             {{-- Published Date --}}
-            @if ($record->published_at)
-                <x-story.meta title="{{ $record->published_at->format('Y-m-d H:i') }}" icon="heroicon-m-calendar-days">
-                    {{ $record->published_at->format('Y-m-d H:i') }}
+            @if ($story->published_at)
+                <x-story.meta title="{{ $story->published_at->format('Y-m-d H:i') }}" icon="heroicon-m-calendar-days">
+                    {{ $story->published_at->format('Y-m-d H:i') }}
                 </x-story.meta>
             @endif
         </div>
