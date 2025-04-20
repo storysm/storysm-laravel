@@ -25,10 +25,13 @@
 
         {{-- Right: Content (2/3 width) --}}
         <div class="flex flex-col justify-between p-2 space-y-1 basis-2/3">
-            {{-- Title --}}
-            <p class="text-lg font-semibold line-clamp-1" title="{{ $record->title }}">
-                {{ $record->title }}
-            </p>
+            <div class="flex flex-row">
+                {{-- Title --}}
+                <p class="text-lg font-semibold line-clamp-2" title="{{ $record->title }}">
+                    {{ $record->title }}
+                </p>
+                <livewire:story.actions :class="'-mt-2 -mr-2'" :story="$record" />
+            </div>
 
             {{-- Creator --}}
             <x-story.meta icon="heroicon-m-user" title="{{ $record->creator->name }}">
