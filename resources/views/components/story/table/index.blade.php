@@ -12,13 +12,13 @@
         {{-- Left: Cover Media (1/3 width) --}}
         <div class="flex-shrink-0 overflow-hidden basis-1/3">
             @if ($record->coverMedia)
-                <img src="{{ $record->coverMedia->url }}" alt="{{ $record->coverMedia->alt ?? 'Story Cover' }}"
-                    {{-- Use
-                    ->url directly --}} class="object-cover w-full h-full">
+                <img src="{{ $record->coverMedia->url }}" alt="{{ $record->coverMedia->alt }}"
+                    class="object-cover w-full h-full">
             @else
                 {{-- Placeholder if no cover media --}}
-                <div class="flex items-center justify-center w-full h-full text-sm">
-                    {{ __('story.resource.no_cover_media') }}
+                <div class="flex flex-col items-center justify-center h-full bg-gray-300 dark:bg-gray-700 rounded-l-xl">
+                    <x-filament::icon alias="story-card.cover-media" class="w-6 h-6 text-gray-500 dark:text-gray-400"
+                        icon="heroicon-o-eye-slash" />
                 </div>
             @endif
         </div>
