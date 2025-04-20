@@ -1,3 +1,7 @@
+@php
+    $currentLocale = app()->getLocale();
+@endphp
+
 <x-filament::dropdown placement="bottom-end" teleport>
     <x-slot name="trigger">
         <button aria-label="{{ __('navigation-menu.language_switcher.open_language_switcher') }}" type="button"
@@ -9,14 +13,10 @@
             <x-filament::icon icon="heroicon-m-chevron-down" color="gray" class="size-3" />
         </button>
     </x-slot>
-    <x-filament::dropdown.list x-data="languageSwitcher" x-init="switchLanguage('{{ app()->getLocale() }}')">
-        <x-filament::dropdown.list.item x-on:click="switchLanguage('id')"
-            href="{{ request()->fullUrlWithQuery(['lang' => 'id']) }}" tag="a">
-            Bahasa Indonesia
-        </x-filament::dropdown.list.item>
-        <x-filament::dropdown.list.item x-on:click="switchLanguage('en')"
-            href="{{ request()->fullUrlWithQuery(['lang' => 'en']) }}" tag="a">
-            English
-        </x-filament::dropdown.list.item>
+    <x-filament::dropdown.list class="space-y-1" x-data="languageSwitcher" x-init="switchLanguage('{{ $currentLocale }}')">
+        <x-navigation-menu.language-switcher-item locale="id" languageName="Bahasa Indonesia" :currentLocale="$currentLocale"
+            x-on:click="switchLanguage('id')" />
+        <x-navigation-menu.language-switcher-item locale="en" languageName="English" :currentLocale="$currentLocale"
+            x-on:click="switchLanguage('en')" />
     </x-filament::dropdown.list>
 </x-filament::dropdown>
