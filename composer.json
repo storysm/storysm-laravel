@@ -40,7 +40,8 @@
         "laravel/sail": "^1.41.0",
         "mockery/mockery": "^1.6.12",
         "nunomaduro/collision": "^8.8.0",
-        "phpunit/phpunit": "^11.5.17"
+        "phpunit/phpunit": "^11.5.17",
+        "prism-php/prism": "^0.61.0"
     },
     "autoload": {
         "psr-4": {
@@ -81,7 +82,8 @@
         ],
         "test": [
             "npm run build",
-            "php artisan test"
+            "@php artisan config:clear --ansi",
+            "@php artisan test"
         ]
     },
     "extra": {
