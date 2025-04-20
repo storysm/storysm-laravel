@@ -16,4 +16,7 @@ return [
         ],
         'title' => 'Judul',
     ],
+    'table' => [
+        'view_all' => 'Lihat Semua Cerita',
+    ],
 ];

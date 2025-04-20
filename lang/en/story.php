@@ -16,4 +16,7 @@ return [
         ],
         'title' => 'Title',
     ],
+    'table' => [
+        'view_all' => 'View All Stories',
+    ],
 ];
