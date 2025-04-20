@@ -27,17 +27,19 @@ class Actions extends Component implements HasActions, HasForms
         $this->class = $class;
     }
 
-    public function canEdit(): bool
-    {
-        return StoryResource::canEdit($this->story);
-    }
-
     public function editAction(): Action
     {
         return Action::make('edit')
-            ->authorize($this->canEdit())
+            ->authorize(StoryResource::canEdit($this->story))
             ->icon('heroicon-m-pencil')
             ->url(route('filament.admin.resources.stories.edit', ['record' => $this->story]));
+    }
+
+    public function viewAction(): Action
+    {
+        return Action::make('view')
+            ->icon('heroicon-m-eye')
+            ->url(route('stories.show', ['story' => $this->story]));
     }
 
     public function render(): View
