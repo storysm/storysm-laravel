@@ -6,6 +6,7 @@ use App\Enums\Story\Status;
 use App\Models\Media;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Carbon;
 
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Story>
@@ -31,7 +32,18 @@ class StoryFactory extends Factory
                 'fr' => fake()->paragraph(),
             ],
             'status' => Status::Draft,
-            'published_at' => $this->faker->dateTimeThisMonth,
+            'published_at' => null,
         ];
+    }
+
+    /**
+     * Indicate that the story is published.
+     */
+    public function ensurePublished(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => Status::Publish,
+            'published_at' => Carbon::now(),
+        ]);
     }
 }

@@ -2,15 +2,16 @@
 
 use App\Enums\Page\Status;
 use App\Http\Controllers\SitemapController;
+use App\Livewire\Home;
 use App\Models\Page;
 use Illuminate\Support\Facades\Route;
 use Laravel\Jetstream\Jetstream;
 
-Route::get('/', function () {
-    return view('welcome');
-})->name('home');
+Route::get('/', Home::class)
+    ->name('home');
 
 require __DIR__.'/resources/page.php';
+require __DIR__.'/resources/story.php';
 
 Route::group(['middleware' => ['auth:sanctum', 'json']], function () {
     require __DIR__.'/resources/user.php';

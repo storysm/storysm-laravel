@@ -4,11 +4,14 @@ namespace Tests\Feature\Filament\Resources;
 
 use App\Enums\Story\Status;
 use App\Filament\Resources\StoryResource;
+use App\Filament\Resources\StoryResource\Pages\ListStories;
 use App\Models\Permission;
 use App\Models\Story;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Livewire\Features\SupportTesting\Testable;
+use Livewire\Livewire;
 use Tests\TestCase;
 
 class StoryResourceTest extends TestCase
@@ -107,5 +110,27 @@ class StoryResourceTest extends TestCase
             ->assertOk()
             ->assertSee($story->title)
             ->assertSee($otherStory->title);
+    }
+
+    public function test_renders_the_story_resource_table_with_view_action_and_record_url(): void
+    {
+        $this->actingAs($this->user);
+
+        $story = Story::factory()->create([
+            'creator_id' => $this->user->id,
+        ]);
+
+        /** @var Testable */
+        $testable = Livewire::test(ListStories::class);
+
+        $testable->assertTableActionExists('view');
+        $testable->assertTableActionHasUrl('view', route('stories.show', $story), $story);
+        $testable->assertCanSeeTableRecords([$story]);
+
+        /** @var ListStories */
+        $instance = $testable->instance();
+        $table = $instance->getTable();
+
+        $this->assertEquals($table->getRecordUrl($story), route('filament.admin.resources.stories.edit', $story));
     }
 }

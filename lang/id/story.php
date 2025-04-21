@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'action' => [
+        'edit' => 'Ubah', // Or 'Edit', depending on preferred Indonesian term
+    ],
     'resource' => [
         'content' => 'Konten',
         'cover_media' => 'Media Sampul',
@@ -15,5 +18,8 @@ return [
             'publish' => 'Terbit',
         ],
         'title' => 'Judul',
+    ],
+    'table' => [
+        'view_all' => 'Lihat Semua Cerita',
     ],
 ];

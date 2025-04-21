@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'action' => [
+        'edit' => 'Edit',
+    ],
     'resource' => [
         'content' => 'Content',
         'cover_media' => 'Cover Media',
@@ -15,5 +18,8 @@ return [
             'publish' => 'Publish',
         ],
         'title' => 'Title',
+    ],
+    'table' => [
+        'view_all' => 'View All Stories',
     ],
 ];

@@ -102,6 +102,11 @@ class StoryResource extends Resource implements HasShieldPermissions
         return trans_choice('story.resource.model_label', 1);
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
+
     public static function getPages(): array
     {
         return [
@@ -178,6 +183,8 @@ class StoryResource extends Resource implements HasShieldPermissions
             ]))
             ->actions([
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->url(fn (Story $record) => route('stories.show', $record)),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),
@@ -186,6 +193,7 @@ class StoryResource extends Resource implements HasShieldPermissions
                 Tables\Actions\BulkActionGroup::make([
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->recordUrl(fn (Story $record) => route('filament.admin.resources.stories.edit', $record));
     }
 }
