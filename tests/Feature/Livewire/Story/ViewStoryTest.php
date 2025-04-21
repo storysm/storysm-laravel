@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Livewire;
+namespace Tests\Feature\Livewire\Story;
 
 use App\Livewire\Story\ViewStory;
 use App\Models\Media;
