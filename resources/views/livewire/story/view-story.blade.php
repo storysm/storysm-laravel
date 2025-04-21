@@ -1,6 +1,6 @@
 <div>
-    <x-header :breadcrumbs="$this->getBreadcrumbs()">
-        {{ $story->title }} {{-- Display story title --}}
+    <x-header :breadcrumbs="$this->getBreadcrumbs()" :actions="$this->getActions()">
+        {{ $story->title }}
     </x-header>
 
     <x-container>

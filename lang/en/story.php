@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'action' => [
+        'edit' => 'Edit',
+    ],
     'resource' => [
         'content' => 'Content',
         'cover_media' => 'Cover Media',

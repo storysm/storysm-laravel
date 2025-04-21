@@ -2,14 +2,23 @@
 
 namespace App\Livewire\Story;
 
-use App\Models\Story; // Import the Story model
+use App\Filament\Resources\StoryResource;
+use App\Models\Story;
 use Artesaos\SEOTools\Facades\SEOTools;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
-class ViewStory extends Component
+class ViewStory extends Component implements HasActions, HasForms
 {
+    use InteractsWithActions;
+    use InteractsWithForms;
+
     public Story $story;
 
     public function mount(Story $story): void
@@ -34,6 +43,20 @@ class ViewStory extends Component
         }
 
         $this->story = $story;
+    }
+
+    /**
+     * @return array<Action>
+     */
+    public function getActions(): array
+    {
+        $actions = [];
+        $actions[] = Action::make('edit')
+            ->authorize(StoryResource::canEdit($this->story))
+            ->label(__('story.action.edit'))
+            ->url(route('filament.admin.resources.stories.edit', $this->story));
+
+        return $actions;
     }
 
     /**

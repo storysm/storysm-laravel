@@ -3,6 +3,9 @@
 declare(strict_types=1);
 
 return [
+    'action' => [
+        'edit' => 'Ubah', // Or 'Edit', depending on preferred Indonesian term
+    ],
     'resource' => [
         'content' => 'Konten',
         'cover_media' => 'Media Sampul',
