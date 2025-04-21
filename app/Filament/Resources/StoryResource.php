@@ -102,6 +102,11 @@ class StoryResource extends Resource implements HasShieldPermissions
         return trans_choice('story.resource.model_label', 1);
     }
 
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
+
     public static function getPages(): array
     {
         return [
