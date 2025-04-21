@@ -13,6 +13,8 @@ class EditStory extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\ViewAction::make()
+                ->url(fn () => route('stories.show', $this->getRecord())),
             Actions\DeleteAction::make(),
         ];
     }
