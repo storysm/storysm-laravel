@@ -4,8 +4,11 @@ namespace Tests\Feature\Livewire\Story;
 
 use App\Livewire\Story\ViewStory;
 use App\Models\Media;
+use App\Models\Permission;
 use App\Models\Story;
+use App\Models\User;
 use Artesaos\SEOTools\Facades\SEOTools;
+use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
@@ -134,5 +137,78 @@ class ViewStoryTest extends TestCase
         $this->assertEquals(__('navigation-menu.menu.home'), $breadcrumbs[route('home')]);
         $this->assertEquals(trans_choice('story.resource.model_label', 2), $breadcrumbs[route('stories.index')]);
         $this->assertEquals(Str::limit($story->title, 50), $breadcrumbs[0]);
+    }
+
+    public function test_view_story_component_generates_edit_action_when_authorized(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $story = Story::factory()->create([
+            'creator_id' => $user->id,
+        ]);
+
+        $component = new ViewStory;
+        $component->story = $story;
+
+        $actions = $component->getActions();
+
+        $this->assertCount(1, $actions);
+        $action = $actions[0];
+
+        $this->assertInstanceOf(Action::class, $action);
+        $this->assertEquals('edit', $action->getName());
+        $this->assertEquals(__('story.action.edit'), $action->getLabel());
+        $this->assertEquals(route('filament.admin.resources.stories.edit', $story),
+            $action->getUrl());
+        $this->assertTrue($action->isAuthorized()); // Assert the action is authorized
+    }
+
+    public function test_view_story_component_generates_edit_action_when_not_authorized(): void
+    {
+        $story = Story::factory()->create();
+
+        $component = new ViewStory;
+        $component->story = $story;
+
+        $actions = $component->getActions();
+
+        $this->assertCount(1, $actions);
+        $action = $actions[0];
+
+        $this->assertInstanceOf(Action::class, $action);
+        $this->assertEquals('edit', $action->getName());
+        $this->assertEquals(__('story.action.edit'), $action->getLabel());
+        $this->assertEquals(route('filament.admin.resources.stories.edit', $story),
+            $action->getUrl());
+        $this->assertFalse($action->isAuthorized()); // Assert the action is NOT authorized
+    }
+
+    public function test_view_story_component_generates_edit_action_for_user_with_view_all_permission(): void
+    {
+        Permission::firstOrCreate(['name' => 'view_all_story']);
+
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        $user->givePermissionTo('view_all_story');
+
+        // Create a story where the user is NOT the creator
+        $story = Story::factory()->create();
+        $this->assertNotEquals($user->id, $story->creator_id);
+
+        $component = new ViewStory;
+        $component->story = $story;
+
+        $actions = $component->getActions();
+
+        $this->assertCount(1, $actions);
+        $action = $actions[0];
+
+        $this->assertInstanceOf(Action::class, $action);
+        $this->assertEquals('edit', $action->getName());
+        $this->assertTrue($action->isAuthorized()); // Assert the action is authorized
     }
 }
