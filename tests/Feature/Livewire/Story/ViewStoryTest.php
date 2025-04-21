@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Livewire\Story;
 
+use App\Enums\Story\Status;
 use App\Livewire\Story\ViewStory;
 use App\Models\Media;
 use App\Models\Permission;
@@ -13,6 +14,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
+use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -28,10 +30,12 @@ class ViewStoryTest extends TestCase
 
     public function test_view_story_component_renders_with_story(): void
     {
-        $story = Story::factory()->create([
-            'title' => 'Test Story Title',
-            'content' => '<p>This is the test story content.</p>',
-        ]);
+        $story = Story::factory()
+            ->ensurePublished()
+            ->create([
+                'title' => 'Test Story Title',
+                'content' => '<p>This is the test story content.</p>',
+            ]);
 
         Livewire::test(ViewStory::class, ['story' => $story])
             ->assertViewIs('livewire.story.view-story')
@@ -41,10 +45,12 @@ class ViewStoryTest extends TestCase
 
     public function test_view_story_component_sets_seo_metadata_without_cover(): void
     {
-        $story = Story::factory()->create([
-            'title' => 'Test Story Title',
-            'content' => '<p>This is the test story content.</p>',
-        ]);
+        $story = Story::factory()
+            ->ensurePublished()
+            ->create([
+                'title' => 'Test Story Title',
+                'content' => '<p>This is the test story content.</p>',
+            ]);
 
         $expectedDescription = Str::limit(strip_tags($story->content), 160);
 
@@ -74,10 +80,12 @@ class ViewStoryTest extends TestCase
     public function test_view_story_component_sets_seo_metadata_with_cover(): void
     {
         /** @var Story */
-        $story = Story::factory()->create([
-            'title' => 'Test Story Title',
-            'content' => '<p>This is the test story content.</p>',
-        ]);
+        $story = Story::factory()
+            ->ensurePublished()
+            ->create([
+                'title' => 'Test Story Title',
+                'content' => '<p>This is the test story content.</p>',
+            ]);
 
         $originalPath = 'test.png';
         $image = Image::canvas(100, 100, 'ffffff');
@@ -138,6 +146,62 @@ class ViewStoryTest extends TestCase
         $this->assertEquals(trans_choice('story.resource.model_label', 2), $breadcrumbs[route('stories.index')]);
         $this->assertEquals(Str::limit($story->title, 50), $breadcrumbs[0]);
     }
+
+    public function test_allows_guest_to_view_published_story(): void
+    {
+        $story = Story::factory()
+            ->ensurePublished()
+            ->create();
+
+        Livewire::test(ViewStory::class, ['story' => $story])
+            ->assertStatus(200);
+    }
+
+    public function test_returns_404_for_guest_trying_to_view_draft_story(): void
+    {
+        $story = Story::factory()->create(['status' => Status::Draft]);
+
+        Livewire::test(ViewStory::class, ['story' => $story])
+            ->assertStatus(404);
+    }
+
+    public function test_allows_authenticated_user_to_view_published_story(): void
+    {
+        $user = User::factory()->create();
+        $story = Story::factory()
+            ->ensurePublished()
+            ->create();
+
+        /** @var Testable */
+        $testable = Livewire::actingAs($user)
+            ->test(ViewStory::class, ['story' => $story]);
+        $testable->assertStatus(200);
+    }
+
+    public function test_returns_404_for_authenticated_user_trying_to_view_draft_story_they_did_not_create_and_have_no_permission_for(): void
+    {
+        $user = User::factory()->create();
+        $story = Story::factory()->create(['status' => Status::Draft]); // Created by another user
+
+        /** @var Testable */
+        $testable = Livewire::actingAs($user)
+            ->test(ViewStory::class, ['story' => $story]);
+        $testable->assertStatus(404);
+    }
+
+    public function test_allows_story_creator_to_view_their_own_draft_story(): void
+    {
+        $creator = User::factory()->create();
+        $story = Story::factory()->create(['status' => Status::Draft, 'creator_id' => $creator->id]);
+
+        /** @var Testable */
+        $testable = Livewire::actingAs($creator)
+            ->test(ViewStory::class, ['story' => $story]);
+        $testable->assertStatus(200);
+    }
+
+    // Note: Test for user with 'view_all_story' permission is covered by the existing
+    // test_view_story_component_generates_edit_action_for_user_with_view_all_permission
 
     public function test_view_story_component_generates_edit_action_when_authorized(): void
     {

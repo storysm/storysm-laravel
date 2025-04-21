@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Enums\Story\Status;
 use App\Models\Story;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -28,6 +29,15 @@ class StoryPolicy
     public function viewAll(User $user): bool
     {
         return $user->can('view_all_story');
+    }
+
+    /**
+     * Determine whether the user can view the model on the public frontend.
+     */
+    public function viewPublic(?User $user, Story $story): bool
+    {
+        // If the story is a draft, only the creator or someone with 'view_all_story' can view it.
+        return $story->status !== Status::Draft || ($user && ($user->is($story->creator) || $this->viewAll($user)));
     }
 
     /**

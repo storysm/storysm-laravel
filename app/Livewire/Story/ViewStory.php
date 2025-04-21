@@ -23,6 +23,12 @@ class ViewStory extends Component implements HasActions, HasForms
 
     public function mount(Story $story): void
     {
+        try {
+            $this->authorize('viewPublic', $story);
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            abort(404);
+        }
+
         $description = Str::limit(strip_tags($story->content), 160);
 
         SEOTools::setTitle($story->title);
