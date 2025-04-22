@@ -34,6 +34,47 @@ class StoryTest extends TestCase
         ];
     }
 
+    /**
+     * Data provider for test_formatted_view_count_formats_correctly.
+     *
+     * @return array<string, array<int|string>>
+     */
+    public static function viewCountFormattingProvider(): array
+    {
+        return [
+            'less than 1000' => [999, '999'],
+            'exactly 1000' => [1000, '1K'],
+            'thousands with decimal' => [1300, '1.3K'],
+            'thousands with whole number' => [2500, '2.5K'],
+            'thousands just under 1000K' => [999000, '999K'],
+            'just under 1 million' => [999999, '999.9K'],
+            'exactly 1 million' => [1000000, '1M'],
+            'millions with decimal' => [1500000, '1.5M'],
+            'millions with whole number' => [5000000, '5M'],
+            'millions just under 1000M' => [999000000, '999M'],
+            'just under 1 billion' => [999999999, '999.9M'],
+            'exactly 1 billion' => [1000000000, '1B'],
+            'billions with decimal' => [1200000000, '1.2B'],
+            'billions just under 1000B' => [999000000000, '999B'],
+            'just under 1 trillion' => [999999999999, '999.9B'],
+            'exactly 1 trillion' => [1000000000000, '1T'],
+            'trillions with decimal' => [2500000000000, '2.5T'],
+            'zero' => [0, '0'],
+        ];
+    }
+
+    /**
+     * Test that formattedViewCount formats the view count correctly with suffixes.
+     *
+     * @dataProvider viewCountFormattingProvider
+     */
+    public function test_formatted_view_count_formats_correctly(int $viewCount, string $expectedFormat): void
+    {
+        $story = Story::factory()->create(['view_count' => $viewCount]);
+
+        $this->assertEquals($expectedFormat, $story->formattedViewCount());
+    }
+
     public function test_increment_view_count_protected_by_session_and_time(): void
     {
         // Use Carbon to control time during the test

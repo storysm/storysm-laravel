@@ -47,7 +47,7 @@
 
             {{-- View Count --}}
             <x-story.meta icon="heroicon-m-eye" iconClass="size-2">
-                <p class="text-xs">{{ $story->view_count }}</p>
+                <p class="text-xs">{{ $story->formattedViewCount() }}</p>
             </x-story.meta>
         </div>
     </div>
