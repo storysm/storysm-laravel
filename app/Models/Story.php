@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Session;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -47,12 +48,15 @@ class Story extends Model
         'id' => 'string',
         'published_at' => 'datetime',
         'status' => Status::class,
+        'view_count' => 'integer',
     ];
 
     /**
      * @var array<int, string>
      */
-    protected $guarded = [];
+    protected $guarded = [
+        'view_count',
+    ];
 
     /**
      * @return BelongsTo<Media, $this>
@@ -60,6 +64,41 @@ class Story extends Model
     public function coverMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'cover_media_id');
+    }
+
+    /**
+     * Increment the view count, protected by session to prevent abuse.
+     */
+    public function incrementViewCount(): void
+    {
+        // Get the array of viewed story IDs and their last view timestamps from the session
+        // The structure will be [story_id => last_view_timestamp]
+        /** @var array<string, int> $viewedStories */
+        $viewedStories = Session::get('viewed_stories', []);
+
+        $storyId = $this->id;
+        $currentTime = intval(Carbon::now()->timestamp); // Get current Unix timestamp
+
+        // Check if the story has been viewed in this session before
+        if (! isset($viewedStories[$storyId])) {
+            // First view in this session: Increment and record timestamp
+            $this->increment('view_count');
+            $viewedStories[$storyId] = $currentTime;
+        } else {
+            // Story has been viewed before in this session
+            $lastViewTime = $viewedStories[$storyId];
+
+            // Check if more than 60 seconds (1 minute) have passed since the last view
+            if ($currentTime - $lastViewTime > 60) {
+                // More than 1 minute passed: Increment and update timestamp
+                $this->increment('view_count');
+                $viewedStories[$storyId] = $currentTime; // Update the timestamp
+            }
+            // If less than or equal to 1 minute passed, do nothing.
+        }
+
+        // Store the updated list back in the session
+        Session::put('viewed_stories', $viewedStories);
     }
 
     public function isReferenced(): bool
