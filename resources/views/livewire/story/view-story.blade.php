@@ -1,6 +1,12 @@
 <div>
     <x-header :breadcrumbs="$this->getBreadcrumbs()" :actions="$this->getActions()">
-        {{ $story->title }}
+        <div class="flex flex-col gap-y-2">
+            {{ $story->title }}
+
+            <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
+                <p class="text-sm">{{ $story->formattedViewCount() }}</p>
+            </x-story.meta>
+        </div>
     </x-header>
 
     <x-container>

@@ -40,17 +40,15 @@
 
             {{-- Creator --}}
             <x-story.meta icon="heroicon-m-user" title="{{ $story->creator->name }}">
-                {{ $story->creator->name }}
+                <p class="text-sm">{{ $story->creator->name }}</p>
             </x-story.meta>
 
             <span class="flex-grow"></span>
 
-            {{-- Published Date --}}
-            @if ($story->published_at)
-                <x-story.meta title="{{ $story->published_at->format('Y-m-d H:i') }}" icon="heroicon-m-calendar-days">
-                    {{ $story->published_at->format('Y-m-d H:i') }}
-                </x-story.meta>
-            @endif
+            {{-- View Count --}}
+            <x-story.meta icon="heroicon-m-eye" iconClass="size-2">
+                <p class="text-xs">{{ $story->formattedViewCount() }}</p>
+            </x-story.meta>
         </div>
     </div>
 </div>

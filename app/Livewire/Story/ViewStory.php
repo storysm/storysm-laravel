@@ -49,6 +49,7 @@ class ViewStory extends Component implements HasActions, HasForms
         }
 
         $this->story = $story;
+        $this->story->incrementViewCount();
     }
 
     /**
