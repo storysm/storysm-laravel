@@ -120,7 +120,7 @@ php artisan llm:pr
 
 ## Upstream
 
-Apply any changes available from the Starter Kit Laravel [main branch](https://github.com/spektasoft/starter-kit-laravel/compare/dc8c4501fb9854e801726ca2e6fd22843204d494...main).
+Apply any changes available from the Starter Kit Laravel [main branch](https://github.com/spektasoft/starter-kit-laravel/compare/a545523f50f944330e357895e15e9843e056ee67...main).
 
 ## License
 

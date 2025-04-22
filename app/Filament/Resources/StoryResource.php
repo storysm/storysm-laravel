@@ -2,12 +2,12 @@
 
 namespace App\Filament\Resources;
 
+use App\Concerns\HasLocales;
 use App\Enums\Story\Status;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\StoryResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\Story;
-use App\Utils\Locale;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Awcodes\Curator\Components\Tables\CuratorColumn;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
@@ -24,6 +24,8 @@ use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class StoryResource extends Resource implements HasShieldPermissions
 {
+    use HasLocales;
+
     protected static ?string $model = Story::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
@@ -56,7 +58,7 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ];
                             })
                             ->columnSpanFull()
-                            ->locales(Locale::getSortedLocales())
+                            ->locales(static::getSortedLocales())
                             ->suffixLocaleLabel(),
                         Translate::make()
                             ->schema([
@@ -64,7 +66,7 @@ class StoryResource extends Resource implements HasShieldPermissions
                                     ->label(__('story.resource.content')),
                             ])
                             ->columnSpanFull()
-                            ->locales(Locale::getSortedLocales())
+                            ->locales(static::getSortedLocales())
                             ->suffixLocaleLabel(),
                     ])->columnSpan([
                         'default' => 1,
