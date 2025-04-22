@@ -221,4 +221,12 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     {
         return $this->hasMany(Story::class, 'creator_id');
     }
+
+    /**
+     * @return HasMany<Vote, $this>
+     */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(Vote::class, 'creator_id');
+    }
 }

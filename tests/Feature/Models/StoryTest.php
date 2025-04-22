@@ -4,7 +4,9 @@ namespace Tests\Feature\Models;
 
 use App\Enums\Story\Status;
 use App\Models\Story;
+use App\Models\Vote;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Session;
 use Tests\TestCase;
@@ -149,5 +151,60 @@ class StoryTest extends TestCase
         $this->assertTrue($pendingStories->contains($stories['pendingStory']));
         $this->assertFalse($pendingStories->contains($stories['publishedStoryPast']));
         $this->assertFalse($pendingStories->contains($stories['draftStory']));
+    }
+
+    public function test_story_has_many_votes(): void
+    {
+        $story = Story::factory()->create();
+        $votes = Vote::factory()->count(3)->for($story)->create();
+
+        $this->assertInstanceOf(Collection::class, $story->votes);
+        $this->assertCount(3, $story->votes);
+        $this->assertTrue($story->votes->contains($votes->firstOrFail()));
+    }
+
+    public function test_vote_related_attributes_are_guarded(): void
+    {
+        /** @var array<string, mixed> */
+        $data = Story::factory()->make()->toArray();
+
+        // Attempt to mass assign guarded attributes
+        $data['upvote_count'] = 99;
+        $data['downvote_count'] = 88;
+        $data['vote_count'] = 77;
+        $data['vote_score'] = 66;
+
+        // Use create to test mass assignment protection
+        $story = Story::create($data);
+
+        // The guarded attributes should not be set to the attempted values
+        $this->assertNotEquals(99, $story->upvote_count);
+        $this->assertNotEquals(88, $story->downvote_count);
+        $this->assertNotEquals(77, $story->vote_count);
+        $this->assertNotEquals(66, $story->vote_score);
+
+        // They should retain their default values (0 based on the migration)
+        $this->assertEquals(0, $story->upvote_count);
+        $this->assertEquals(0, $story->downvote_count);
+        $this->assertEquals(0, $story->vote_count);
+        $this->assertEquals(0, $story->vote_score);
+
+        // Verify in the database as well
+        $this->assertDatabaseHas('stories', [
+            'id' => $story->id,
+            'upvote_count' => 0,
+            'downvote_count' => 0,
+            'vote_count' => 0,
+            'vote_score' => 0,
+        ]);
+
+        // Ensure other attributes were set correctly
+        $locale = app()->getLocale();
+        /** @var string[] */
+        $titles = $data['title'];
+        /** @var string[] */
+        $contents = $data['content'];
+        $this->assertEquals($titles[$locale], $story->title);
+        $this->assertEquals($contents[$locale], $story->content);
     }
 }

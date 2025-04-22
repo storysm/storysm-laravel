@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Session;
 use Spatie\Translatable\HasTranslations;
@@ -20,6 +21,10 @@ use Spatie\Translatable\HasTranslations;
  * @property string $title
  * @property string $content
  * @property Status $status
+ * @property int $upvote_count
+ * @property int $downvote_count
+ * @property int $vote_count
+ * @property int $vote_score
  * @property ?Carbon $published_at
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
@@ -56,6 +61,10 @@ class Story extends Model
      */
     protected $guarded = [
         'view_count',
+        'upvote_count',
+        'downvote_count',
+        'vote_count',
+        'vote_score',
     ];
 
     /**
@@ -112,7 +121,7 @@ class Story extends Model
         // We use '.' for decimal point and '' for thousands separator.
         $formattedNumber = number_format($finalValue, $finalPrecision, '.', '');
 
-        return $formattedNumber . $suffixes[$i];
+        return $formattedNumber.$suffixes[$i];
     }
 
     /**
@@ -171,5 +180,13 @@ class Story extends Model
     {
         $query->where('status', Status::Publish)
             ->where('published_at', '<=', now());
+    }
+
+    /**
+     * @return HasMany<Vote, $this>
+     */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(Vote::class);
     }
 }
