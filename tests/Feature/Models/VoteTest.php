@@ -7,11 +7,21 @@ use App\Models\Story;
 use App\Models\User;
 use App\Models\Vote;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
 use Tests\TestCase;
 
 class VoteTest extends TestCase
 {
     use RefreshDatabase;
+
+    /**
+     * Clean up the testing environment before the next test.
+     */
+    protected function tearDown(): void
+    {
+        Mockery::close(); // Close Mockery after each test
+        parent::tearDown();
+    }
 
     public function test_vote_can_be_created_using_factory(): void
     {
@@ -24,6 +34,42 @@ class VoteTest extends TestCase
             'creator_id' => $vote->creator_id,
         ]);
         $this->assertInstanceOf(Vote::class, $vote);
+    }
+
+    /**
+     * Test that Vote model events trigger Story updateVoteCountsAndScore.
+     */
+    public function test_vote_events_trigger_story_update(): void
+    {
+        // Create a real story and user first
+        $story = Story::factory()->create();
+        $user = User::factory()->create();
+
+        // Mock the specific story instance and make it partial so original methods can still be called
+        // We expect updateVoteCountsAndScore to be called 3 times:
+        // 1. When the vote is created (saved event)
+        // 2. When the vote is updated (saved event)
+        // 3. When the vote is deleted (deleted event)
+        $storyMock = Mockery::mock($story)->makePartial();
+        /** @var Mockery\Expectation */
+        $expectation = $storyMock->shouldReceive('updateVoteCountsAndScore');
+        $expectation->times(3);
+
+        // Create a vote instance, linking it to the real user and the mocked story instance
+        // We need to manually set the story relationship property to the mock
+        /** @var Vote */
+        $vote = Vote::factory()->for($user, 'creator')->make(['type' => Type::Up]);
+        // Manually set the story_id to link to the real story in the database
+        $vote->story_id = $story->id;
+        $vote->setRelation('story', $storyMock); // Set the loaded relationship to the mock instance
+
+        $vote->save(); // Trigger saved event (1st call)
+        $vote->type = Type::Down;
+        $vote->save(); // Trigger saved event (2nd call)
+        $vote->delete(); // Trigger deleted event (3rd call)
+
+        // Add an assertion to satisfy PHPUnit
+        $this->assertDatabaseMissing('votes', ['id' => $vote->id]);
     }
 
     public function test_vote_type_attribute_is_cast_to_enum(): void

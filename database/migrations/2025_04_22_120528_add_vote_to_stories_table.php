@@ -12,10 +12,23 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('stories', function (Blueprint $table) {
-            $table->unsignedBigInteger('upvote_count')->default(0)->after('view_count')->index();
-            $table->unsignedBigInteger('downvote_count')->default(0)->after('upvote_count')->index();
-            $table->unsignedBigInteger('vote_count')->default(0)->after('downvote_count')->index();
-            $table->unsignedBigInteger('vote_score')->default(0)->after('vote_count')->index();
+            $table->unsignedBigInteger('upvote_count')
+                ->default(0)
+                ->after('view_count')
+                ->index();
+            $table->unsignedBigInteger('downvote_count')
+                ->default(0)
+                ->after('upvote_count')
+                ->index();
+            $table->unsignedBigInteger('vote_count')
+                ->default(0)
+                ->after('downvote_count')
+                ->index();
+            $table
+                ->decimal('vote_score', 8, 2)
+                ->default(0)
+                ->after('vote_count')
+                ->index();
         });
     }
 

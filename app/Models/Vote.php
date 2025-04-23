@@ -46,6 +46,27 @@ class Vote extends Model
     ];
 
     /**
+     * The "booted" method of the model.
+     */
+    protected static function booted(): void
+    {
+        // When a Vote is created or updated, update the story's counts/score
+        static::saved(function (self $vote) {
+            // TODO: Use a queue to avoid blocking the request, especially if stories have many votes. Ensure you have configured a queue driver other than 'sync' for production. Dispatch a job or call the method directly if not using queues.
+            $vote->story->updateVoteCountsAndScore();
+        });
+
+        // When a Vote is deleted, update the story's counts/score
+        static::deleted(function (self $vote) {
+            // Check if the story still exists before trying to update it
+            if ($vote->story()->exists()) {
+                // TODO: Use a queue
+                $vote->story->updateVoteCountsAndScore();
+            }
+        });
+    }
+
+    /**
      * Get the story that the vote belongs to.
      *
      * @return BelongsTo<Story, $this>
