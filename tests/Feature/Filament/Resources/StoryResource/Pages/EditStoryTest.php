@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Filament\Resources\Pages;
+namespace Tests\Feature\Filament\Resources\StoryResource\Pages;
 
 use App\Filament\Resources\StoryResource\Pages\EditStory;
 use App\Models\Story;
