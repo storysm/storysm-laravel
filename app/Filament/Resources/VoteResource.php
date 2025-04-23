@@ -58,8 +58,6 @@ class VoteResource extends Resource implements HasShieldPermissions
     {
         return [
             'index' => Pages\ListVotes::route('/'),
-            'create' => Pages\CreateVote::route('/create'),
-            'edit' => Pages\EditVote::route('/{record}/edit'),
         ];
     }
 
@@ -84,7 +82,6 @@ class VoteResource extends Resource implements HasShieldPermissions
             ->columns([])
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\EditAction::make(),
                 ]),
             ])
             ->bulkActions([

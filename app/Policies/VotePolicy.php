@@ -31,15 +31,19 @@ class VotePolicy
     }
 
     /**
+     * Determine whether the user can create the model.
+     */
+    public function create(User $user): bool
+    {
+        return false;
+    }
+
+    /**
      * Determine whether the user can update the model.
      */
     public function update(User $user, Vote $vote): bool
     {
-        if ($user->isNot($vote->creator) && ! $this->viewAll($user)) {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     /**
