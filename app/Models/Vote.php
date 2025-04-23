@@ -66,6 +66,11 @@ class Vote extends Model
         });
     }
 
+    public function isReferenced(): bool
+    {
+        return false;
+    }
+
     /**
      * Get the story that the vote belongs to.
      *
