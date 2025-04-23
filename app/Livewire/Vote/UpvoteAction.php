@@ -56,7 +56,7 @@ class UpvoteAction extends Component implements HasActions, HasForms
                 $this->dispatch('vote-updated', storyId: $this->story->id);
             })
             ->icon($active ? 'heroicon-m-hand-thumb-up' : 'heroicon-o-hand-thumb-up')
-            ->label(strval($this->story->upvote_count))
+            ->label($this->story->formattedUpvoteCount())
             ->outlined(! $active);
     }
 

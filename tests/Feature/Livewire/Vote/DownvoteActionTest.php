@@ -198,7 +198,7 @@ class DownvoteActionTest extends TestCase
         $testable = Livewire::actingAs($user)->test(DownvoteAction::class, ['story' => $story]);
 
         $testable->assertActionVisible('downvote');
-        $testable->assertActionHasLabel('downvote', '5');
+        $testable->assertActionHasLabel('downvote', $story->formattedDownvoteCount());
         $testable->assertActionHasIcon('downvote', 'heroicon-o-hand-thumb-down'); // Outlined icon when not downvoted
 
         // Simulate user downvoting
@@ -218,7 +218,7 @@ class DownvoteActionTest extends TestCase
 
         // Assert state after downvoting
         $testable->assertActionVisible('downvote');
-        $testable->assertActionHasLabel('downvote', '6');
+        $testable->assertActionHasLabel('downvote', $story->formattedDownvoteCount());
         $testable->assertActionHasIcon('downvote', 'heroicon-m-hand-thumb-down'); // Solid icon when downvoted
 
         // Simulate user changing to upvote
@@ -239,7 +239,7 @@ class DownvoteActionTest extends TestCase
 
         // Assert state after upvoting
         $testable->assertActionVisible('downvote');
-        $testable->assertActionHasLabel('downvote', '5'); // Label shows downvote count
+        $testable->assertActionHasLabel('downvote', $story->formattedDownvoteCount()); // Label shows downvote count
         $testable->assertActionHasIcon('downvote', 'heroicon-o-hand-thumb-down'); // Outlined icon when not downvoted
 
         // Simulate user removing their vote (e.g., clicking upvote again)
@@ -254,7 +254,7 @@ class DownvoteActionTest extends TestCase
 
         // Assert state after removing vote
         $testable->assertActionVisible('downvote');
-        $testable->assertActionHasLabel('downvote', '5'); // Label shows downvote count
+        $testable->assertActionHasLabel('downvote', $story->formattedDownvoteCount()); // Label shows downvote count
         $testable->assertActionHasIcon('downvote', 'heroicon-o-hand-thumb-down'); // Outlined icon when not downvoted
     }
 }

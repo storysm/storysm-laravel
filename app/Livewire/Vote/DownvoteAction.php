@@ -57,7 +57,7 @@ class DownvoteAction extends Component implements HasActions, HasForms
             })
             ->color('danger')
             ->icon($active ? 'heroicon-m-hand-thumb-down' : 'heroicon-o-hand-thumb-down')
-            ->label(strval($this->story->downvote_count))
+            ->label($this->story->formattedDownvoteCount())
             ->outlined(! $active);
     }
 

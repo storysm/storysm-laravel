@@ -104,12 +104,10 @@ class Story extends Model
     }
 
     /**
-     * Get the view count formatted with suffixes (K, M, B, T).
+     * Formats an integer attribute with suffixes (K, M, B, T).
      */
-    public function formattedViewCount(): string
+    private function formatCountAttribute(int $count): string
     {
-        $count = $this->view_count;
-
         if ($count < 1000) {
             return (string) $count;
         }
@@ -150,6 +148,38 @@ class Story extends Model
         $formattedNumber = number_format($finalValue, $finalPrecision, '.', '');
 
         return $formattedNumber.$suffixes[$i];
+    }
+
+    /**
+     * Get the downvote count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedDownvoteCount(): string
+    {
+        return $this->formatCountAttribute($this->downvote_count);
+    }
+
+    /**
+     * Get the upvote count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedUpvoteCount(): string
+    {
+        return $this->formatCountAttribute($this->upvote_count);
+    }
+
+    /**
+     * Get the view count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedViewCount(): string
+    {
+        return $this->formatCountAttribute($this->view_count);
+    }
+
+    /**
+     * Get the total vote count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedVoteCount(): string
+    {
+        return $this->formatCountAttribute($this->vote_count);
     }
 
     /**

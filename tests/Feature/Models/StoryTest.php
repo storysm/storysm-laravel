@@ -41,11 +41,9 @@ class StoryTest extends TestCase
     }
 
     /**
-     * Data provider for test_formatted_view_count_formats_correctly.
-     *
      * @return array<string, array<int|string>>
      */
-    public static function viewCountFormattingProvider(): array
+    public static function formattingProvider(): array
     {
         return [
             'less than 1000' => [999, '999'],
@@ -125,15 +123,51 @@ class StoryTest extends TestCase
     }
 
     /**
+     * Test that formattedDownvoteCount formats the downvote count correctly with suffixes.
+     *
+     * @dataProvider formattingProvider
+     */
+    public function test_formatted_downvote_count_formats_correctly(int $count, string $expectedFormat): void
+    {
+        $story = Story::factory()->create(['downvote_count' => $count]);
+
+        $this->assertEquals($expectedFormat, $story->formattedDownvoteCount());
+    }
+
+    /**
+     * Test that formattedUpvoteCount formats the upvote count correctly with suffixes.
+     *
+     * @dataProvider formattingProvider
+     */
+    public function test_formatted_upvote_count_formats_correctly(int $count, string $expectedFormat): void
+    {
+        $story = Story::factory()->create(['upvote_count' => $count]);
+
+        $this->assertEquals($expectedFormat, $story->formattedUpvoteCount());
+    }
+
+    /**
      * Test that formattedViewCount formats the view count correctly with suffixes.
      *
-     * @dataProvider viewCountFormattingProvider
+     * @dataProvider formattingProvider
      */
     public function test_formatted_view_count_formats_correctly(int $viewCount, string $expectedFormat): void
     {
         $story = Story::factory()->create(['view_count' => $viewCount]);
 
         $this->assertEquals($expectedFormat, $story->formattedViewCount());
+    }
+
+    /**
+     * Test that formattedVoteCount formats the total vote count correctly with suffixes.
+     *
+     * @dataProvider formattingProvider
+     */
+    public function test_formatted_vote_count_formats_correctly(int $count, string $expectedFormat): void
+    {
+        $story = Story::factory()->create(['vote_count' => $count]);
+
+        $this->assertEquals($expectedFormat, $story->formattedVoteCount());
     }
 
     public function test_increment_view_count_protected_by_session_and_time(): void
