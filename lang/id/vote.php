@@ -12,6 +12,8 @@ return [
     ],
     'resource' => [
         'model_label' => 'Suara|Suara',
+        'upvote_count' => 'Jumlah Suka',
+        'downvote_count' => 'Jumlah Tidak Suka',
     ],
     'type' => [
         'up' => 'Suka',

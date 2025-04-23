@@ -12,6 +12,8 @@ return [
     ],
     'resource' => [
         'model_label' => 'Vote|Votes',
+        'upvote_count' => 'Like Count',
+        'downvote_count' => 'Dislike Count',
     ],
     'type' => [
         'up' => 'Like',
