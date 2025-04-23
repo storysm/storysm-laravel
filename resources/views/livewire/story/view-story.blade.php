@@ -19,7 +19,10 @@
                         </div>
                     </x-filament::section>
                     <x-filament::section>
-                        <livewire:vote.upvote-action :story="$story" />
+                        <div class="flex flex-row space-x-2">
+                            <livewire:vote.upvote-action :story="$story" />
+                            <livewire:vote.downvote-action :story="$story" />
+                        </div>
                     </x-filament::section>
                 </div>
                 <div class="sm:col-span-4">

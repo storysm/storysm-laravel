@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-class UpvoteAction extends Component implements HasActions, HasForms
+class DownvoteAction extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
@@ -28,11 +28,11 @@ class UpvoteAction extends Component implements HasActions, HasForms
         $this->story = $story;
     }
 
-    public function upvoteAction(): Action
+    public function downvoteAction(): Action
     {
-        $active = $this->story->currentUserVote()?->type === Type::Up;
+        $active = $this->story->currentUserVote()?->type === Type::Down;
 
-        return Action::make('upvote')
+        return Action::make('downvote')
             ->action(function () {
                 if (! Auth::check()) {
                     Notification::make()
@@ -50,13 +50,14 @@ class UpvoteAction extends Component implements HasActions, HasForms
                     return;
                 }
 
-                $this->story->vote(Type::Up);
+                $this->story->vote(Type::Down);
                 $this->story->refresh();
 
                 $this->dispatch('vote-updated', storyId: $this->story->id);
             })
-            ->icon($active ? 'heroicon-m-hand-thumb-up' : 'heroicon-o-hand-thumb-up')
-            ->label(strval($this->story->upvote_count))
+            ->color('danger')
+            ->icon($active ? 'heroicon-m-hand-thumb-down' : 'heroicon-o-hand-thumb-down')
+            ->label(strval($this->story->downvote_count))
             ->outlined(! $active);
     }
 
@@ -70,6 +71,6 @@ class UpvoteAction extends Component implements HasActions, HasForms
 
     public function render(): View
     {
-        return view('livewire.vote.upvote-action');
+        return view('livewire.vote.downvote-action');
     }
 }
