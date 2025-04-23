@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
+use App\Enums\Vote\Type;
 use App\Filament\Resources\VoteResource;
 use App\Filament\Resources\VoteResource\Pages\ListVotes;
 use App\Models\Permission;
@@ -97,5 +98,27 @@ class VoteResourceTest extends TestCase
         $this->assertTrue($records->contains($vote2_user1));
         $this->assertTrue($records->contains($vote1_user2));
         $this->assertTrue($records->contains($vote2_user2));
+    }
+
+    public function test_vote_resource_index_page_filters_by_type(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // Create votes of different types
+        $upvote1 = Vote::factory()->create(['creator_id' => $user->id, 'type' => Type::Up]);
+        $upvote2 = Vote::factory()->create(['creator_id' => $user->id, 'type' => Type::Up]);
+        $downvote1 = Vote::factory()->create(['creator_id' => $user->id, 'type' => Type::Down]);
+        $downvote2 = Vote::factory()->create(['creator_id' => $user->id, 'type' => Type::Down]);
+
+        $testable = Livewire::test(ListVotes::class);
+        $testable->assertCanSeeTableRecords([$upvote1, $upvote2, $downvote1, $downvote2]); // See all initially
+        $testable->filterTable('type', Type::Up->value);
+        $testable->assertCanSeeTableRecords([$upvote1, $upvote2]);
+        $testable->assertCanNotSeeTableRecords([$downvote1, $downvote2]);
+        $testable->filterTable('type', Type::Down->value); // Apply DOWNVOTE filter
+        $testable->assertCanSeeTableRecords([$downvote1, $downvote2]);
+        $testable->assertCanNotSeeTableRecords([$upvote1, $upvote2]);
     }
 }

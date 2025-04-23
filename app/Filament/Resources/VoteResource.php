@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\Vote\Type;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\VoteResource\Pages;
 use App\Models\Vote;
@@ -17,7 +18,7 @@ class VoteResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = Vote::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-hand-thumb-up';
 
     public static function canViewAll(): bool
     {
@@ -79,15 +80,30 @@ class VoteResource extends Resource implements HasShieldPermissions
     public static function table(Table $table): Table
     {
         return $table
-            ->columns([])
             ->actions([
                 Tables\Actions\ActionGroup::make([
+                    Tables\Actions\ViewAction::make()
+                        ->url(fn (Vote $record) => route('stories.show', $record->story)),
+                    Tables\Actions\DeleteAction::make(),
                 ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
+            ])
+            ->columns([
+                Tables\Columns\TextColumn::make('story.title')
+                    ->label(trans_choice('story.resource.model_label', 1)),
+                Tables\Columns\TextColumn::make('creator.name')
+                    ->label(trans_choice('user.resource.model_label', 1)),
+                Tables\Columns\IconColumn::make('type')
+                    ->label(trans_choice('vote.resource.model_label', 1)),
+            ])
+            ->filters([
+                Tables\Filters\SelectFilter::make('type')
+                    ->label(trans_choice('vote.resource.model_label', 1))
+                    ->options(Type::class),
             ]);
     }
 }

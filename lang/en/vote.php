@@ -13,4 +13,8 @@ return [
     'resource' => [
         'model_label' => 'Vote|Votes',
     ],
+    'type' => [
+        'up' => 'Like',
+        'down' => 'Dislike',
+    ],
 ];

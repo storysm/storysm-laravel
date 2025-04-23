@@ -13,4 +13,8 @@ return [
     'resource' => [
         'model_label' => 'Suara|Suara',
     ],
+    'type' => [
+        'up' => 'Suka',
+        'down' => 'Tidak Suka',
+    ],
 ];
