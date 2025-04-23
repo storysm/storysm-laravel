@@ -1,0 +1,64 @@
+<?php
+
+namespace App\Livewire\Vote;
+
+use App\Enums\Vote\Type;
+use App\Models\Story;
+use Filament\Actions\Action;
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Notifications;
+use Filament\Notifications\Notification;
+use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
+
+class UpvoteAction extends Component implements HasActions, HasForms
+{
+    use InteractsWithActions;
+    use InteractsWithForms;
+
+    public Story $story;
+
+    public function mount(Story $story): void
+    {
+        $this->story = $story;
+    }
+
+    public function upvoteAction(): Action
+    {
+        $active = $this->story->currentUserVote()?->type === Type::Up;
+
+        return Action::make('upvote')
+            ->action(function () {
+                if (! Auth::check()) {
+                    Notification::make()
+                        ->title(__('vote.notification.login_required.title'))
+                        ->body(__('vote.notification.login_required.body'))
+                        ->warning()
+                        ->actions([
+                            Notifications\Actions\Action::make('login')
+                                ->label(__('vote.notification.login_required.action.login'))
+                                ->url(route('login'))
+                                ->button(),
+                        ])
+                        ->send();
+
+                    return;
+                }
+
+                $this->story->vote(Type::Up);
+                $this->story->refresh();
+            })
+            ->icon($active ? 'heroicon-m-hand-thumb-up' : 'heroicon-o-hand-thumb-up')
+            ->label(strval($this->story->vote_count))
+            ->outlined(! $active);
+    }
+
+    public function render(): View
+    {
+        return view('livewire.vote.upvote-action');
+    }
+}

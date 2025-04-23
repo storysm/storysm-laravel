@@ -10,10 +10,23 @@
     </x-header>
 
     <x-container>
-        <section class="flex flex-col items-center min-h-screen pt-6 sm:pt-0">
-            <div
-                class="w-full p-6 mt-6 overflow-hidden prose bg-white shadow-md sm:max-w-2xl dark:bg-gray-900 sm:rounded-lg dark:prose-invert">
-                {!! $story->content !!}
+        <section class="flex flex-col gap-y-8">
+            <div class="grid items-start w-full grid-cols-1 gap-4 lg:grid-cols-12">
+                <div class="flex flex-col gap-4 lg:col-span-8">
+                    <x-filament::section>
+                        <div class="prose dark:prose-invert max-w-fit">
+                            {!! $story->content !!}
+                        </div>
+                    </x-filament::section>
+                    <x-filament::section>
+                        <livewire:vote.upvote-action :story="$story" />
+                    </x-filament::section>
+                </div>
+                <div class="sm:col-span-4">
+                    <div>
+                        <x-filament::section></x-filament::section>
+                    </div>
+                </div>
             </div>
         </section>
     </x-container>
