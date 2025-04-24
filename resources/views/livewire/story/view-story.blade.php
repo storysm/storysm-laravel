@@ -24,6 +24,7 @@
                             <livewire:vote.downvote-action :story="$story" />
                         </div>
                     </x-filament::section>
+                    <livewire:comment.create-comment :story="$story" />
                 </div>
                 <div class="sm:col-span-4">
                     <div>
