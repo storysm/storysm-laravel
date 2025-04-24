@@ -81,6 +81,16 @@ class Story extends Model
     ];
 
     /**
+     * Get the comments for the story.
+     *
+     * @return HasMany<Comment, $this>
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+
+    /**
      * @return BelongsTo<Media, $this>
      */
     public function coverMedia(): BelongsTo
@@ -219,6 +229,10 @@ class Story extends Model
 
     public function isReferenced(): bool
     {
+        if ($this->comments()->exists()) {
+            return true;
+        }
+
         return false;
     }
 

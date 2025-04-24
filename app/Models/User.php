@@ -95,6 +95,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     }
 
     /**
+     * Get the comments created by the user.
+     *
+     * @return HasMany<Comment, $this>
+     */
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class, 'creator_id');
+    }
+
+    /**
      * Delete the user's profile photo.
      *
      * @return void
@@ -162,6 +172,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function isReferenced(): bool
     {
+        if ($this->comments()->exists()) {
+            return true;
+        }
         if ($this->media()->exists()) {
             return true;
         }
