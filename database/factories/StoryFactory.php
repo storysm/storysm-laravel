@@ -32,6 +32,8 @@ class StoryFactory extends Factory
                 'fr' => fake()->paragraph(),
             ],
             'status' => Status::Draft,
+            'upvote_count' => 0,
+            'downvote_count' => 0,
             'published_at' => null,
         ];
     }

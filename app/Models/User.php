@@ -11,6 +11,7 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -220,5 +221,24 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function stories(): HasMany
     {
         return $this->hasMany(Story::class, 'creator_id');
+    }
+
+    /**
+     * @return HasMany<Vote, $this>
+     */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(Vote::class, 'creator_id');
+    }
+
+    /**
+     * Get the stories that the user has voted on.
+     *
+     * @return BelongsToMany<Story, $this>
+     */
+    public function votedStories(): BelongsToMany
+    {
+        return $this->belongsToMany(Story::class, 'votes', 'creator_id', 'story_id')
+            ->withTimestamps();
     }
 }

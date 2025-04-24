@@ -165,6 +165,14 @@ class StoryResource extends Resource implements HasShieldPermissions
                             default => $state,
                         };
                     }),
+                Tables\Columns\TextColumn::make('upvote_count')
+                    ->label(__('vote.resource.upvote_count'))
+                    ->state(fn (Story $record) => $record->formattedUpvoteCount())
+                    ->tooltip(fn (Story $record) => $record->upvote_count > 999 ? $record->upvote_count : null),
+                Tables\Columns\TextColumn::make('downvote_count')
+                    ->label(__('vote.resource.downvote_count'))
+                    ->state(fn (Story $record) => $record->formattedDownvoteCount())
+                    ->tooltip(fn (Story $record) => $record->downvote_count > 999 ? $record->downvote_count : null),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator'))) : null,
                 Tables\Columns\TextColumn::make('published_at')

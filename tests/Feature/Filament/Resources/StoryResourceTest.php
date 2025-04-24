@@ -73,6 +73,48 @@ class StoryResourceTest extends TestCase
             ->assertSee($story->status->value);
     }
 
+    /**
+     * Test that the upvote and downvote counts are displayed correctly in the table, using the formatted methods from the Story model.
+     */
+    public function test_displays_upvote_and_downvote_counts_in_table(): void
+    {
+        // Test with counts that might be formatted (e.g., > 999)
+        // Create the story first, then update the guarded attributes
+        $storyLargeVotes = Story::factory()->create(['title' => ['en' => 'Story with Many Votes'], 'creator_id' => $this->user->id]);
+        $storyLargeVotes->upvote_count = 1234567;
+        $storyLargeVotes->downvote_count = 98765;
+        $storyLargeVotes->save();
+
+        // Test with counts below 1000 (no formatting expected)
+        // Create the story first, then update the guarded attributes
+        $storySmallVotes = Story::factory()->create(['title' => ['en' => 'Story with Few Votes'], 'creator_id' => $this->user->id]);
+        $storySmallVotes->upvote_count = 500;
+        $storySmallVotes->downvote_count = 10;
+        $storySmallVotes->save();
+
+        // Test with zero votes
+        // Create the story first, then update the guarded attributes
+        $storyZeroVotes = Story::factory()->create(['title' => ['en' => 'Story with Zero Votes'], 'creator_id' => $this->user->id]);
+        $storyZeroVotes->upvote_count = 0;
+        $storyZeroVotes->downvote_count = 0;
+        $storyZeroVotes->save();
+
+        /** @var Testable */
+        $testable = Livewire::test(ListStories::class);
+
+        $testable->assertCanSeeTableRecords([$storyLargeVotes, $storySmallVotes, $storyZeroVotes]);
+
+        // Assert the columns display the correct formatted values by calling the model methods
+        $testable->assertTableColumnStateSet('upvote_count', $storyLargeVotes->formattedUpvoteCount(), $storyLargeVotes);
+        $testable->assertTableColumnStateSet('downvote_count', $storyLargeVotes->formattedDownvoteCount(), $storyLargeVotes);
+
+        $testable->assertTableColumnStateSet('upvote_count', $storySmallVotes->formattedUpvoteCount(), $storySmallVotes);
+        $testable->assertTableColumnStateSet('downvote_count', $storySmallVotes->formattedDownvoteCount(), $storySmallVotes);
+
+        $testable->assertTableColumnStateSet('upvote_count', $storyZeroVotes->formattedUpvoteCount(), $storyZeroVotes);
+        $testable->assertTableColumnStateSet('downvote_count', $storyZeroVotes->formattedDownvoteCount(), $storyZeroVotes);
+    }
+
     public function test_only_shows_stories_created_by_the_current_user_if_they_cannot_view_all(): void
     {
         $story = Story::factory()->create([
