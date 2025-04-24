@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class StoryTest extends TestCase
@@ -124,9 +125,8 @@ class StoryTest extends TestCase
 
     /**
      * Test that formattedDownvoteCount formats the downvote count correctly with suffixes.
-     *
-     * @dataProvider formattingProvider
      */
+    #[DataProvider('formattingProvider')]
     public function test_formatted_downvote_count_formats_correctly(int $count, string $expectedFormat): void
     {
         $story = Story::factory()->create(['downvote_count' => $count]);
@@ -136,9 +136,8 @@ class StoryTest extends TestCase
 
     /**
      * Test that formattedUpvoteCount formats the upvote count correctly with suffixes.
-     *
-     * @dataProvider formattingProvider
      */
+    #[DataProvider('formattingProvider')]
     public function test_formatted_upvote_count_formats_correctly(int $count, string $expectedFormat): void
     {
         $story = Story::factory()->create(['upvote_count' => $count]);
@@ -148,9 +147,8 @@ class StoryTest extends TestCase
 
     /**
      * Test that formattedViewCount formats the view count correctly with suffixes.
-     *
-     * @dataProvider formattingProvider
      */
+    #[DataProvider('formattingProvider')]
     public function test_formatted_view_count_formats_correctly(int $viewCount, string $expectedFormat): void
     {
         $story = Story::factory()->create(['view_count' => $viewCount]);
@@ -160,9 +158,8 @@ class StoryTest extends TestCase
 
     /**
      * Test that formattedVoteCount formats the total vote count correctly with suffixes.
-     *
-     * @dataProvider formattingProvider
      */
+    #[DataProvider('formattingProvider')]
     public function test_formatted_vote_count_formats_correctly(int $count, string $expectedFormat): void
     {
         $story = Story::factory()->create(['vote_count' => $count]);
