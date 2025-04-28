@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignUlid('story_id')->constrained();
             $table->foreignUlid('parent_id')->nullable()->constrained('comments');
             $table->json('body');
+            $table->unsignedBigInteger('reply_count')->default(0)->index();
             $table->timestamps();
         });
     }

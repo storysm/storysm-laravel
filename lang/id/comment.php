@@ -28,5 +28,7 @@ return [
     ],
     'resource' => [
         'comment_count' => 'Jumlah Komentar',
+        'model_label' => 'Komentar|Komentar',
+        'reply_count' => 'Jumlah Balasan',
     ],
 ];

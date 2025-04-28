@@ -28,5 +28,7 @@ return [
     ],
     'resource' => [
         'comment_count' => 'Comment Count',
+        'model_label' => 'Comment|Comments',
+        'reply_count' => 'Reply Count',
     ],
 ];
