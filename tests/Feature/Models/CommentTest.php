@@ -119,4 +119,36 @@ class CommentTest extends TestCase
         $this->assertTrue($retrievedChildren->every(fn ($comment) => $comment->parent_id === $parentComment->id));
         $childComments->each(fn ($child) => $this->assertTrue($retrievedChildren->contains($child)));
     }
+
+    public function test_story_comment_count_increments_on_comment_creation(): void
+    {
+        // Arrange: Create a story
+        $story = Story::factory()->create();
+        $initialCommentCount = $story->comment_count;
+
+        // Act: Create a comment for the story
+        Comment::factory()->create(['story_id' => $story->id]);
+
+        // Assert: Reload the story and check if the comment_count has incremented
+        $story->refresh();
+        $this->assertEquals($initialCommentCount + 1, $story->comment_count);
+    }
+
+    public function test_story_comment_count_decrements_on_comment_deletion(): void
+    {
+        // Arrange: Create a story and a comment for it
+        $story = Story::factory()->create();
+        $comment = Comment::factory()->create(['story_id' => $story->id]);
+
+        // Ensure the count is 1 after creation
+        $story->refresh();
+        $this->assertEquals(1, $story->comment_count);
+
+        // Act: Delete the comment
+        $comment->delete();
+
+        // Assert: Reload the story and check if the comment_count has decremented
+        $story->refresh();
+        $this->assertEquals(0, $story->comment_count);
+    }
 }
