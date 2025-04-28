@@ -28,6 +28,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $downvote_count
  * @property int $vote_count
  * @property float $vote_score
+ * @property int $comment_count
  * @property ?Carbon $published_at
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
@@ -67,6 +68,7 @@ class Story extends Model
         'downvote_count' => 'integer',
         'vote_count' => 'integer',
         'vote_score' => 'float',
+        'comment_count' => 'integer',
     ];
 
     /**
@@ -78,6 +80,7 @@ class Story extends Model
         'downvote_count',
         'vote_count',
         'vote_score',
+        'comment_count',
     ];
 
     /**
@@ -158,6 +161,14 @@ class Story extends Model
         $formattedNumber = number_format($finalValue, $finalPrecision, '.', '');
 
         return $formattedNumber.$suffixes[$i];
+    }
+
+    /**
+     * Get the comment count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedCommentCount(): string
+    {
+        return $this->formatCountAttribute($this->comment_count);
     }
 
     /**
