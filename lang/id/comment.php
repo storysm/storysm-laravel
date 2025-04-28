@@ -26,4 +26,7 @@ return [
             'body_required' => 'Isi komentar wajib diisi.',
         ],
     ],
+    'resource' => [
+        'comment_count' => 'Jumlah Komentar',
+    ],
 ];

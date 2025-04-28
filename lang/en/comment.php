@@ -26,4 +26,7 @@ return [
             'body_required' => 'Comment body is required.',
         ],
     ],
+    'resource' => [
+        'comment_count' => 'Comment Count',
+    ],
 ];
