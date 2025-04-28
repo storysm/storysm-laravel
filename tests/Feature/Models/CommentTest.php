@@ -66,6 +66,7 @@ class CommentTest extends TestCase
     public function test_user_can_have_many_comments(): void
     {
         // Arrange: Create a user and multiple comments for that user
+        /** @var User */
         $user = User::factory()->create();
         Comment::factory()->count(3)->create(['creator_id' => $user->id]);
 
@@ -74,7 +75,7 @@ class CommentTest extends TestCase
 
         // Assert: Check if the relationship returns a collection of comments
         $this->assertCount(3, $userComments);
-        $this->assertTrue($userComments->every(fn ($comment) => $comment->creator_id === $user->id));
+        $this->assertTrue($userComments->every(fn ($comment) => $comment->creator->is($user)));
     }
 
     public function test_story_can_have_many_comments(): void
