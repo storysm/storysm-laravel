@@ -45,10 +45,17 @@
 
             <span class="flex-grow"></span>
 
-            {{-- View Count --}}
-            <x-story.meta icon="heroicon-m-eye" iconClass="size-2">
-                <p class="text-xs">{{ $story->formattedViewCount() }}</p>
-            </x-story.meta>
+            <div class="flex flex-row gap-2">
+                {{-- View Count --}}
+                <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
+                    <p class="text-xs">{{ $story->formattedViewCount() }}</p>
+                </x-story.meta>
+
+                {{-- Comment Count --}}
+                <x-story.meta icon="heroicon-m-chat-bubble-oval-left-ellipsis" iconClass="size-3">
+                    <p class="text-xs">{{ $story->formattedCommentCount() }}</p>
+                </x-story.meta>
+            </div>
         </div>
     </div>
 </div>
