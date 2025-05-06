@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Concerns\CanFormatCount;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -17,6 +18,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string $creator_id
  * @property ?string $parent_id
  * @property string $body
+ * @property int $reply_count
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
  * @property-read Collection<int, Comment> $comments
@@ -26,9 +28,10 @@ use Spatie\Translatable\HasTranslations;
  */
 class Comment extends Model
 {
+    use CanFormatCount;
+
     /** @use HasFactory<\Database\Factories\CommentFactory> */
     use HasFactory;
-
     use HasTranslations;
     use HasUlids;
 
@@ -93,6 +96,14 @@ class Comment extends Model
     public function isReferenced(): bool
     {
         return false;
+    }
+
+    /**
+     * Get the reply count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedReplyCount(): string
+    {
+        return $this->formatCount($this->reply_count);
     }
 
     /**
