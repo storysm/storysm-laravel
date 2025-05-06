@@ -54,10 +54,12 @@ class ListComments extends Component implements HasForms, HasTable
                 ];
             })
             ->defaultSort('created_at', 'desc')
+            ->paginated([10])
             ->query(Comment::query()
                 ->where('story_id', $this->story->id)
                 ->whereNull('parent_id')
                 ->with('creator') // Eager load the creator relationship
-            );
+            )
+            ->queryStringIdentifier('comments');
     }
 }
