@@ -11,6 +11,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\HtmlString;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
@@ -54,6 +55,11 @@ class ListComments extends Component implements HasForms, HasTable
                 ];
             })
             ->defaultSort('created_at', 'desc')
+            ->header(new HtmlString(
+                '<div class="p-4 text-xl font-bold">'.
+                $this->story->formattedCommentCount().' '.trans_choice('comment.resource.model_label', $this->story->comment_count).
+                '</div>'
+            ))
             ->paginated([10])
             ->query(Comment::query()
                 ->where('story_id', $this->story->id)
