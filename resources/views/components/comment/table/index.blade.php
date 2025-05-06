@@ -11,7 +11,12 @@
         <div class="flex flex-col gap-4">
             <div class="flex flex-col gap-1">
                 {{-- Creator --}}
-                <p class="text-sm font-extrabold">{{ $comment->creator->name }}</p>
+                <div class="flex items-center gap-2 text-sm">
+                    <p class="font-extrabold">{{ $comment->creator->name }}</p>
+                    <span class="text-gray-500 dark:text-gray-400">&middot;</span>
+                    <p class="text-gray-500 dark:text-gray-400" title="{{ $comment->created_at }}">
+                        {{ $comment->created_at->diffForHumans() }}</p>
+                </div>
 
                 {{-- Body --}}
                 <p class="max-w-full prose dark:prose-invert">

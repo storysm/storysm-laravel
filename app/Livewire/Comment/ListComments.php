@@ -41,13 +41,19 @@ class ListComments extends Component implements HasForms, HasTable
     {
         return $table
             ->columns([
-                Tables\Columns\Layout\View::make('components.comment.table.index'),
+                Tables\Columns\Layout\View::make('components.comment.table.index')
+                    ->schema([
+                        Tables\Columns\TextColumn::make('created_at')
+                            ->label(ucfirst(__('validation.attributes.created_at')))
+                            ->sortable(),
+                    ]),
             ])
             ->contentGrid(function () {
                 return [
                     'default' => 1,
                 ];
             })
+            ->defaultSort('created_at', 'desc')
             ->query(Comment::query()
                 ->where('story_id', $this->story->id)
                 ->whereNull('parent_id')
