@@ -152,4 +152,49 @@ class CommentTest extends TestCase
         $story->refresh();
         $this->assertEquals(0, $story->comment_count);
     }
+
+    public function test_parent_reply_count_increments_on_child_comment_creation(): void
+    {
+        // Arrange: Create a parent comment
+        $parentComment = Comment::factory()->create();
+        $this->assertEquals(0, $parentComment->reply_count);
+
+        // Act: Create a child comment for the parent
+        Comment::factory()->create(['parent_id' => $parentComment->id]);
+
+        // Assert: Reload the parent and check if reply_count has incremented
+        $parentComment->refresh();
+        $this->assertEquals(1, $parentComment->reply_count);
+
+        // Create another child
+        Comment::factory()->create(['parent_id' => $parentComment->id]);
+        $parentComment->refresh();
+        $this->assertEquals(2, $parentComment->reply_count);
+    }
+
+    public function test_parent_reply_count_decrements_on_child_comment_deletion(): void
+    {
+        // Arrange: Create a parent comment and two child comments
+        $parentComment = Comment::factory()->create();
+        $childComment1 = Comment::factory()->create(['parent_id' => $parentComment->id]);
+        $childComment2 = Comment::factory()->create(['parent_id' => $parentComment->id]);
+
+        // Ensure the count is 2 after creation
+        $parentComment->refresh();
+        $this->assertEquals(2, $parentComment->reply_count);
+
+        // Act: Delete one child comment
+        $childComment1->delete();
+
+        // Assert: Reload the parent and check if reply_count has decremented
+        $parentComment->refresh();
+        $this->assertEquals(1, $parentComment->reply_count);
+
+        // Delete the second child comment
+        $childComment2->delete();
+
+        // Assert: Reload the parent and check if reply_count has decremented to 0
+        $parentComment->refresh();
+        $this->assertEquals(0, $parentComment->reply_count);
+    }
 }

@@ -56,19 +56,25 @@ class Comment extends Model
 
         static::created(function (Comment $comment) {
             // If this comment is a reply, update the parent's reply count
-            self::updateParentReplyCount($comment);
+            if ($comment->parent_id !== null) {
+                $comment->parent()->increment('reply_count');
+            }
 
             // Update story comment count
-            self::updateStoryCommentCount($comment);
+            $comment->story()->increment('comment_count');
         });
+    }
+
+    // Add a deleted event listener to decrement counts
+    protected static function booted(): void
+    {
+        parent::booted();
 
         static::deleted(function (Comment $comment) {
-            // If this comment was a reply, update the parent's reply count
-            // We need to check parent_id before the comment is fully gone
-            self::updateParentReplyCount($comment);
-
-            // Update story comment count
-            self::updateStoryCommentCount($comment);
+            if ($comment->parent_id !== null) {
+                Comment::where('id', $comment->parent_id)->decrement('reply_count');
+            }
+            Story::where('id', $comment->story_id)->decrement('comment_count');
         });
     }
 
@@ -123,30 +129,5 @@ class Comment extends Model
     public function story(): BelongsTo
     {
         return $this->belongsTo(Story::class);
-    }
-
-    /**
-     * Recalculates and updates the reply_count on the parent comment if this comment is a reply.
-     */
-    private static function updateParentReplyCount(Comment $comment): void
-    {
-        // Retrieve the parent using the relationship
-        $parent = $comment->parent;
-        if ($parent !== null) {
-            // Recalculate the parent's reply count
-            $parent->reply_count = $parent->comments()->count();
-            $parent->save();
-        }
-    }
-
-    /**
-     * Recalculates and updates the comment_count on the associated story.
-     * Handles guarded attribute by using direct assignment and save().
-     */
-    private static function updateStoryCommentCount(Comment $comment): void
-    {
-        $story = $comment->story;
-        $story->comment_count = $story->comments()->count();
-        $story->save();
     }
 }
