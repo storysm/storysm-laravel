@@ -12,6 +12,7 @@ use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ViewStory extends Component implements HasActions, HasForms
@@ -78,6 +79,12 @@ class ViewStory extends Component implements HasActions, HasForms
         ];
 
         return $breadcrumbs;
+    }
+
+    #[On('commentCreated')]
+    public function refreshStory(): void
+    {
+        $this->story->refresh();
     }
 
     public function render(): View

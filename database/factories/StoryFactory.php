@@ -34,6 +34,7 @@ class StoryFactory extends Factory
             'status' => Status::Draft,
             'upvote_count' => 0,
             'downvote_count' => 0,
+            'comment_count' => 0,
             'published_at' => null,
         ];
     }

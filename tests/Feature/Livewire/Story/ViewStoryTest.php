@@ -4,6 +4,7 @@ namespace Tests\Feature\Livewire\Story;
 
 use App\Enums\Story\Status;
 use App\Livewire\Story\ViewStory;
+use App\Models\Comment;
 use App\Models\Media;
 use App\Models\Permission;
 use App\Models\Story;
@@ -224,8 +225,10 @@ class ViewStoryTest extends TestCase
         $this->assertInstanceOf(Action::class, $action);
         $this->assertEquals('edit', $action->getName());
         $this->assertEquals(__('story.action.edit'), $action->getLabel());
-        $this->assertEquals(route('filament.admin.resources.stories.edit', $story),
-            $action->getUrl());
+        $this->assertEquals(
+            route('filament.admin.resources.stories.edit', $story),
+            $action->getUrl()
+        );
         $this->assertTrue($action->isAuthorized()); // Assert the action is authorized
     }
 
@@ -244,8 +247,10 @@ class ViewStoryTest extends TestCase
         $this->assertInstanceOf(Action::class, $action);
         $this->assertEquals('edit', $action->getName());
         $this->assertEquals(__('story.action.edit'), $action->getLabel());
-        $this->assertEquals(route('filament.admin.resources.stories.edit', $story),
-            $action->getUrl());
+        $this->assertEquals(
+            route('filament.admin.resources.stories.edit', $story),
+            $action->getUrl()
+        );
         $this->assertFalse($action->isAuthorized()); // Assert the action is NOT authorized
     }
 
@@ -274,5 +279,40 @@ class ViewStoryTest extends TestCase
         $this->assertInstanceOf(Action::class, $action);
         $this->assertEquals('edit', $action->getName());
         $this->assertTrue($action->isAuthorized()); // Assert the action is authorized
+    }
+
+    public function test_refreshes_story_model_when_comment_created_event_is_received(): void
+    {
+        /** @var User */
+        $user = User::factory()->create();
+        $story = Story::factory()->ensurePublished()->create(['creator_id' => $user->id]);
+
+        $this->actingAs($user);
+
+        /** @var Testable */
+        $testable = Livewire::test(ViewStory::class, ['story' => $story]);
+
+        // Assert the initial comment count is displayed
+        $testable->assertSee($story->formattedCommentCount());
+
+        // Simulate a new comment being created by another component (or user)
+        // This updates the database record for the story's comment count
+        Comment::factory()->create(['story_id' => $story->id, 'creator_id' => $user->id]);
+
+        // The $story model instance currently held by the Livewire component
+        // does NOT yet reflect the new comment count from the database.
+
+        // Dispatch the event that the ViewStory component listens for.
+        // This should trigger the refreshStory method, which calls $this->story->refresh().
+        $testable->dispatch('commentCreated');
+
+        // After the event and refresh, the $story model instance on the component
+        // should now have the updated comment count.
+        // We need to refresh the $story object in the test scope to get the new count for assertion.
+        $story->refresh();
+
+        // Assert that the view now displays the incremented comment count.
+        // The component's view will re-render after the refresh.
+        $testable->assertSee($story->formattedCommentCount());
     }
 }

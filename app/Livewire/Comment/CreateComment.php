@@ -79,6 +79,9 @@ class CreateComment extends Component implements HasForms
             ->send();
 
         $this->form->fill(); // Reset the form
+
+        // Dispatch event to notify other components
+        $this->dispatch('commentCreated');
     }
 
     public function form(Form $form): Form

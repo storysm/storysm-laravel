@@ -11,6 +11,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Livewire\Attributes\On;
 use Livewire\Component;
 
 class ListComments extends Component implements HasForms, HasTable
@@ -23,6 +24,12 @@ class ListComments extends Component implements HasForms, HasTable
     public function mount(Story $story): void
     {
         $this->story = $story;
+    }
+
+    #[On('commentCreated')]
+    public function refreshCommentsList(): void
+    {
+        $this->resetTable();
     }
 
     public function render(): View
