@@ -31,11 +31,26 @@ class CreateComment extends Component implements HasForms
      */
     public ?array $data = [];
 
-    public Story $story;
+    public ?Story $story = null;
 
-    public function mount(Story $story): void
+    public ?Comment $comment = null;
+
+    /**
+     * @param  ?Story  $story
+     * @param  ?Comment  $comment
+     */
+    public function mount($story = null, $comment = null): void
     {
+        // Ensure only one parent type is provided
+        if ($story === null && $comment === null) {
+            throw new \InvalidArgumentException('Either a Story or a Comment must be provided.');
+        }
+        if ($story !== null && $comment !== null) {
+            throw new \InvalidArgumentException('Only one of Story or Comment can be provided.');
+        }
+
         $this->story = $story;
+        $this->comment = $comment;
         $this->form->fill();
     }
 
@@ -68,8 +83,16 @@ class CreateComment extends Component implements HasForms
         }
 
         $comment = new Comment;
+        // Fill the translatable body
         $comment->fill($data);
-        $comment->story()->associate($this->story);
+
+        // Associate with the correct parent (Story or Comment)
+        if ($this->story !== null) {
+            $comment->story()->associate($this->story);
+        } elseif ($this->comment !== null) {
+            $comment->story()->associate($this->comment->story); // Associate with the parent comment's story
+            $comment->parent()->associate($this->comment); // Set the parent comment
+        }
         $comment->creator()->associate(Auth::user());
         $comment->save();
 

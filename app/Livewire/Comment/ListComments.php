@@ -11,6 +11,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\HtmlString;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -20,11 +21,26 @@ class ListComments extends Component implements HasForms, HasTable
     use InteractsWithForms;
     use InteractsWithTable;
 
-    public Story $story;
+    public ?Story $story = null;
 
-    public function mount(Story $story): void
+    public ?Comment $comment = null;
+
+    /**
+     * @param  ?Story  $story
+     * @param  ?Comment  $comment
+     */
+    public function mount($story = null, $comment = null): void
     {
+        // Ensure only one parent type is provided
+        if ($story === null && $comment === null) {
+            throw new \InvalidArgumentException('Either a Story or a Comment must be provided.');
+        }
+        if ($story !== null && $comment !== null) {
+            throw new \InvalidArgumentException('Only one of Story or Comment can be provided.');
+        }
+
         $this->story = $story;
+        $this->comment = $comment;
     }
 
     #[On('commentCreated')]
@@ -55,16 +71,33 @@ class ListComments extends Component implements HasForms, HasTable
                 ];
             })
             ->defaultSort('created_at', 'desc')
-            ->header(new HtmlString(
-                '<div class="p-4 text-xl font-bold">'.
-                $this->story->formattedCommentCount().' '.trans_choice('comment.resource.model_label', $this->story->comment_count).
-                '</div>'
-            ))
+            ->header(function () {
+                $count = 0;
+                $formattedCount = '';
+                if ($this->story !== null) {
+                    $count = $this->story->comment_count;
+                    $formattedCount = $this->story->formattedCommentCount();
+                } elseif ($this->comment !== null) {
+                    $count = $this->comment->reply_count;
+                    $formattedCount = $this->comment->formattedReplyCount();
+                }
+
+                return new HtmlString(
+                    '<div class="p-4 text-xl font-bold">'.
+                    $formattedCount.' '.trans_choice('comment.resource.model_label', $count).
+                    '</div>'
+                );
+            })
             ->paginated([10])
             ->query(Comment::query()
-                ->where('story_id', $this->story->id)
-                ->whereNull('parent_id')
-                ->with('creator') // Eager load the creator relationship
+                ->when($this->story !== null, function (Builder $query) {
+                    $query->where('story_id', $this->story?->id)
+                        ->whereNull('parent_id');
+                })
+                ->when($this->comment !== null, function (Builder $query) {
+                    $query->where('parent_id', $this->comment?->id);
+                })
+                ->with('creator')
             )
             ->queryStringIdentifier('comments');
     }

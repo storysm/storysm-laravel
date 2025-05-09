@@ -10,6 +10,7 @@ use Laravel\Jetstream\Jetstream;
 Route::get('/', Home::class)
     ->name('home');
 
+require __DIR__.'/resources/comment.php';
 require __DIR__.'/resources/page.php';
 require __DIR__.'/resources/story.php';
 

@@ -30,5 +30,6 @@ return [
         'comment_count' => 'Jumlah Komentar',
         'model_label' => 'Komentar|Komentar',
         'reply_count' => 'Jumlah Balasan',
+        'reply_label' => 'Balasan|Balasan',
     ],
 ];
