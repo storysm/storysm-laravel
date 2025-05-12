@@ -83,7 +83,7 @@ class StoryComment extends Model
      *
      * @return HasMany<StoryComment, $this>
      */
-    public function StoryComments(): HasMany
+    public function storyComments(): HasMany
     {
         return $this->hasMany(StoryComment::class, 'parent_id');
     }
@@ -100,6 +100,10 @@ class StoryComment extends Model
 
     public function isReferenced(): bool
     {
+        if ($this->storyComments()->exists()) {
+            return true;
+        }
+
         return false;
     }
 
