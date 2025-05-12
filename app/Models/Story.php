@@ -216,7 +216,7 @@ class Story extends Model
      */
     public function scopeOrderByVoteScore(Builder $query, string $direction = 'desc'): void
     {
-        $query->orderBy('vote_score', $direction);
+        $query->orderBy('vote_score', $direction)->orderBy('created_at');
     }
 
     /**
@@ -224,7 +224,7 @@ class Story extends Model
      */
     public function scopeOrderByUpvotes(Builder $query, string $direction = 'desc'): void
     {
-        $query->orderBy('upvote_count', $direction);
+        $query->orderBy('upvote_count', $direction)->orderBy('created_at');
     }
 
     /**
@@ -232,7 +232,7 @@ class Story extends Model
      */
     public function scopeOrderByDownvotes(Builder $query, string $direction = 'desc'): void
     {
-        $query->orderBy('downvote_count', $direction);
+        $query->orderBy('downvote_count', $direction)->orderBy('created_at');
     }
 
     /**
