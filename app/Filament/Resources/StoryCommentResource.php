@@ -18,6 +18,8 @@ class StoryCommentResource extends Resource
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-oval-left-ellipsis';
 
+    protected static ?int $navigationSort = 1;
+
     public static function canViewAll(): bool
     {
         return static::can('viewAll');
@@ -47,7 +49,7 @@ class StoryCommentResource extends Resource
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Administration');
+        return trans_choice('story.resource.model_label', 1);
     }
 
     public static function getModelLabel(): string

@@ -30,6 +30,8 @@ class StoryResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationIcon = 'heroicon-o-document-text';
 
+    protected static ?int $navigationSort = 0;
+
     public static function canViewAll(): bool
     {
         return static::can('viewAll');
@@ -106,7 +108,7 @@ class StoryResource extends Resource implements HasShieldPermissions
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Administration');
+        return trans_choice('story.resource.model_label', 1);
     }
 
     public static function getPages(): array
