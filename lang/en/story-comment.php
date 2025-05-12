@@ -29,6 +29,7 @@ return [
     'resource' => [
         'comment_count' => 'Comment Count',
         'model_label' => 'Comment|Comments',
+        'replied_comment' => 'Replied Comment',
         'reply_count' => 'Reply Count',
         'reply_label' => 'Reply|Replies',
     ],

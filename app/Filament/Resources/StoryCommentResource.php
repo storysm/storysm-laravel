@@ -90,6 +90,9 @@ class StoryCommentResource extends Resource
                 Tables\Columns\TextColumn::make('story.title')
                     ->label(trans_choice('story.resource.model_label', 1))
                     ->limit(30),
+                Tables\Columns\TextColumn::make('parent.body')
+                    ->label(__('story-comment.resource.replied_comment'))
+                    ->limit(30),
                 Tables\Columns\TextColumn::make('reply_count')
                     ->label(__('story-comment.resource.reply_count')),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
@@ -98,6 +101,14 @@ class StoryCommentResource extends Resource
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
+                        ->url(fn (StoryComment $record) => route('story-comments.show', $record)),
+                    Tables\Actions\ViewAction::make()
+                        ->hidden(fn (StoryComment $record) => ! $record->parent)
+                        ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+                        ->label(__('View :name', ['name' => __('story-comment.resource.replied_comment')]))
+                        ->url(fn (StoryComment $record) => $record->parent ? route('story-comments.show', $record->parent) : null),
+                    Tables\Actions\ViewAction::make()
+                        ->icon('heroicon-o-document-text')
                         ->label(__('View :name', ['name' => trans_choice('story.resource.model_label', 1)]))
                         ->url(fn (StoryComment $record) => route('stories.show', $record->story)),
                     Tables\Actions\EditAction::make(),
@@ -108,6 +119,7 @@ class StoryCommentResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
-            ]);
+            ])
+            ->recordUrl(fn (StoryComment $record) => route('story-comments.show', $record));
     }
 }
