@@ -95,13 +95,13 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     }
 
     /**
-     * Get the comments created by the user.
+     * Get the story StoryComments created by the user.
      *
-     * @return HasMany<Comment, $this>
+     * @return HasMany<StoryComment, $this>
      */
-    public function comments(): HasMany
+    public function storyComments(): HasMany
     {
-        return $this->hasMany(Comment::class, 'creator_id');
+        return $this->hasMany(StoryComment::class, 'creator_id');
     }
 
     /**
@@ -172,7 +172,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function isReferenced(): bool
     {
-        if ($this->comments()->exists()) {
+        if ($this->storyComments()->exists()) {
             return true;
         }
         if ($this->media()->exists()) {

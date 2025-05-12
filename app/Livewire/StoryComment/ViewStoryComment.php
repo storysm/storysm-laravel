@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Livewire\Comment;
+namespace App\Livewire\StoryComment;
 
-use App\Filament\Resources\CommentResource;
-use App\Models\Comment;
+use App\Filament\Resources\StoryCommentResource;
+use App\Models\StoryComment;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -13,16 +13,16 @@ use Illuminate\Contracts\View\View;
 use Illuminate\Support\Str;
 use Livewire\Component;
 
-class ViewComment extends Component implements HasActions, HasForms
+class ViewStoryComment extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
 
-    public Comment $comment;
+    public StoryComment $storyComment;
 
-    public function mount(Comment $comment): void
+    public function mount(StoryComment $storyComment): void
     {
-        $this->comment = $comment;
+        $this->storyComment = $storyComment;
     }
 
     /**
@@ -32,9 +32,9 @@ class ViewComment extends Component implements HasActions, HasForms
     {
         $actions = [];
         $actions[] = Action::make('edit')
-            ->authorize(CommentResource::canEdit($this->comment))
+            ->authorize(StoryCommentResource::canEdit($this->storyComment))
             ->label(__('Edit'))
-            ->url(route('filament.admin.resources.comments.edit', $this->comment));
+            ->url(route('filament.admin.resources.story-comments.edit', $this->storyComment));
 
         return $actions;
     }
@@ -47,8 +47,8 @@ class ViewComment extends Component implements HasActions, HasForms
         $breadcrumbs = [
             route('home') => __('navigation-menu.menu.home'),
             route('stories.index') => trans_choice('story.resource.model_label', 2),
-            route('stories.show', $this->comment->story) => Str::limit($this->comment->story->title, 50),
-            0 => trans_choice('comment.resource.model_label', 2),
+            route('stories.show', $this->storyComment->story) => Str::limit($this->storyComment->story->title, 50),
+            0 => trans_choice('story-comment.resource.model_label', 2),
             1 => __('View'),
         ];
 
@@ -57,6 +57,6 @@ class ViewComment extends Component implements HasActions, HasForms
 
     public function render(): View
     {
-        return view('livewire.comment.view-comment');
+        return view('livewire.story-comment.view-story-comment');
     }
 }

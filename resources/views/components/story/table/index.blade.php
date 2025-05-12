@@ -51,7 +51,7 @@
                     <p class="text-xs">{{ $story->formattedViewCount() }}</p>
                 </x-story.meta>
 
-                {{-- Comment Count --}}
+                {{-- StoryComment Count --}}
                 <x-story.meta icon="heroicon-m-chat-bubble-oval-left-ellipsis" iconClass="size-3">
                     <p class="text-xs">{{ $story->formattedCommentCount() }}</p>
                 </x-story.meta>

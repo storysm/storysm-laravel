@@ -174,7 +174,7 @@ class StoryResource extends Resource implements HasShieldPermissions
                     ->state(fn (Story $record) => $record->formattedDownvoteCount())
                     ->tooltip(fn (Story $record) => $record->downvote_count > 999 ? $record->downvote_count : null),
                 Tables\Columns\TextColumn::make('comment_count')
-                    ->label(__('comment.resource.comment_count'))
+                    ->label(__('story-comment.resource.comment_count'))
                     ->state(fn (Story $record) => $record->formattedCommentCount())
                     ->tooltip(fn (Story $record) => $record->comment_count > 999 ? $record->comment_count : null),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')

@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Livewire\Comment;
+namespace App\Livewire\StoryComment;
 
-use App\Models\Comment;
 use App\Models\Story;
+use App\Models\StoryComment;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Tables;
@@ -16,31 +16,31 @@ use Illuminate\Support\HtmlString;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-class ListComments extends Component implements HasForms, HasTable
+class ListStoryComments extends Component implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
 
     public ?Story $story = null;
 
-    public ?Comment $comment = null;
+    public ?StoryComment $storyComment = null;
 
     /**
      * @param  ?Story  $story
-     * @param  ?Comment  $comment
+     * @param  ?StoryComment  $storyComment
      */
-    public function mount($story = null, $comment = null): void
+    public function mount($story = null, $storyComment = null): void
     {
         // Ensure only one parent type is provided
-        if ($story === null && $comment === null) {
-            throw new \InvalidArgumentException('Either a Story or a Comment must be provided.');
+        if ($story === null && $storyComment === null) {
+            throw new \InvalidArgumentException('Either a Story or a StoryComment must be provided.');
         }
-        if ($story !== null && $comment !== null) {
-            throw new \InvalidArgumentException('Only one of Story or Comment can be provided.');
+        if ($story !== null && $storyComment !== null) {
+            throw new \InvalidArgumentException('Only one of Story or StoryComment can be provided.');
         }
 
         $this->story = $story;
-        $this->comment = $comment;
+        $this->storyComment = $storyComment;
     }
 
     #[On('commentCreated')]
@@ -51,14 +51,14 @@ class ListComments extends Component implements HasForms, HasTable
 
     public function render(): View
     {
-        return view('livewire.comment.list-comments');
+        return view('livewire.story-comment.list-story-comments');
     }
 
     public function table(Table $table): Table
     {
         return $table
             ->columns([
-                Tables\Columns\Layout\View::make('components.comment.table.index')
+                Tables\Columns\Layout\View::make('components.story-comment.table.index')
                     ->schema([
                         Tables\Columns\TextColumn::make('created_at')
                             ->label(ucfirst(__('validation.attributes.created_at')))
@@ -77,25 +77,25 @@ class ListComments extends Component implements HasForms, HasTable
                 if ($this->story !== null) {
                     $count = $this->story->comment_count;
                     $formattedCount = $this->story->formattedCommentCount();
-                } elseif ($this->comment !== null) {
-                    $count = $this->comment->reply_count;
-                    $formattedCount = $this->comment->formattedReplyCount();
+                } elseif ($this->storyComment !== null) {
+                    $count = $this->storyComment->reply_count;
+                    $formattedCount = $this->storyComment->formattedReplyCount();
                 }
 
                 return new HtmlString(
                     '<div class="p-4 text-xl font-bold">'.
-                    $formattedCount.' '.trans_choice('comment.resource.model_label', $count).
+                    $formattedCount.' '.trans_choice('story-comment.resource.model_label', $count).
                     '</div>'
                 );
             })
             ->paginated([10])
-            ->query(Comment::query()
+            ->query(StoryComment::query()
                 ->when($this->story !== null, function (Builder $query) {
                     $query->where('story_id', $this->story?->id)
                         ->whereNull('parent_id');
                 })
-                ->when($this->comment !== null, function (Builder $query) {
-                    $query->where('parent_id', $this->comment?->id);
+                ->when($this->storyComment !== null, function (Builder $query) {
+                    $query->where('parent_id', $this->storyComment?->id);
                 })
                 ->with('creator')
             )

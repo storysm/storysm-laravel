@@ -21,16 +21,16 @@ use Spatie\Translatable\HasTranslations;
  * @property int $reply_count
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
- * @property-read Collection<int, Comment> $comments
+ * @property-read Collection<int, StoryComment> $storyComments
  * @property-read User $creator
- * @property-read ?Comment $parent
+ * @property-read ?StoryComment $parent
  * @property-read Story $story
  */
-class Comment extends Model
+class StoryComment extends Model
 {
     use CanFormatCount;
 
-    /** @use HasFactory<\Database\Factories\CommentFactory> */
+    /** @use HasFactory<\Database\Factories\StoryCommentFactory> */
     use HasFactory;
 
     use HasTranslations;
@@ -54,14 +54,14 @@ class Comment extends Model
     {
         parent::boot();
 
-        static::created(function (Comment $comment) {
-            // If this comment is a reply, update the parent's reply count
-            if ($comment->parent_id !== null) {
-                $comment->parent()->increment('reply_count');
+        static::created(function (StoryComment $storyComment) {
+            // If this StoryComment is a reply, update the parent's reply count
+            if ($storyComment->parent_id !== null) {
+                $storyComment->parent()->increment('reply_count');
             }
 
-            // Update story comment count
-            $comment->story()->increment('comment_count');
+            // Update story StoryComment count
+            $storyComment->story()->increment('comment_count');
         });
     }
 
@@ -70,26 +70,26 @@ class Comment extends Model
     {
         parent::booted();
 
-        static::deleted(function (Comment $comment) {
-            if ($comment->parent_id !== null) {
-                Comment::where('id', $comment->parent_id)->decrement('reply_count');
+        static::deleted(function (StoryComment $storyComment) {
+            if ($storyComment->parent_id !== null) {
+                StoryComment::where('id', $storyComment->parent_id)->decrement('reply_count');
             }
-            Story::where('id', $comment->story_id)->decrement('comment_count');
+            Story::where('id', $storyComment->story_id)->decrement('comment_count');
         });
     }
 
     /**
-     * Get the children for the comment.
+     * Get the children for the StoryComment.
      *
-     * @return HasMany<Comment, $this>
+     * @return HasMany<StoryComment, $this>
      */
-    public function comments(): HasMany
+    public function StoryComments(): HasMany
     {
-        return $this->hasMany(Comment::class, 'parent_id');
+        return $this->hasMany(StoryComment::class, 'parent_id');
     }
 
     /**
-     * Get the creator (user) of the comment.
+     * Get the creator (user) of the StoryComment.
      *
      * @return BelongsTo<User, $this>
      */
@@ -112,17 +112,17 @@ class Comment extends Model
     }
 
     /**
-     * Get the parent of the comment.
+     * Get the parent of the StoryComment.
      *
-     * @return BelongsTo<Comment, $this>
+     * @return BelongsTo<StoryComment, $this>
      */
     public function parent(): BelongsTo
     {
-        return $this->belongsTo(Comment::class, 'parent_id');
+        return $this->belongsTo(StoryComment::class, 'parent_id');
     }
 
     /**
-     * Get the story that the comment belongs to.
+     * Get the story that the StoryComment belongs to.
      *
      * @return BelongsTo<Story, $this>
      */

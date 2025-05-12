@@ -4,10 +4,10 @@ namespace Tests\Feature\Livewire\Story;
 
 use App\Enums\Story\Status;
 use App\Livewire\Story\ViewStory;
-use App\Models\Comment;
 use App\Models\Media;
 use App\Models\Permission;
 use App\Models\Story;
+use App\Models\StoryComment;
 use App\Models\User;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Filament\Actions\Action;
@@ -292,26 +292,26 @@ class ViewStoryTest extends TestCase
         /** @var Testable */
         $testable = Livewire::test(ViewStory::class, ['story' => $story]);
 
-        // Assert the initial comment count is displayed
+        // Assert the initial StoryComment count is displayed
         $testable->assertSee($story->formattedCommentCount());
 
-        // Simulate a new comment being created by another component (or user)
-        // This updates the database record for the story's comment count
-        Comment::factory()->create(['story_id' => $story->id, 'creator_id' => $user->id]);
+        // Simulate a new StoryComment being created by another component (or user)
+        // This updates the database record for the story's StoryComment count
+        StoryComment::factory()->create(['story_id' => $story->id, 'creator_id' => $user->id]);
 
         // The $story model instance currently held by the Livewire component
-        // does NOT yet reflect the new comment count from the database.
+        // does NOT yet reflect the new StoryComment count from the database.
 
         // Dispatch the event that the ViewStory component listens for.
         // This should trigger the refreshStory method, which calls $this->story->refresh().
         $testable->dispatch('commentCreated');
 
         // After the event and refresh, the $story model instance on the component
-        // should now have the updated comment count.
+        // should now have the updated StoryComment count.
         // We need to refresh the $story object in the test scope to get the new count for assertion.
         $story->refresh();
 
-        // Assert that the view now displays the incremented comment count.
+        // Assert that the view now displays the incremented StoryComment count.
         // The component's view will re-render after the refresh.
         $testable->assertSee($story->formattedCommentCount());
     }

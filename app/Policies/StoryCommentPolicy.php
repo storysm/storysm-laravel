@@ -2,20 +2,20 @@
 
 namespace App\Policies;
 
-use App\Models\Comment;
+use App\Models\StoryComment;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class CommentPolicy
+class StoryCommentPolicy
 {
     use HandlesAuthorization;
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Comment $comment): bool
+    public function view(User $user, StoryComment $storyComment): bool
     {
-        if ($user->isNot($comment->creator) && ! $this->viewAll($user)) {
+        if ($user->isNot($storyComment->creator) && ! $this->viewAll($user)) {
             return false;
         }
 
@@ -41,12 +41,12 @@ class CommentPolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Comment $comment): bool
+    public function update(User $user, StoryComment $storyComment): bool
     {
-        if ($comment->isReferenced()) {
+        if ($storyComment->isReferenced()) {
             return false;
         }
-        if ($user->isNot($comment->creator) && ! $this->viewAll($user)) {
+        if ($user->isNot($storyComment->creator) && ! $this->viewAll($user)) {
             return false;
         }
 
@@ -56,12 +56,12 @@ class CommentPolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Comment $comment): bool
+    public function delete(User $user, StoryComment $storyComment): bool
     {
-        if ($comment->isReferenced()) {
+        if ($storyComment->isReferenced()) {
             return false;
         }
-        if ($user->isNot($comment->creator) && ! $this->viewAll($user)) {
+        if ($user->isNot($storyComment->creator) && ! $this->viewAll($user)) {
             return false;
         }
 

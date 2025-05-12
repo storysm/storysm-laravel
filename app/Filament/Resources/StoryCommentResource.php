@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\CommentResource\Pages;
-use App\Models\Comment;
+use App\Models\StoryComment;
 use Filament\Facades\Filament;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -12,9 +12,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class CommentResource extends Resource
+class StoryCommentResource extends Resource
 {
-    protected static ?string $model = Comment::class;
+    protected static ?string $model = StoryComment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-oval-left-ellipsis';
 
@@ -32,7 +32,7 @@ class CommentResource extends Resource
     }
 
     /**
-     * @return Builder<Comment>
+     * @return Builder<StoryComment>
      */
     public static function getEloquentQuery(): Builder
     {
@@ -52,12 +52,12 @@ class CommentResource extends Resource
 
     public static function getModelLabel(): string
     {
-        return trans_choice('comment.resource.model_label', 1);
+        return trans_choice('story-comment.resource.model_label', 1);
     }
 
     public static function getPluralModelLabel(): string
     {
-        return trans_choice('comment.resource.model_label', 2);
+        return trans_choice('story-comment.resource.model_label', 2);
     }
 
     /**
@@ -73,8 +73,8 @@ class CommentResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListComments::route('/'),
-            'edit' => Pages\EditComment::route('/{record}/edit'),
+            'index' => Pages\ListStoryComments::route('/'),
+            'edit' => Pages\EditStoryComment::route('/{record}/edit'),
         ];
     }
 
@@ -83,13 +83,13 @@ class CommentResource extends Resource
         return $table
             ->columns(array_filter([
                 Tables\Columns\TextColumn::make('body')
-                    ->label(trans_choice('comment.resource.model_label', 1))
+                    ->label(trans_choice('story-comment.resource.model_label', 1))
                     ->limit(30),
                 Tables\Columns\TextColumn::make('story.title')
                     ->label(trans_choice('story.resource.model_label', 1))
                     ->limit(30),
                 Tables\Columns\TextColumn::make('reply_count')
-                    ->label(__('comment.resource.reply_count')),
+                    ->label(__('story-comment.resource.reply_count')),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator'))) : null,
             ]))
@@ -97,7 +97,7 @@ class CommentResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
                         ->label(__('View :name', ['name' => trans_choice('story.resource.model_label', 1)]))
-                        ->url(fn (Comment $record) => route('stories.show', $record->story)),
+                        ->url(fn (StoryComment $record) => route('stories.show', $record->story)),
                     Tables\Actions\EditAction::make(),
                     Tables\Actions\DeleteAction::make(),
                 ]),

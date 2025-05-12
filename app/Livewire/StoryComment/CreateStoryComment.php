@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Livewire\Comment;
+namespace App\Livewire\StoryComment;
 
 use App\Concerns\HasLocales;
-use App\Models\Comment;
 use App\Models\Story;
+use App\Models\StoryComment;
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Textarea;
@@ -21,7 +21,7 @@ use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 /**
  * @property Form $form
  */
-class CreateComment extends Component implements HasForms
+class CreateStoryComment extends Component implements HasForms
 {
     use HasLocales;
     use InteractsWithForms;
@@ -33,24 +33,24 @@ class CreateComment extends Component implements HasForms
 
     public ?Story $story = null;
 
-    public ?Comment $comment = null;
+    public ?StoryComment $storyComment = null;
 
     /**
      * @param  ?Story  $story
-     * @param  ?Comment  $comment
+     * @param  ?StoryComment  $storyComment
      */
-    public function mount($story = null, $comment = null): void
+    public function mount($story = null, $storyComment = null): void
     {
         // Ensure only one parent type is provided
-        if ($story === null && $comment === null) {
-            throw new \InvalidArgumentException('Either a Story or a Comment must be provided.');
+        if ($story === null && $storyComment === null) {
+            throw new \InvalidArgumentException('Either a Story or a StoryComment must be provided.');
         }
-        if ($story !== null && $comment !== null) {
-            throw new \InvalidArgumentException('Only one of Story or Comment can be provided.');
+        if ($story !== null && $storyComment !== null) {
+            throw new \InvalidArgumentException('Only one of Story or StoryComment can be provided.');
         }
 
         $this->story = $story;
-        $this->comment = $comment;
+        $this->storyComment = $storyComment;
         $this->form->fill();
     }
 
@@ -58,7 +58,7 @@ class CreateComment extends Component implements HasForms
     {
         if (Auth::guest()) {
             Notification::make()
-                ->title(__('comment.form.section.description.login_required'))
+                ->title(__('story-comment.form.section.description.login_required'))
                 ->danger()
                 ->send();
 
@@ -75,29 +75,29 @@ class CreateComment extends Component implements HasForms
 
         if (! $hasContent) {
             Notification::make()
-                ->title(__('comment.form.validation.body_required'))
+                ->title(__('story-comment.form.validation.body_required'))
                 ->danger()
                 ->send();
 
             return;
         }
 
-        $comment = new Comment;
+        $storyComment = new StoryComment;
         // Fill the translatable body
-        $comment->fill($data);
+        $storyComment->fill($data);
 
-        // Associate with the correct parent (Story or Comment)
+        // Associate with the correct parent (Story or StoryComment)
         if ($this->story !== null) {
-            $comment->story()->associate($this->story);
-        } elseif ($this->comment !== null) {
-            $comment->story()->associate($this->comment->story); // Associate with the parent comment's story
-            $comment->parent()->associate($this->comment); // Set the parent comment
+            $storyComment->story()->associate($this->story);
+        } elseif ($this->storyComment !== null) {
+            $storyComment->story()->associate($this->storyComment->story); // Associate with the parent StoryComment's story
+            $storyComment->parent()->associate($this->storyComment); // Set the parent StoryComment
         }
-        $comment->creator()->associate(Auth::user());
-        $comment->save();
+        $storyComment->creator()->associate(Auth::user());
+        $storyComment->save();
 
         Notification::make()
-            ->title(__('comment.form.notification.created'))
+            ->title(__('story-comment.form.notification.created'))
             ->success()
             ->send();
 
@@ -122,9 +122,9 @@ class CreateComment extends Component implements HasForms
 
                             return [
                                 Textarea::make('body')
-                                    ->label(__('comment.form.body.label'))
+                                    ->label(__('story-comment.form.body.label'))
                                     ->lazy()
-                                    ->placeholder(__('comment.form.body.placeholder'))
+                                    ->placeholder(__('story-comment.form.body.placeholder'))
                                     ->required($required),
                             ];
                         })
@@ -136,27 +136,27 @@ class CreateComment extends Component implements HasForms
                         Action::make('submit')
                             ->action('createComment')
                             ->disabled(! $auth)
-                            ->label(__('comment.form.actions.submit')),
+                            ->label(__('story-comment.form.actions.submit')),
                     ])
-                    ->description($auth ? null : strval(__('comment.form.section.description.login_required')))
+                    ->description($auth ? null : strval(__('story-comment.form.section.description.login_required')))
                     ->headerActions([
                         Action::make('login')
                             ->hidden($auth)
-                            ->label(__('comment.form.actions.login'))
+                            ->label(__('story-comment.form.actions.login'))
                             ->url(route('login')),
                     ])
-                    ->heading($auth ? __('comment.form.section.heading.write') : __('comment.form.section.heading.login_required'))
+                    ->heading($auth ? __('story-comment.form.section.heading.write') : __('story-comment.form.section.heading.login_required'))
                     ->icon($auth ? null : 'heroicon-o-exclamation-circle')
                     ->iconColor('warning')
                     ->key('comment'),
             ])
             ->disabled(! $auth)
-            ->model(Comment::class)
+            ->model(StoryComment::class)
             ->statePath('data');
     }
 
     public function render(): View
     {
-        return view('livewire.comment.create-comment');
+        return view('livewire.story-comment.create-story-comment');
     }
 }

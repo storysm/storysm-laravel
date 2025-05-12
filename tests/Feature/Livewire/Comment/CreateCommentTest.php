@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Livewire\Comment;
 
-use App\Livewire\Comment\CreateComment;
-use App\Models\Comment;
+use App\Livewire\StoryComment\CreateStoryComment;
 use App\Models\Story;
+use App\Models\StoryComment;
 use App\Models\User;
 use Filament\Notifications\Notification;
 use Livewire\Features\SupportTesting\Testable;
@@ -21,7 +21,7 @@ class CreateCommentTest extends TestCase
 
         $this->actingAs($user);
 
-        Livewire::test(CreateComment::class, ['story' => $story])
+        Livewire::test(CreateStoryComment::class, ['story' => $story])
             ->assertStatus(200);
     }
 
@@ -34,33 +34,33 @@ class CreateCommentTest extends TestCase
         $this->actingAs($user);
 
         /** @var Testable */
-        $testable = Livewire::test(CreateComment::class, ['story' => $story]);
+        $testable = Livewire::test(CreateStoryComment::class, ['story' => $story]);
         $testable->fillForm([
-            'body' => ['en' => 'This is a test comment.'],
+            'body' => ['en' => 'This is a test StoryComment.'],
         ]);
         $testable->call('createComment');
         $testable->assertHasNoFormErrors();
         $testable->assertNotified(
             Notification::make()
-                ->title(__('comment.form.notification.created'))
+                ->title(__('story-comment.form.notification.created'))
                 ->success()
         );
 
-        $this->assertDatabaseHas('comments', [
+        $this->assertDatabaseHas('story_comments', [
             'story_id' => $story->id,
             'creator_id' => $user->id,
         ]);
 
-        // Now, fetch the specific comment record
-        $comment = Comment::where('story_id', $story->id)
+        // Now, fetch the specific StoryComment record
+        $storyComment = StoryComment::where('story_id', $story->id)
             ->where('creator_id', $user->id)
             ->first();
 
-        // Assert that the comment was found
-        $this->assertNotNull($comment, 'Comment not found in the database.');
+        // Assert that the StoryComment was found
+        $this->assertNotNull($storyComment, 'Comment not found in the database.');
 
-        $body = $comment->body;
-        $this->assertEquals('This is a test comment.', $body);
+        $body = $storyComment->body;
+        $this->assertEquals('This is a test StoryComment.', $body);
     }
 
     public function test_requires_content_to_create_a_comment(): void
@@ -72,7 +72,7 @@ class CreateCommentTest extends TestCase
         $this->actingAs($user);
 
         /** @var Testable */
-        $testable = Livewire::test(CreateComment::class, ['story' => $story]);
+        $testable = Livewire::test(CreateStoryComment::class, ['story' => $story]);
         $testable->fillForm([
             'body' => null, // Empty content
         ]);
@@ -89,9 +89,9 @@ class CreateCommentTest extends TestCase
         $this->actingAs($user);
 
         /** @var Testable */
-        $testable = Livewire::test(CreateComment::class, ['story' => $story]);
+        $testable = Livewire::test(CreateStoryComment::class, ['story' => $story]);
         $testable->fillForm([
-            'body' => ['en' => 'This is a test comment.'],
+            'body' => ['en' => 'This is a test StoryComment.'],
         ]);
         $testable->call('createComment');
         $testable->assertDispatched('commentCreated');

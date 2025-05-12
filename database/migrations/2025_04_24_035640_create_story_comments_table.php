@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('comments', function (Blueprint $table) {
+        Schema::create('story_comments', function (Blueprint $table) {
             $table->ulid('id')->primary();
             $table->foreignUlid('creator_id')->constrained('users');
             $table->foreignUlid('story_id')->constrained();
-            $table->foreignUlid('parent_id')->nullable()->constrained('comments');
+            $table->foreignUlid('parent_id')->nullable()->constrained('story_comments');
             $table->json('body');
             $table->unsignedBigInteger('reply_count')->default(0)->index();
             $table->timestamps();
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('comments');
+        Schema::dropIfExists('story_comments');
     }
 };

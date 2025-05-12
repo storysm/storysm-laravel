@@ -1,8 +1,8 @@
 @php
-    $comment = $getRecord();
+    $storyComment = $getRecord();
 @endphp
 
 {{-- Card Container --}}
 <div {{ $attributes->merge($getExtraAttributes()) }}>
-    <x-comment.card :comment="$comment" />
+    <x-story-comment.card :storyComment="$storyComment" />
 </div>

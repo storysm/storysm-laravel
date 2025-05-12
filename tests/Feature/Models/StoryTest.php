@@ -124,7 +124,7 @@ class StoryTest extends TestCase
     }
 
     /**
-     * Test that formattedCommentCount formats the comment count correctly with suffixes.
+     * Test that formattedCommentCount formats the StoryComment count correctly with suffixes.
      */
     #[DataProvider('formattingProvider')]
     public function test_formatted_comment_count_formats_correctly(int $count, string $expectedFormat): void

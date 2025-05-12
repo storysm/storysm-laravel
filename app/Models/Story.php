@@ -29,7 +29,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $downvote_count
  * @property int $vote_count
  * @property float $vote_score
- * @property int $comment_count
+ * @property int $storyComment_count
  * @property ?Carbon $published_at
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
@@ -86,13 +86,13 @@ class Story extends Model
     ];
 
     /**
-     * Get the comments for the story.
+     * Get the storyComments for the story.
      *
-     * @return HasMany<Comment, $this>
+     * @return HasMany<StoryComment, $this>
      */
-    public function comments(): HasMany
+    public function storyComments(): HasMany
     {
-        return $this->hasMany(Comment::class);
+        return $this->hasMany(StoryComment::class);
     }
 
     /**
@@ -119,7 +119,7 @@ class Story extends Model
     }
 
     /**
-     * Get the comment count formatted with suffixes (K, M, B, T).
+     * Get the StoryComment count formatted with suffixes (K, M, B, T).
      */
     public function formattedCommentCount(): string
     {
@@ -195,7 +195,7 @@ class Story extends Model
 
     public function isReferenced(): bool
     {
-        if ($this->comments()->exists()) {
+        if ($this->storyComments()->exists()) {
             return true;
         }
 

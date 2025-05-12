@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Livewire\Comment;
 
-use App\Livewire\Comment\ListComments;
-use App\Models\Comment;
+use App\Livewire\StoryComment\ListStoryComments;
 use App\Models\Story;
+use App\Models\StoryComment;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Features\SupportTesting\Testable;
@@ -23,7 +23,7 @@ class ListCommentsTest extends TestCase
 
         $this->actingAs($user);
 
-        Livewire::test(ListComments::class, ['story' => $story])
+        Livewire::test(ListStoryComments::class, ['story' => $story])
             ->assertStatus(200);
     }
 
@@ -34,17 +34,17 @@ class ListCommentsTest extends TestCase
         $story = Story::factory()->create();
         $otherStory = Story::factory()->create();
 
-        // Comments for the target story
-        $comments = Comment::factory()->count(3)->for($story)->create();
-        // Comments for another story (should not be displayed)
-        Comment::factory()->count(2)->for($otherStory)->create();
+        // StoryComments for the target story
+        $storyComments = StoryComment::factory()->count(3)->for($story)->create();
+        // StoryComments for another story (should not be displayed)
+        StoryComment::factory()->count(2)->for($otherStory)->create();
 
         $this->actingAs($user);
 
         /** @var Testable */
-        $testable = Livewire::test(ListComments::class, ['story' => $story]);
-        $testable->assertCanSeeTableRecords($comments);
-        $testable->assertCanNotSeeTableRecords(Comment::where('story_id', $otherStory->id)->get());
+        $testable = Livewire::test(ListStoryComments::class, ['story' => $story]);
+        $testable->assertCanSeeTableRecords($storyComments);
+        $testable->assertCanNotSeeTableRecords(StoryComment::where('story_id', $otherStory->id)->get());
     }
 
     public function test_refreshes_table_when_comment_created_event_is_received(): void
@@ -53,29 +53,29 @@ class ListCommentsTest extends TestCase
         $user = User::factory()->create();
         $story = Story::factory()->create(['creator_id' => $user->id]);
         $initialCommentCount = 3;
-        // Create some initial comments
-        $initialComments = Comment::factory()->count($initialCommentCount)->for($story)->create();
+        // Create some initial StoryComments
+        $initialComments = StoryComment::factory()->count($initialCommentCount)->for($story)->create();
 
         $this->actingAs($user);
 
         /** @var Testable */
-        $testable = Livewire::test(ListComments::class, ['story' => $story]);
+        $testable = Livewire::test(ListStoryComments::class, ['story' => $story]);
 
-        // Assert the initial comments are displayed
+        // Assert the initial StoryComments are displayed
         $testable->assertCanSeeTableRecords($initialComments);
 
-        // Create a new comment in the database
-        $newComment = Comment::factory()->for($story)->create();
+        // Create a new StoryComment in the database
+        $newComment = StoryComment::factory()->for($story)->create();
 
-        // Get all comments for the story, including the new one
-        $allComments = $story->comments()->get();
+        // Get all StoryComments for the story, including the new one
+        $allComments = $story->storyComments()->get();
 
         // Dispatch the event
         $testable->dispatch('commentCreated');
 
-        // Assert the table refreshes and now shows all comments, including the new one
+        // Assert the table refreshes and now shows all StoryComments, including the new one
         $testable->assertCanSeeTableRecords($allComments);
-        // Optionally, assert the new comment specifically is visible
+        // Optionally, assert the new StoryComment specifically is visible
         $testable->assertCanSeeTableRecords([$newComment]);
     }
 }

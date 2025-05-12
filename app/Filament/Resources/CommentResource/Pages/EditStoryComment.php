@@ -2,13 +2,13 @@
 
 namespace App\Filament\Resources\CommentResource\Pages;
 
-use App\Filament\Resources\CommentResource;
+use App\Filament\Resources\StoryCommentResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditComment extends EditRecord
+class EditStoryComment extends EditRecord
 {
-    protected static string $resource = CommentResource::class;
+    protected static string $resource = StoryCommentResource::class;
 
     protected function getHeaderActions(): array
     {
