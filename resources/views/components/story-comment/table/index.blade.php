@@ -4,5 +4,5 @@
 
 {{-- Card Container --}}
 <div {{ $attributes->merge($getExtraAttributes()) }}>
-    <x-story-comment.card :storyComment="$storyComment" />
+    <livewire:story-comment.story-comment-card :$storyComment />
 </div>
