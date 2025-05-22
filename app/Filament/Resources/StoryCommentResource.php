@@ -2,18 +2,25 @@
 
 namespace App\Filament\Resources;
 
+use App\Concerns\HasLocales;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\CommentResource\Pages;
+use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\StoryComment;
 use Filament\Facades\Filament;
+use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class StoryCommentResource extends Resource
 {
+    use HasLocales;
+
     protected static ?string $model = StoryComment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-oval-left-ellipsis';
@@ -29,7 +36,31 @@ class StoryCommentResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Section::make([
+                    Forms\Components\Livewire::make('story-comment.story-comment-card',
+                        fn (Get $get): array => [
+                            'storyComment' => StoryComment::find($get('parent_id')),
+                            'showReplies' => false,
+                        ]),
+                ]),
+                Translate::make()
+                    ->schema(function (Get $get) {
+                        /** @var array<?string> */
+                        $titles = $get('body');
+                        $required = collect($titles)->every(fn ($item) => $item === null || trim($item) === '');
+
+                        return [
+                            Forms\Components\Textarea::make('body')
+                                ->label(__('story-comment.form.body.label'))
+                                ->lazy()
+                                ->placeholder(__('story-comment.form.body.placeholder'))
+                                ->required($required),
+                        ];
+                    })
+                    ->columnSpanFull()
+                    ->locales(static::getSortedLocales())
+                    ->suffixLocaleLabel(),
+                Creator::getComponent(static::canViewAll()),
             ]);
     }
 
