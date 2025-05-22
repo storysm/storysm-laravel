@@ -7,6 +7,7 @@ use App\Models\StoryComment;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
@@ -34,6 +35,18 @@ class StoryCommentCard extends Component implements HasActions, HasForms
         if (Auth::check()) {
             $this->hasUserReplied = $storyComment->storyComments()->where('creator_id', Auth::id())->exists();
         }
+    }
+
+    protected function deleteAction(): Action
+    {
+        return DeleteAction::make()
+            ->after(fn () => $this->dispatch('commentDeleted'))
+            ->record($this->storyComment);
+    }
+
+    public function deleteActionPermitted(): bool
+    {
+        return StoryCommentResource::canDelete($this->storyComment);
     }
 
     protected function editAction(): Action

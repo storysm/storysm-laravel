@@ -7,7 +7,7 @@
                     <x-filament-panels::avatar.user :user="$storyComment->creator" />
                     {{-- Creator --}}
                     <div class="flex flex-row gap-1">
-                        <p class="font-extrabold">{{ $storyComment->creator->name }}</p>
+                        <p class="font-extrabold">{{ $storyComment->creator?->name }}</p>
                         <span class="text-gray-500 dark:text-gray-400">&middot;</span>
                         <p class="text-gray-500 dark:text-gray-400" title="{{ $storyComment->created_at }}">
                             {{ $storyComment->created_at->diffForHumans() }}
@@ -16,9 +16,19 @@
                 </div>
 
                 {{-- Actions --}}
-                @if ($this->editActionPermitted())
+                @php
+                    $actions = [];
+                    if ($this->editActionPermitted()) {
+                        $actions[] = $this->editAction;
+                    }
+                    if ($this->deleteActionPermitted()) {
+                        $actions[] = $this->deleteAction;
+                    }
+                @endphp
+
+                @if (!empty($actions))
                     <div>
-                        <x-filament-actions::group :actions="[$this->editAction]" />
+                        <x-filament-actions::group :actions="$actions" />
                         <x-filament-actions::modals />
                     </div>
                 @endif

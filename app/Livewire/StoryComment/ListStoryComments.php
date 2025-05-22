@@ -44,6 +44,7 @@ class ListStoryComments extends Component implements HasForms, HasTable
     }
 
     #[On('commentCreated')]
+    #[On('commentDeleted')]
     public function refreshCommentsList(): void
     {
         $this->resetTable();
