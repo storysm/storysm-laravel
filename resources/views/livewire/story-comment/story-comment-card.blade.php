@@ -21,7 +21,7 @@
         @if ($showReplies)
             <div>
                 {{-- Replies --}}
-                <x-filament::button :href="route('story-comments.show', $storyComment)" icon="heroicon-m-arrow-uturn-left" outlined size="xs"
+                <x-filament::button :href="route('story-comments.show', $storyComment)" icon="heroicon-m-arrow-uturn-left" :outlined="!$hasUserReplied" size="xs"
                     tag="a">
                     {{ $storyComment->formattedReplyCount() }}
                 </x-filament::button>
