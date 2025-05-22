@@ -1,15 +1,27 @@
-<div class="flex flex-row gap-4 rounded-xl">
-    {{-- Avatar --}}
-    <x-filament-panels::avatar.user :user="$storyComment->creator" />
+<div>
+    <div class="flex flex-col gap-8">
+        <div class="flex flex-col gap-4">
+            <div class="flex flex-row items-center justify-between gap-2 text-sm">
+                <div class="flex flex-row gap-4">
+                    {{-- Avatar --}}
+                    <x-filament-panels::avatar.user :user="$storyComment->creator" />
+                    {{-- Creator --}}
+                    <div class="flex flex-row gap-1">
+                        <p class="font-extrabold">{{ $storyComment->creator->name }}</p>
+                        <span class="text-gray-500 dark:text-gray-400">&middot;</span>
+                        <p class="text-gray-500 dark:text-gray-400" title="{{ $storyComment->created_at }}">
+                            {{ $storyComment->created_at->diffForHumans() }}
+                        </p>
+                    </div>
+                </div>
 
-    <div class="flex flex-col gap-4">
-        <div class="flex flex-col gap-1">
-            {{-- Creator --}}
-            <div class="flex items-center gap-2 text-sm">
-                <p class="font-extrabold">{{ $storyComment->creator->name }}</p>
-                <span class="text-gray-500 dark:text-gray-400">&middot;</span>
-                <p class="text-gray-500 dark:text-gray-400" title="{{ $storyComment->created_at }}">
-                    {{ $storyComment->created_at->diffForHumans() }}</p>
+                {{-- Actions --}}
+                @if ($this->editActionPermitted())
+                    <div>
+                        <x-filament-actions::group :actions="[$this->editAction]" />
+                        <x-filament-actions::modals />
+                    </div>
+                @endif
             </div>
 
             {{-- Body --}}
@@ -21,8 +33,8 @@
         @if ($showReplies)
             <div>
                 {{-- Replies --}}
-                <x-filament::button :href="route('story-comments.show', $storyComment)" icon="heroicon-m-arrow-uturn-left" :outlined="!$hasUserReplied" size="xs"
-                    tag="a">
+                <x-filament::button :href="route('story-comments.show', $storyComment)" icon="heroicon-m-arrow-uturn-left" :outlined="!$hasUserReplied"
+                    size="xs" tag="a">
                     {{ $storyComment->formattedReplyCount() }}
                 </x-filament::button>
             </div>
