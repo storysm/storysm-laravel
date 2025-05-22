@@ -304,7 +304,7 @@ class ViewStoryTest extends TestCase
 
         // Dispatch the event that the ViewStory component listens for.
         // This should trigger the refreshStory method, which calls $this->story->refresh().
-        $testable->dispatch('commentCreated');
+        $testable->dispatch('storyCommentCreated');
 
         // After the event and refresh, the $story model instance on the component
         // should now have the updated StoryComment count.

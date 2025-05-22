@@ -104,7 +104,7 @@ class CreateStoryComment extends Component implements HasForms
         $this->form->fill(); // Reset the form
 
         // Dispatch event to notify other components
-        $this->dispatch('commentCreated');
+        $this->dispatch('storyCommentCreated');
     }
 
     public function form(Form $form): Form

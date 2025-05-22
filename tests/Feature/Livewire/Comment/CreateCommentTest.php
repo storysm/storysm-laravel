@@ -94,6 +94,6 @@ class CreateCommentTest extends TestCase
             'body' => ['en' => 'This is a test StoryComment.'],
         ]);
         $testable->call('createComment');
-        $testable->assertDispatched('commentCreated');
+        $testable->assertDispatched('storyCommentCreated');
     }
 }

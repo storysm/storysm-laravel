@@ -40,7 +40,7 @@ class StoryCommentCard extends Component implements HasActions, HasForms
     protected function deleteAction(): Action
     {
         return DeleteAction::make()
-            ->after(fn () => $this->dispatch('commentDeleted'))
+            ->after(fn () => $this->dispatch('storyCommentDeleted'))
             ->record($this->storyComment);
     }
 

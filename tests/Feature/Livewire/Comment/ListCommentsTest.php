@@ -71,7 +71,7 @@ class ListCommentsTest extends TestCase
         $allComments = $story->storyComments()->get();
 
         // Dispatch the event
-        $testable->dispatch('commentCreated');
+        $testable->dispatch('storyCommentCreated');
 
         // Assert the table refreshes and now shows all StoryComments, including the new one
         $testable->assertCanSeeTableRecords($allComments);

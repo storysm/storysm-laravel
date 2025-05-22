@@ -81,7 +81,7 @@ class ViewStory extends Component implements HasActions, HasForms
         return $breadcrumbs;
     }
 
-    #[On('commentCreated')]
+    #[On('storyCommentCreated')]
     public function refreshStory(): void
     {
         $this->story->refresh();

@@ -43,8 +43,8 @@ class ListStoryComments extends Component implements HasForms, HasTable
         $this->storyComment = $storyComment;
     }
 
-    #[On('commentCreated')]
-    #[On('commentDeleted')]
+    #[On('storyCommentCreated')]
+    #[On('storyCommentDeleted')]
     public function refreshCommentsList(): void
     {
         $this->resetTable();
