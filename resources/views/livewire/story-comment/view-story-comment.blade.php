@@ -22,4 +22,5 @@
             </div>
         </section>
     </x-container>
+    <x-filament-actions::modals />
 </div>
