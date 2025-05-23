@@ -13,6 +13,8 @@ class EditStoryComment extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
+            Actions\ViewAction::make()
+                ->url(route('story-comments.show', $this->record)),
             Actions\DeleteAction::make(),
         ];
     }
