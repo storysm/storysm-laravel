@@ -43,7 +43,8 @@ class StoryCommentResource extends Resource
                             'showActions' => false,
                             'showReplyButton' => false,
                         ]),
-                ]),
+                ])
+                    ->hidden(fn (Get $get): bool => is_null($get('parent_id'))),
                 Translate::make()
                     ->schema(function (Get $get) {
                         /** @var array<?string> */
