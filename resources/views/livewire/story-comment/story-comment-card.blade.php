@@ -16,21 +16,23 @@
                 </div>
 
                 {{-- Actions --}}
-                @php
-                    $actions = [];
-                    if ($this->editActionPermitted()) {
-                        $actions[] = $this->editAction;
-                    }
-                    if ($this->deleteActionPermitted()) {
-                        $actions[] = $this->deleteAction;
-                    }
-                @endphp
+                @if ($showActions)
+                    @php
+                        $actions = [];
+                        if ($this->editActionPermitted()) {
+                            $actions[] = $this->editAction;
+                        }
+                        if ($this->deleteActionPermitted()) {
+                            $actions[] = $this->deleteAction;
+                        }
+                    @endphp
 
-                @if (!empty($actions))
-                    <div>
-                        <x-filament-actions::group :actions="$actions" />
-                        <x-filament-actions::modals />
-                    </div>
+                    @if (!empty($actions))
+                        <div>
+                            <x-filament-actions::group :actions="$actions" />
+                            <x-filament-actions::modals />
+                        </div>
+                    @endif
                 @endif
             </div>
 

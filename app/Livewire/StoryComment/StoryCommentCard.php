@@ -26,11 +26,14 @@ class StoryCommentCard extends Component implements HasActions, HasForms
 
     public bool $hasUserReplied;
 
-    public function mount(StoryComment $storyComment, bool $showReplyButton = true): void
+    public bool $showActions;
+
+    public function mount(StoryComment $storyComment, bool $showReplyButton = true, bool $showActions = true): void
     {
         $this->storyComment = $storyComment;
         $this->showReplyButton = $showReplyButton;
         $this->hasUserReplied = false;
+        $this->showActions = $showActions;
 
         if (Auth::check()) {
             $this->hasUserReplied = $storyComment->storyComments()->where('creator_id', Auth::id())->exists();
