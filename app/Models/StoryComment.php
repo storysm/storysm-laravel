@@ -4,6 +4,8 @@ namespace App\Models;
 
 use App\Concerns\CanFormatCount;
 use Carbon\Carbon;
+use Database\Factories\StoryCommentFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -25,12 +27,18 @@ use Spatie\Translatable\HasTranslations;
  * @property-read User $creator
  * @property-read ?StoryComment $parent
  * @property-read Story $story
+ *
+ * @method static StoryCommentFactory factory(...$parameters)
+ * @method static Builder|StoryComment newModelQuery()
+ * @method static Builder|StoryComment newQuery()
+ * @method static Builder|StoryComment query()
+ * @method static Builder|StoryComment find(string|array<string> $id, array<string> $columns = ['*'])
  */
 class StoryComment extends Model
 {
     use CanFormatCount;
 
-    /** @use HasFactory<\Database\Factories\StoryCommentFactory> */
+    /** @use HasFactory<StoryCommentFactory> */
     use HasFactory;
 
     use HasTranslations;

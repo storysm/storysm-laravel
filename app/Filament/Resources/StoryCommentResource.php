@@ -11,10 +11,14 @@ use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
+use Filament\Navigation\NavigationItem;
+use Filament\Pages\SubNavigationPosition;
+use Filament\Resources\Pages\Page;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Facades\Request;
 use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class StoryCommentResource extends Resource
@@ -26,6 +30,8 @@ class StoryCommentResource extends Resource
     protected static ?string $navigationIcon = 'heroicon-o-chat-bubble-oval-left-ellipsis';
 
     protected static ?int $navigationSort = 1;
+
+    protected static SubNavigationPosition $subNavigationPosition = SubNavigationPosition::Top;
 
     public static function canViewAll(): bool
     {
@@ -113,6 +119,46 @@ class StoryCommentResource extends Resource
         ];
     }
 
+    public static function getRecordSubNavigation(Page $page): array
+    {
+        $navigationItems = [];
+
+        /** @var ?StoryComment */
+        $record = null;
+
+        if ($page instanceof Pages\ListStoryComments) {
+            $storyCommentId = Request::query('parent_id');
+
+            if ($storyCommentId) {
+                $record = StoryComment::find($storyCommentId);
+            }
+        } elseif ($page instanceof Pages\EditStoryComment) {
+            /** @var StoryComment */
+            $record = $page->getRecord();
+        }
+
+        if (! $record) {
+            return [];
+        }
+
+        $navigationItems = [];
+
+        if (static::canEdit($record)) {
+            $navigationItems['edit'] = NavigationItem::make(__('Edit'))
+                ->icon('heroicon-o-pencil')
+                ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.edit'))
+                ->url(static::getUrl('edit', ['record' => $record->getRouteKey()]));
+        }
+
+        $navigationItems['replies'] = NavigationItem::make(trans_choice('story-comment.resource.reply_label', 2))
+            ->badge(fn () => $record->storyComments()->count())
+            ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+            ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.index') && request('parent_id') == $record->id)
+            ->url(static::getUrl('index', ['parent_id' => $record->id]));
+
+        return $navigationItems;
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -132,11 +178,11 @@ class StoryCommentResource extends Resource
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
                         ->url(fn (StoryComment $record) => route('story-comments.show', $record)),
-                    Tables\Actions\ViewAction::make()
-                        ->hidden(fn (StoryComment $record) => ! $record->parent)
+                    Tables\Actions\Action::make('view_replies')
+                        ->label(__('View :name', ['name' => trans_choice('story-comment.resource.reply_label', 2)]))
                         ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
-                        ->label(__('View :name', ['name' => __('story-comment.resource.replied_comment')]))
-                        ->url(fn (StoryComment $record) => $record->parent ? route('story-comments.show', $record->parent) : null),
+                        ->url(fn (StoryComment $record): string => StoryCommentResource::getUrl('index', ['parent_id' => $record->id]))
+                        ->visible(fn (StoryComment $record): bool => $record->storyComments()->count() > 0),
                     Tables\Actions\ViewAction::make()
                         ->icon('heroicon-o-document-text')
                         ->label(__('View :name', ['name' => trans_choice('story.resource.model_label', 1)]))
