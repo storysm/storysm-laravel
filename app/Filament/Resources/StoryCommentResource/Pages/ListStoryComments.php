@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Filament\Resources\CommentResource\Pages;
+namespace App\Filament\Resources\StoryCommentResource\Pages;
 
 use App\Filament\Resources\StoryCommentResource;
 use Filament\Resources\Pages\ListRecords;

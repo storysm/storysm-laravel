@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Concerns\HasLocales;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
-use App\Filament\Resources\CommentResource\Pages;
+use App\Filament\Resources\StoryCommentResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
 use App\Models\StoryComment;
 use Filament\Facades\Filament;

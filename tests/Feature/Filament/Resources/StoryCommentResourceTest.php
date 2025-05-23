@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Filament\Resources\CommentResource\Pages\ListStoryComments;
 use App\Filament\Resources\StoryCommentResource;
+use App\Filament\Resources\StoryCommentResource\Pages\ListStoryComments;
 use App\Models\Permission;
 use App\Models\Story;
 use App\Models\StoryComment;
