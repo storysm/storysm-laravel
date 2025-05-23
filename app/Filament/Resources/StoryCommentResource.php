@@ -123,9 +123,6 @@ class StoryCommentResource extends Resource
                 Tables\Columns\TextColumn::make('story.title')
                     ->label(trans_choice('story.resource.model_label', 1))
                     ->limit(30),
-                Tables\Columns\TextColumn::make('parent.body')
-                    ->label(__('story-comment.resource.replied_comment'))
-                    ->limit(30),
                 Tables\Columns\TextColumn::make('reply_count')
                     ->label(__('story-comment.resource.reply_count')),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
