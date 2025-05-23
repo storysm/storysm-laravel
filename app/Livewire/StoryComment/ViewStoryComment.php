@@ -50,6 +50,7 @@ class ViewStoryComment extends Component implements HasActions, HasForms
         $story = $this->storyComment->story;
 
         return DeleteAction::make()
+            ->authorize(StoryCommentResource::canDelete($this->storyComment))
             ->color('danger')
             ->record($this->storyComment)
             ->successRedirectUrl(fn () => $parent
