@@ -40,7 +40,7 @@ class StoryCommentResource extends Resource
                     Forms\Components\Livewire::make('story-comment.story-comment-card',
                         fn (Get $get): array => [
                             'storyComment' => StoryComment::find($get('parent_id')),
-                            'showReplies' => false,
+                            'showReplyButton' => false,
                         ]),
                 ]),
                 Translate::make()

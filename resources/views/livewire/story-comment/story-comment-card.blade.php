@@ -40,7 +40,7 @@
             </p>
         </div>
 
-        @if ($showReplies)
+        @if ($showReplyButton)
             <div>
                 {{-- Replies --}}
                 <x-filament::button :href="route('story-comments.show', $storyComment)" icon="heroicon-m-arrow-uturn-left" :outlined="!$hasUserReplied"

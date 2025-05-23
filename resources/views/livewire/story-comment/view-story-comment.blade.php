@@ -11,7 +11,7 @@
                 <div class="lg:col-span-4 lg:sticky lg:top-4">
                     <div>
                         <x-filament::section>
-                            <livewire:story-comment.story-comment-card :$storyComment :showReplies="false" />
+                            <livewire:story-comment.story-comment-card :$storyComment :showReplyButton="false" />
                         </x-filament::section>
                     </div>
                 </div>
