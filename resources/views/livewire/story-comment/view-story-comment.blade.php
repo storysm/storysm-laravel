@@ -13,7 +13,7 @@
                 </x-filament::section>
             </div>
             <div>
-                <livewire:story-comment.list-story-comments :storyComment="$storyComment" />
+                <livewire:story-comment.story-comments-table :storyComment="$storyComment" />
             </div>
             <div>
                 <livewire:story-comment.create-story-comment :storyComment="$storyComment" />

@@ -31,7 +31,7 @@
                         </div>
                     </x-filament::section>
                     <livewire:story-comment.create-story-comment :story="$story" />
-                    <livewire:story-comment.list-story-comments :story="$story" />
+                    <livewire:story-comment.story-comments-table :story="$story" />
                 </div>
                 <div class="sm:col-span-4">
                     <div>

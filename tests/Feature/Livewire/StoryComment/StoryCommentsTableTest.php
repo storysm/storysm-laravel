@@ -1,8 +1,8 @@
 <?php
 
-namespace Tests\Feature\Livewire\Comment;
+namespace Tests\Feature\Livewire\StoryComment;
 
-use App\Livewire\StoryComment\ListStoryComments;
+use App\Livewire\StoryComment\StoryCommentsTable;
 use App\Models\Story;
 use App\Models\StoryComment;
 use App\Models\User;
@@ -11,7 +11,7 @@ use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class ListCommentsTest extends TestCase
+class StoryCommentsTableTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,7 +23,7 @@ class ListCommentsTest extends TestCase
 
         $this->actingAs($user);
 
-        Livewire::test(ListStoryComments::class, ['story' => $story])
+        Livewire::test(StoryCommentsTable::class, ['story' => $story])
             ->assertStatus(200);
     }
 
@@ -42,7 +42,7 @@ class ListCommentsTest extends TestCase
         $this->actingAs($user);
 
         /** @var Testable */
-        $testable = Livewire::test(ListStoryComments::class, ['story' => $story]);
+        $testable = Livewire::test(StoryCommentsTable::class, ['story' => $story]);
         $testable->assertCanSeeTableRecords($storyComments);
         $testable->assertCanNotSeeTableRecords(StoryComment::where('story_id', $otherStory->id)->get());
     }
@@ -59,7 +59,7 @@ class ListCommentsTest extends TestCase
         $this->actingAs($user);
 
         /** @var Testable */
-        $testable = Livewire::test(ListStoryComments::class, ['story' => $story]);
+        $testable = Livewire::test(StoryCommentsTable::class, ['story' => $story]);
 
         // Assert the initial StoryComments are displayed
         $testable->assertCanSeeTableRecords($initialComments);

@@ -16,7 +16,7 @@ use Illuminate\Support\HtmlString;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-class ListStoryComments extends Component implements HasForms, HasTable
+class StoryCommentsTable extends Component implements HasForms, HasTable
 {
     use InteractsWithForms;
     use InteractsWithTable;
@@ -52,7 +52,7 @@ class ListStoryComments extends Component implements HasForms, HasTable
 
     public function render(): View
     {
-        return view('livewire.story-comment.list-story-comments');
+        return view('livewire.story-comment.story-comments-table');
     }
 
     public function table(Table $table): Table
