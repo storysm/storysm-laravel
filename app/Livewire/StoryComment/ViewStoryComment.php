@@ -8,6 +8,7 @@ use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Actions\DeleteAction;
+use Filament\Actions\ViewAction;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Contracts\View\View;
@@ -16,6 +17,8 @@ use Livewire\Component;
 
 /**
  * @property Action $deleteAction
+ * @property Action $viewParentCommentAction
+ * @property Action $viewStoryAction
  */
 class ViewStoryComment extends Component implements HasActions, HasForms
 {
@@ -34,14 +37,15 @@ class ViewStoryComment extends Component implements HasActions, HasForms
      */
     public function getActions(): array
     {
-        $actions = [];
-        $actions[] = Action::make('edit')
-            ->authorize(StoryCommentResource::canEdit($this->storyComment))
-            ->label(__('Edit'))
-            ->url(route('filament.admin.resources.story-comments.edit', $this->storyComment));
-        $actions[] = $this->deleteAction;
-
-        return $actions;
+        return [
+            $this->viewParentCommentAction,
+            $this->viewStoryAction,
+            Action::make('edit')
+                ->authorize(StoryCommentResource::canEdit($this->storyComment))
+                ->label(__('Edit'))
+                ->url(route('filament.admin.resources.story-comments.edit', $this->storyComment)),
+            $this->deleteAction,
+        ];
     }
 
     protected function deleteAction(): Action
@@ -56,6 +60,24 @@ class ViewStoryComment extends Component implements HasActions, HasForms
             ->successRedirectUrl(fn () => $parent
                 ? route('story-comments.show', ['storyComment' => $parent])
                 : route('stories.show', $story));
+    }
+
+    protected function viewParentCommentAction(): Action
+    {
+        $parent = $this->storyComment->parent;
+
+        return ViewAction::make('view_parent')
+            ->label(__('View :name', ['name' => __('story-comment.resource.parent_comment')]))
+            ->url(fn () => $parent ? route('story-comments.show', ['storyComment' => $parent]) : null)
+            ->visible(fn () => $parent !== null);
+    }
+
+    protected function viewStoryAction(): Action
+    {
+        return ViewAction::make('view_story')
+            ->label(__('View :name', ['name' => trans_choice('story.resource.model_label', 1)]))
+            ->url(fn () => route('stories.show', ['story' => $this->storyComment->story]))
+            ->visible(fn () => true);
     }
 
     /**
