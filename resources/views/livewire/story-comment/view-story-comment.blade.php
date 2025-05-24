@@ -6,20 +6,17 @@
     </x-header>
 
     <x-container>
-        <section class="flex flex-col gap-y-8">
-            <div class="grid items-start w-full grid-cols-1 gap-4 lg:grid-cols-12">
-                <div class="lg:col-span-4 lg:sticky lg:top-4">
-                    <div>
-                        <x-filament::section>
-                            <livewire:story-comment.story-comment-card :$storyComment :showActions="false"
-                                :showReplyButton="false" />
-                        </x-filament::section>
-                    </div>
-                </div>
-                <div class="flex flex-col gap-4 lg:col-span-8">
-                    <livewire:story-comment.list-story-comments :storyComment="$storyComment" />
-                    <livewire:story-comment.create-story-comment :storyComment="$storyComment" />
-                </div>
+        <section class="flex flex-col max-w-2xl gap-4 mx-auto">
+            <div>
+                <x-filament::section>
+                    <livewire:story-comment.story-comment-card :$storyComment :showActions="false" :showReplyButton="false" />
+                </x-filament::section>
+            </div>
+            <div>
+                <livewire:story-comment.list-story-comments :storyComment="$storyComment" />
+            </div>
+            <div>
+                <livewire:story-comment.create-story-comment :storyComment="$storyComment" />
             </div>
         </section>
     </x-container>
