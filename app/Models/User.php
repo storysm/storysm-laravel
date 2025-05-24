@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\SuperUserAuthorizable;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
@@ -27,11 +28,14 @@ use LasseRafn\InitialAvatarGenerator\InitialAvatar;
 use Spatie\Color\Rgb;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @method static UserFactory factory($count = null)
+ */
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     use HasApiTokens;
 
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
 
     use HasProfilePhoto;

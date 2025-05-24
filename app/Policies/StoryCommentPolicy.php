@@ -27,7 +27,7 @@ class StoryCommentPolicy
      */
     public function viewAll(User $user): bool
     {
-        return $user->can('view_all_comment');
+        return $user->can('view_all_story::comment');
     }
 
     /**

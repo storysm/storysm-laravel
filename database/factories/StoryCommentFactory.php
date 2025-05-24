@@ -25,6 +25,8 @@ class StoryCommentFactory extends Factory
                 'en' => $this->faker->sentence(),
                 'id' => $this->faker->sentence(),
             ],
+            'parent_id' => null,
+            'reply_count' => 0,
         ];
     }
 }

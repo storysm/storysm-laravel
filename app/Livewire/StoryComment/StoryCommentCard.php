@@ -44,6 +44,7 @@ class StoryCommentCard extends Component implements HasActions, HasForms
     {
         return DeleteAction::make()
             ->after(fn () => $this->dispatch('storyCommentDeleted'))
+            ->authorize($this->deleteActionPermitted())
             ->record($this->storyComment);
     }
 
@@ -52,9 +53,10 @@ class StoryCommentCard extends Component implements HasActions, HasForms
         return StoryCommentResource::canDelete($this->storyComment);
     }
 
-    protected function editAction(): Action
+    public function editAction(): Action
     {
         return EditAction::make()
+            ->authorize($this->editActionPermitted())
             ->url(route('filament.admin.resources.story-comments.edit', $this->storyComment));
     }
 
