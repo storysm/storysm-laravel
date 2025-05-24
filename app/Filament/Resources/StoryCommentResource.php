@@ -148,13 +148,13 @@ class StoryCommentResource extends Resource
                 ->icon('heroicon-o-pencil')
                 ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.edit'))
                 ->url(static::getUrl('edit', ['record' => $record->getRouteKey()]));
-        }
 
-        $navigationItems['replies'] = NavigationItem::make(trans_choice('story-comment.resource.reply_label', 2))
-            ->badge(fn () => $record->storyComments()->count())
-            ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
-            ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.index') && request('parent_id') == $record->id)
-            ->url(static::getUrl('index', ['parent_id' => $record->id]));
+            $navigationItems['replies'] = NavigationItem::make(trans_choice('story-comment.resource.reply_label', 2))
+                ->badge(fn () => $record->storyComments()->count())
+                ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
+                ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.index') && request('parent_id') == $record->id)
+                ->url(static::getUrl('index', ['parent_id' => $record->id]));
+        }
 
         return $navigationItems;
     }
