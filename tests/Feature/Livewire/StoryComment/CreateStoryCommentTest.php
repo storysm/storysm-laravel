@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Livewire\Comment;
+namespace Tests\Feature\Livewire\StoryComment;
 
 use App\Livewire\StoryComment\CreateStoryComment;
 use App\Models\Story;
@@ -11,7 +11,7 @@ use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-class CreateCommentTest extends TestCase
+class CreateStoryCommentTest extends TestCase
 {
     public function test_renders_successfully(): void
     {
