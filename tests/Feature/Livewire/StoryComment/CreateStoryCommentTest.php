@@ -7,12 +7,15 @@ use App\Models\Story;
 use App\Models\StoryComment;
 use App\Models\User;
 use Filament\Notifications\Notification;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Features\SupportTesting\Testable;
 use Livewire\Livewire;
 use Tests\TestCase;
 
 class CreateStoryCommentTest extends TestCase
 {
+    use RefreshDatabase;
+
     public function test_renders_successfully(): void
     {
         /** @var User */
@@ -95,5 +98,50 @@ class CreateStoryCommentTest extends TestCase
         ]);
         $testable->call('createComment');
         $testable->assertDispatched('storyCommentCreated');
+    }
+
+    public function test_guest_cannot_create_a_comment(): void
+    {
+        $story = Story::factory()->create();
+
+        // No actingAs() call
+        /** @var Testable */
+        $testable = Livewire::test(CreateStoryComment::class, ['story' => $story]);
+        $testable->fillForm(['body' => ['en' => 'Guest comment']]);
+        $testable->call('createComment');
+        $testable->assertNotified(
+            Notification::make()
+                ->title(__('story-comment.form.section.description.login_required'))
+                ->danger()
+        );
+
+        $this->assertDatabaseCount('story_comments', 0);
+    }
+
+    public function test_can_create_a_reply_to_another_comment(): void
+    {
+        $user = User::factory()->create();
+        $parentComment = StoryComment::factory()->create();
+        $story = $parentComment->story;
+
+        $this->actingAs($user);
+
+        /** @var Testable */
+        $testable = Livewire::test(CreateStoryComment::class, ['storyComment' => $parentComment]);
+        $testable->fillForm(['body' => ['en' => 'This is a reply.']]);
+        $testable->call('createComment');
+        $testable->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('story_comments', [
+            'body->en' => 'This is a reply.',
+            'parent_id' => $parentComment->id,
+            'story_id' => $story->id, // Important: ensures it's linked to the original story
+        ]);
+
+        $parentComment->refresh();
+        $this->assertEquals(1, $parentComment->reply_count);
+
+        $story->refresh();
+        $this->assertEquals(2, $story->comment_count); // Parent + Reply
     }
 }

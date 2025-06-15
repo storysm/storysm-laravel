@@ -56,7 +56,14 @@ class CreateStoryComment extends Component implements HasForms
 
     public function createComment(): void
     {
-        $this->authorize('create', StoryComment::class);
+        if (Auth::guest()) {
+            Notification::make()
+                ->title(__('story-comment.form.section.description.login_required'))
+                ->danger()
+                ->send();
+
+            return;
+        }
 
         $data = $this->form->getState();
 
