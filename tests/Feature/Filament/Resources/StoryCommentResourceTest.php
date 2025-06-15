@@ -54,8 +54,8 @@ class StoryCommentResourceTest extends TestCase
 
     public function test_displays_creator_name_column_if_user_can_view_all(): void
     {
-        Permission::firstOrCreate(['name' => 'view_all_comment']);
-        $this->user->givePermissionTo('view_all_comment');
+        Permission::firstOrCreate(['name' => 'view_all_story::comment']);
+        $this->user->givePermissionTo('view_all_story::comment');
 
         $story = Story::factory()->create(['creator_id' => $this->user->id]);
         $storyComment = StoryComment::factory()->create([
@@ -111,8 +111,8 @@ class StoryCommentResourceTest extends TestCase
 
     public function test_shows_all_comments_if_the_user_can_view_all(): void
     {
-        Permission::firstOrCreate(['name' => 'view_all_comment']);
-        $this->user->givePermissionTo('view_all_comment');
+        Permission::firstOrCreate(['name' => 'view_all_story::comment']);
+        $this->user->givePermissionTo('view_all_story::comment');
 
         $story = Story::factory()->create(['creator_id' => $this->user->id]);
         $storyComment = StoryComment::factory()->create([
