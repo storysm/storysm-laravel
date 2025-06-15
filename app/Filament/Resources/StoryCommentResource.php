@@ -176,14 +176,14 @@ class StoryCommentResource extends Resource
             ]))
             ->actions([
                 Tables\Actions\ActionGroup::make([
-                    Tables\Actions\ViewAction::make()
+                    Tables\Actions\ViewAction::make('view_comment')
                         ->url(fn (StoryComment $record) => route('story-comments.show', $record)),
                     Tables\Actions\Action::make('view_replies')
                         ->label(__('View :name', ['name' => trans_choice('story-comment.resource.reply_label', 2)]))
                         ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
                         ->url(fn (StoryComment $record): string => StoryCommentResource::getUrl('index', ['parent_id' => $record->id]))
                         ->visible(fn (StoryComment $record): bool => $record->reply_count > 0),
-                    Tables\Actions\ViewAction::make()
+                    Tables\Actions\ViewAction::make('view_story')
                         ->icon('heroicon-o-document-text')
                         ->label(__('View :name', ['name' => trans_choice('story.resource.model_label', 1)]))
                         ->url(fn (StoryComment $record) => route('stories.show', $record->story)),

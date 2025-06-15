@@ -147,12 +147,13 @@ class StoryCommentResourceTest extends TestCase
         $testable = Livewire::test(ListStoryComments::class);
 
         $testable->assertCanSeeTableRecords([$storyComment]);
-        $testable->assertTableActionExists('view');
+        $testable->assertTableActionExists('view_comment');
+        $testable->assertTableActionExists('view_story');
         $testable->assertTableActionExists('edit');
         $testable->assertTableActionExists('delete');
     }
 
-    public function test_view_action_links_to_story_show_page(): void
+    public function test_view_comment_action_links_to_comment_show_page(): void
     {
         $story = Story::factory()->create(['creator_id' => $this->user->id]);
         $storyComment = StoryComment::factory()->create([
@@ -164,7 +165,22 @@ class StoryCommentResourceTest extends TestCase
         $testable = Livewire::test(ListStoryComments::class);
 
         $testable->assertCanSeeTableRecords([$storyComment]);
-        $testable->assertTableActionHasUrl('view', route('stories.show', $story), $storyComment);
+        $testable->assertTableActionHasUrl('view_comment', route('story-comments.show', $storyComment), $storyComment);
+    }
+
+    public function test_view_story_action_links_to_story_show_page(): void
+    {
+        $story = Story::factory()->create(['creator_id' => $this->user->id]);
+        $storyComment = StoryComment::factory()->create([
+            'story_id' => $story->id,
+            'creator_id' => $this->user->id,
+        ]);
+
+        /** @var Testable */
+        $testable = Livewire::test(ListStoryComments::class);
+
+        $testable->assertCanSeeTableRecords([$storyComment]);
+        $testable->assertTableActionHasUrl('view_story', route('stories.show', $story), $storyComment);
     }
 
     public function test_renders_the_comment_resource_table_with_bulk_actions(): void
