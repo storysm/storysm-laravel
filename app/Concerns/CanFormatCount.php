@@ -19,18 +19,26 @@ trait CanFormatCount
      */
     protected function formatCount(int $count): string
     {
-        if ($count < 1000) {
+        if ($count === 0) {
+            return '0';
+        }
+
+        $isNegative = $count < 0;
+        $absCount = abs($count);
+
+        if ($absCount < 1000) {
+            // Now returns the original count, handles negatives correctly
             return (string) $count;
         }
 
         // Find the appropriate suffix and threshold
         $i = count($this->thresholds) - 1;
-        while ($i > 0 && $count < $this->thresholds[$i]) {
+        while ($i > 0 && $absCount < $this->thresholds[$i]) {
             $i--;
         }
 
         // Calculate the raw value scaled by the threshold
-        $rawValue = $count / $this->thresholds[$i];
+        $rawValue = $absCount / $this->thresholds[$i];
 
         // Calculate the value rounded to 1 decimal place to check for the edge case
         $roundedToOneDecimal = round($rawValue, 1);
@@ -55,6 +63,7 @@ trait CanFormatCount
         // We use '.' for decimal point and '' for thousands separator.
         $formattedNumber = number_format($finalValue, $finalPrecision, '.', '');
 
-        return $formattedNumber.$this->suffixes[$i];
+        // Prepend negative sign if necessary
+        return ($isNegative ? '-' : '').$formattedNumber.$this->suffixes[$i];
     }
 }
