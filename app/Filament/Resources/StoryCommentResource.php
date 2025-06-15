@@ -150,7 +150,7 @@ class StoryCommentResource extends Resource
                 ->url(static::getUrl('edit', ['record' => $record->getRouteKey()]));
 
             $navigationItems['replies'] = NavigationItem::make(trans_choice('story-comment.resource.reply_label', 2))
-                ->badge(fn () => $record->storyComments()->count())
+                ->badge(fn () => $record->reply_count)
                 ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
                 ->isActiveWhen(fn () => request()->routeIs(static::getRouteBaseName().'.index') && request('parent_id') == $record->id)
                 ->url(static::getUrl('index', ['parent_id' => $record->id]));
@@ -182,7 +182,7 @@ class StoryCommentResource extends Resource
                         ->label(__('View :name', ['name' => trans_choice('story-comment.resource.reply_label', 2)]))
                         ->icon('heroicon-o-chat-bubble-oval-left-ellipsis')
                         ->url(fn (StoryComment $record): string => StoryCommentResource::getUrl('index', ['parent_id' => $record->id]))
-                        ->visible(fn (StoryComment $record): bool => $record->storyComments()->count() > 0),
+                        ->visible(fn (StoryComment $record): bool => $record->reply_count > 0),
                     Tables\Actions\ViewAction::make()
                         ->icon('heroicon-o-document-text')
                         ->label(__('View :name', ['name' => trans_choice('story.resource.model_label', 1)]))
