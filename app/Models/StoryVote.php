@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasCreatorAttribute;
-use App\Enums\Vote\Type;
+use App\Enums\StoryVote\Type;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -20,11 +20,11 @@ use Illuminate\Support\Carbon;
  * @property-read User $creator
  * @property-read Story $story
  */
-class Vote extends Model
+class StoryVote extends Model
 {
     use HasCreatorAttribute;
 
-    /** @use HasFactory<\Database\Factories\VoteFactory> */
+    /** @use HasFactory<\Database\Factories\StoryVoteFactory> */
     use HasFactory;
 
     use HasUlids;
@@ -51,17 +51,17 @@ class Vote extends Model
     protected static function booted(): void
     {
         // When a Vote is created or updated, update the story's counts/score
-        static::saved(function (self $vote) {
+        static::saved(function (self $storyVote) {
             // TODO: Use a queue to avoid blocking the request, especially if stories have many votes. Ensure you have configured a queue driver other than 'sync' for production. Dispatch a job or call the method directly if not using queues.
-            $vote->story->updateVoteCountsAndScore();
+            $storyVote->story->updateVoteCountsAndScore();
         });
 
         // When a Vote is deleted, update the story's counts/score
-        static::deleted(function (self $vote) {
+        static::deleted(function (self $storyVote) {
             // Check if the story still exists before trying to update it
-            if ($vote->story()->exists()) {
+            if ($storyVote->story()->exists()) {
                 // TODO: Use a queue
-                $vote->story->updateVoteCountsAndScore();
+                $storyVote->story->updateVoteCountsAndScore();
             }
         });
     }

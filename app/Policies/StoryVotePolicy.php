@@ -2,20 +2,20 @@
 
 namespace App\Policies;
 
+use App\Models\StoryVote;
 use App\Models\User;
-use App\Models\Vote;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class VotePolicy
+class StoryVotePolicy
 {
     use HandlesAuthorization;
 
     /**
      * Determine whether the user can view the model.
      */
-    public function view(User $user, Vote $vote): bool
+    public function view(User $user, StoryVote $storyVote): bool
     {
-        if ($user->isNot($vote->creator) && ! $this->viewAll($user)) {
+        if ($user->isNot($storyVote->creator) && ! $this->viewAll($user)) {
             return false;
         }
 
@@ -27,7 +27,7 @@ class VotePolicy
      */
     public function viewAll(User $user): bool
     {
-        return $user->can('view_all_vote');
+        return $user->can('view_all_story_vote');
     }
 
     /**
@@ -41,7 +41,7 @@ class VotePolicy
     /**
      * Determine whether the user can update the model.
      */
-    public function update(User $user, Vote $vote): bool
+    public function update(User $user, StoryVote $storyVote): bool
     {
         return false;
     }
@@ -49,12 +49,12 @@ class VotePolicy
     /**
      * Determine whether the user can delete the model.
      */
-    public function delete(User $user, Vote $vote): bool
+    public function delete(User $user, StoryVote $storyVote): bool
     {
-        if ($vote->isReferenced()) {
+        if ($storyVote->isReferenced()) {
             return false;
         }
-        if ($user->isNot($vote->creator) && ! $this->viewAll($user)) {
+        if ($user->isNot($storyVote->creator) && ! $this->viewAll($user)) {
             return false;
         }
 

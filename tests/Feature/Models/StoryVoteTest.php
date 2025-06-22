@@ -2,15 +2,15 @@
 
 namespace Tests\Feature\Models;
 
-use App\Enums\Vote\Type;
+use App\Enums\StoryVote\Type;
 use App\Models\Story;
+use App\Models\StoryVote;
 use App\Models\User;
-use App\Models\Vote;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Mockery;
 use Tests\TestCase;
 
-class VoteTest extends TestCase
+class StoryVoteTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -23,23 +23,23 @@ class VoteTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_vote_can_be_created_using_factory(): void
+    public function test_story_vote_can_be_created_using_factory(): void
     {
-        $vote = Vote::factory()->create();
+        $vote = StoryVote::factory()->create();
 
-        $this->assertDatabaseHas('votes', [
+        $this->assertDatabaseHas('story_votes', [
             'id' => $vote->id,
             'type' => $vote->type,
             'story_id' => $vote->story_id,
             'creator_id' => $vote->creator_id,
         ]);
-        $this->assertInstanceOf(Vote::class, $vote);
+        $this->assertInstanceOf(StoryVote::class, $vote);
     }
 
     /**
-     * Test that Vote model events trigger Story updateVoteCountsAndScore.
+     * Test that StoryVote model events trigger Story updateVoteCountsAndScore.
      */
-    public function test_vote_events_trigger_story_update(): void
+    public function test_story_vote_events_trigger_story_update(): void
     {
         // Create a real story and user first
         $story = Story::factory()->create();
@@ -57,8 +57,8 @@ class VoteTest extends TestCase
 
         // Create a vote instance, linking it to the real user and the mocked story instance
         // We need to manually set the story relationship property to the mock
-        /** @var Vote */
-        $vote = Vote::factory()->for($user, 'creator')->make(['type' => Type::Up]);
+        /** @var StoryVote */
+        $vote = StoryVote::factory()->for($user, 'creator')->make(['type' => Type::Up]);
         // Manually set the story_id to link to the real story in the database
         $vote->story_id = $story->id;
         $vote->setRelation('story', $storyMock); // Set the loaded relationship to the mock instance
@@ -69,33 +69,33 @@ class VoteTest extends TestCase
         $vote->delete(); // Trigger deleted event (3rd call)
 
         // Add an assertion to satisfy PHPUnit
-        $this->assertDatabaseMissing('votes', ['id' => $vote->id]);
+        $this->assertDatabaseMissing('story_votes', ['id' => $vote->id]);
     }
 
-    public function test_vote_type_attribute_is_cast_to_enum(): void
+    public function test_story_vote_type_attribute_is_cast_to_enum(): void
     {
-        $vote = Vote::factory()->create(['type' => Type::Up]);
+        $vote = StoryVote::factory()->create(['type' => Type::Up]);
 
         $this->assertInstanceOf(Type::class, $vote->type);
         $this->assertEquals(Type::Up, $vote->type);
 
-        $vote = Vote::factory()->create(['type' => Type::Down]);
+        $vote = StoryVote::factory()->create(['type' => Type::Down]);
         $this->assertEquals(Type::Down, $vote->type);
     }
 
-    public function test_vote_belongs_to_story(): void
+    public function test_story_vote_belongs_to_story(): void
     {
         $story = Story::factory()->create();
-        $vote = Vote::factory()->for($story)->create();
+        $vote = StoryVote::factory()->for($story)->create();
 
         $this->assertInstanceOf(Story::class, $vote->story);
         $this->assertEquals($story->id, $vote->story->id);
     }
 
-    public function test_vote_belongs_to_creator(): void
+    public function test_story_vote_belongs_to_creator(): void
     {
         $creator = User::factory()->create();
-        $vote = Vote::factory()->for($creator, 'creator')->create();
+        $vote = StoryVote::factory()->for($creator, 'creator')->create();
 
         $this->assertInstanceOf(User::class, $vote->creator);
         $this->assertEquals($creator->id, $vote->creator->id);

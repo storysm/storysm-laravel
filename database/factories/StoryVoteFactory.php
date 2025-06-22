@@ -2,15 +2,15 @@
 
 namespace Database\Factories;
 
-use App\Enums\Vote\Type;
+use App\Enums\StoryVote\Type;
 use App\Models\Story;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Vote>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\StoryVote>
  */
-class VoteFactory extends Factory
+class StoryVoteFactory extends Factory
 {
     /**
      * Define the model's default state.

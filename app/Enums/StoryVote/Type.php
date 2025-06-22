@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\Vote;
+namespace App\Enums\StoryVote;
 
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;
@@ -26,6 +26,6 @@ enum Type: string implements HasColor, HasIcon, HasLabel
 
     public function getLabel(): string
     {
-        return __('vote.type.'.$this->value);
+        return __('story-vote.type.'.$this->value);
     }
 }

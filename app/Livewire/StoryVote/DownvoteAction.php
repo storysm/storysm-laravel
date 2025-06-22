@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Livewire\Vote;
+namespace App\Livewire\StoryVote;
 
-use App\Enums\Vote\Type;
+use App\Enums\StoryVote\Type;
 use App\Models\Story;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -36,12 +36,12 @@ class DownvoteAction extends Component implements HasActions, HasForms
             ->action(function () {
                 if (! Auth::check()) {
                     Notification::make()
-                        ->title(__('vote.notification.login_required.title'))
-                        ->body(__('vote.notification.login_required.body'))
+                        ->title(__('story-vote.notification.login_required.title'))
+                        ->body(__('story-vote.notification.login_required.body'))
                         ->warning()
                         ->actions([
                             Notifications\Actions\Action::make('login')
-                                ->label(__('vote.notification.login_required.action.login'))
+                                ->label(__('story-vote.notification.login_required.action.login'))
                                 ->url(route('login'))
                                 ->button(),
                         ])
@@ -71,6 +71,6 @@ class DownvoteAction extends Component implements HasActions, HasForms
 
     public function render(): View
     {
-        return view('livewire.vote.downvote-action');
+        return view('livewire.story-vote.downvote-action');
     }
 }

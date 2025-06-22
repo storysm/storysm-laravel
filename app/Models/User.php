@@ -241,11 +241,11 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     }
 
     /**
-     * @return HasMany<Vote, $this>
+     * @return HasMany<StoryVote, $this>
      */
-    public function votes(): HasMany
+    public function storyVotes(): HasMany
     {
-        return $this->hasMany(Vote::class, 'creator_id');
+        return $this->hasMany(StoryVote::class, 'creator_id');
     }
 
     /**
@@ -255,7 +255,7 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
      */
     public function votedStories(): BelongsToMany
     {
-        return $this->belongsToMany(Story::class, 'votes', 'creator_id', 'story_id')
+        return $this->belongsToMany(Story::class, 'story_votes', 'creator_id', 'story_id')
             ->withTimestamps();
     }
 }

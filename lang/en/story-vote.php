@@ -11,7 +11,7 @@ return [
         ],
     ],
     'resource' => [
-        'model_label' => 'Vote|Votes',
+        'model_label' => 'Story Vote|Story Votes',
         'upvote_count' => 'Like Count',
         'downvote_count' => 'Dislike Count',
     ],

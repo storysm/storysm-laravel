@@ -3,10 +3,10 @@
 namespace Tests\Feature\Models;
 
 use App\Enums\Story\Status;
-use App\Enums\Vote\Type;
+use App\Enums\StoryVote\Type;
 use App\Models\Story;
+use App\Models\StoryVote;
 use App\Models\User;
-use App\Models\Vote;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -91,7 +91,7 @@ class StoryTest extends TestCase
         $this->assertNull($currentUserVote); // @phpstan-ignore-line
 
         // Create a vote for user1
-        $vote1 = Vote::factory()->for($story)->for($user1, 'creator')->create(['type' => Type::Up]);
+        $vote1 = StoryVote::factory()->for($story)->for($user1, 'creator')->create(['type' => Type::Up]);
 
         // Test when authenticated user has voted
         $currentUserVote = $story->currentUserVote();
@@ -100,7 +100,7 @@ class StoryTest extends TestCase
         $this->assertEquals(Type::Up, $currentUserVote->type);
 
         // Create a vote for user2 (should not affect user1's view)
-        Vote::factory()->for($story)->for($user2, 'creator')->create(['type' => Type::Down]);
+        StoryVote::factory()->for($story)->for($user2, 'creator')->create(['type' => Type::Down]);
 
         // Test that currentUserVote still returns user1's vote
         $currentUserVote = $story->currentUserVote();
@@ -342,13 +342,13 @@ class StoryTest extends TestCase
         $user3 = User::factory()->create(); // This user will not vote
 
         // Act
-        // Simulate votes by creating Vote model instances
-        Vote::create([
+        // Simulate votes by creating StoryVote model instances
+        StoryVote::create([
             'story_id' => $story->id,
             'creator_id' => $user1->id,
             'type' => Type::Up, // Specify a vote type
         ]);
-        Vote::create([
+        StoryVote::create([
             'story_id' => $story->id,
             'creator_id' => $user2->id,
             'type' => Type::Up, // Specify a vote type
@@ -365,7 +365,7 @@ class StoryTest extends TestCase
         $this->assertInstanceOf(User::class, $story->voters()->getRelated());
 
         // Assert that the relationship uses the correct pivot table
-        $this->assertEquals('votes', $story->voters()->getTable());
+        $this->assertEquals('story_votes', $story->voters()->getTable());
 
         // Assert that the relationship uses the correct foreign keys
         $this->assertEquals('story_id', $story->voters()->getForeignPivotKeyName());
@@ -380,9 +380,9 @@ class StoryTest extends TestCase
         $this->assertFalse($story->voters->contains($user3));
 
         // Assert that pivot timestamps exist (these come from the Vote model's timestamps)
-        /** @var ?Vote */
+        /** @var ?StoryVote */
         $voter1Pivot = $story->voters->find($user1->id)?->pivot; // @phpstan-ignore-line
-        /** @var ?Vote */
+        /** @var ?StoryVote */
         $voter2Pivot = $story->voters->find($user2->id)?->pivot; // @phpstan-ignore-line
 
         $this->assertNotNull($voter1Pivot?->created_at);
@@ -394,11 +394,11 @@ class StoryTest extends TestCase
     public function test_story_has_many_votes(): void
     {
         $story = Story::factory()->create();
-        $votes = Vote::factory()->count(3)->for($story)->create();
+        $storyVotes = StoryVote::factory()->count(3)->for($story)->create();
 
-        $this->assertInstanceOf(Collection::class, $story->votes);
-        $this->assertCount(3, $story->votes);
-        $this->assertTrue($story->votes->contains($votes->firstOrFail()));
+        $this->assertInstanceOf(Collection::class, $story->storyVotes);
+        $this->assertCount(3, $story->storyVotes);
+        $this->assertTrue($story->storyVotes->contains($storyVotes->firstOrFail()));
     }
 
     /**
@@ -419,10 +419,10 @@ class StoryTest extends TestCase
         $user4 = User::factory()->create();
 
         // Add some votes
-        Vote::factory()->for($story)->for($user1, 'creator')->create(['type' => Type::Up]); // +1
-        Vote::factory()->for($story)->for($user2, 'creator')->create(['type' => Type::Up]); // +1
-        Vote::factory()->for($story)->for($user3, 'creator')->create(['type' => Type::Down]); // -1.1
-        Vote::factory()->for($story)->for($user4, 'creator')->create(['type' => Type::Down]); // -1.1
+        StoryVote::factory()->for($story)->for($user1, 'creator')->create(['type' => Type::Up]); // +1
+        StoryVote::factory()->for($story)->for($user2, 'creator')->create(['type' => Type::Up]); // +1
+        StoryVote::factory()->for($story)->for($user3, 'creator')->create(['type' => Type::Down]); // -1.1
+        StoryVote::factory()->for($story)->for($user4, 'creator')->create(['type' => Type::Down]); // -1.1
 
         // Expected counts and score (assuming penalty weight 1.1)
         $expectedUpvotes = 2;
@@ -457,7 +457,7 @@ class StoryTest extends TestCase
         // Scenario 1: Voting while unauthenticated - Should do nothing
         Auth::logout();
         $story->vote(Type::Up);
-        $this->assertDatabaseCount('votes', 0);
+        $this->assertDatabaseCount('story_votes', 0);
         $story->refresh();
         $this->assertEquals(0, $story->upvote_count);
         $this->assertEquals(0, $story->downvote_count);
@@ -469,12 +469,12 @@ class StoryTest extends TestCase
 
         // Scenario 2: Upvoting for the first time
         $story->vote(Type::Up);
-        $this->assertDatabaseHas('votes', [
+        $this->assertDatabaseHas('story_votes', [
             'story_id' => $story->id,
             'creator_id' => $user->id,
             'type' => Type::Up,
         ]);
-        $this->assertDatabaseCount('votes', 1);
+        $this->assertDatabaseCount('story_votes', 1);
         $story->refresh();
         $this->assertEquals(1, $story->upvote_count);
         $this->assertEquals(0, $story->downvote_count);
@@ -483,12 +483,12 @@ class StoryTest extends TestCase
 
         // Scenario 3: Changing vote from Up to Down
         $story->vote(Type::Down);
-        $this->assertDatabaseHas('votes', [
+        $this->assertDatabaseHas('story_votes', [
             'story_id' => $story->id,
             'creator_id' => $user->id,
             'type' => Type::Down, // Type should be updated
         ]);
-        $this->assertDatabaseCount('votes', 1); // Still only one vote for this user/story
+        $this->assertDatabaseCount('story_votes', 1); // Still only one vote for this user/story
         $story->refresh();
         $this->assertEquals(0, $story->upvote_count);
         $this->assertEquals(1, $story->downvote_count);
@@ -497,12 +497,12 @@ class StoryTest extends TestCase
 
         // Scenario 4: Changing vote from Down to Up
         $story->vote(Type::Up);
-        $this->assertDatabaseHas('votes', [
+        $this->assertDatabaseHas('story_votes', [
             'story_id' => $story->id,
             'creator_id' => $user->id,
             'type' => Type::Up, // Type should be updated back
         ]);
-        $this->assertDatabaseCount('votes', 1);
+        $this->assertDatabaseCount('story_votes', 1);
         $story->refresh();
         $this->assertEquals(1, $story->upvote_count);
         $this->assertEquals(0, $story->downvote_count);
@@ -511,11 +511,11 @@ class StoryTest extends TestCase
 
         // Scenario 5: Removing an Upvote (passing null)
         $story->vote(null);
-        $this->assertDatabaseMissing('votes', [ // Vote should be deleted
+        $this->assertDatabaseMissing('story_votes', [ // Vote should be deleted
             'story_id' => $story->id,
             'creator_id' => $user->id,
         ]);
-        $this->assertDatabaseCount('votes', 0);
+        $this->assertDatabaseCount('story_votes', 0);
         $story->refresh();
         $this->assertEquals(0, $story->upvote_count);
         $this->assertEquals(0, $story->downvote_count);
@@ -526,12 +526,12 @@ class StoryTest extends TestCase
         $story = Story::factory()->create(); // New story to reset state
         $this->actingAs($user); // Ensure user is still authenticated
         $story->vote(Type::Down);
-        $this->assertDatabaseHas('votes', [
+        $this->assertDatabaseHas('story_votes', [
             'story_id' => $story->id,
             'creator_id' => $user->id,
             'type' => Type::Down,
         ]);
-        $this->assertDatabaseCount('votes', 1);
+        $this->assertDatabaseCount('story_votes', 1);
         $story->refresh();
         $this->assertEquals(0, $story->upvote_count);
         $this->assertEquals(1, $story->downvote_count);
@@ -540,11 +540,11 @@ class StoryTest extends TestCase
 
         // Scenario 7: Removing a Downvote (passing null)
         $story->vote(null);
-        $this->assertDatabaseMissing('votes', [ // Vote should be deleted
+        $this->assertDatabaseMissing('story_votes', [ // Vote should be deleted
             'story_id' => $story->id,
             'creator_id' => $user->id,
         ]);
-        $this->assertDatabaseCount('votes', 0);
+        $this->assertDatabaseCount('story_votes', 0);
         $story->refresh();
         $this->assertEquals(0, $story->upvote_count);
         $this->assertEquals(0, $story->downvote_count);
@@ -555,12 +555,12 @@ class StoryTest extends TestCase
         $story = Story::factory()->create(); // New story
         $this->actingAs($user);
         $story->vote(Type::Up); // First Upvote
-        $this->assertDatabaseCount('votes', 1);
+        $this->assertDatabaseCount('story_votes', 1);
         $story->refresh();
         $this->assertEquals(1.0, $story->vote_score);
 
         $story->vote(Type::Up); // Click Upvote again
-        $this->assertDatabaseCount('votes', 0); // Vote should be removed
+        $this->assertDatabaseCount('story_votes', 0); // Vote should be removed
         $story->refresh();
         $this->assertEquals(0, $story->upvote_count);
         $this->assertEquals(0, $story->downvote_count);
@@ -571,12 +571,12 @@ class StoryTest extends TestCase
         $story = Story::factory()->create(); // New story
         $this->actingAs($user);
         $story->vote(Type::Down); // First Downvote
-        $this->assertDatabaseCount('votes', 1);
+        $this->assertDatabaseCount('story_votes', 1);
         $story->refresh();
         $this->assertEquals(-1.1, $story->vote_score);
 
         $story->vote(Type::Down); // Click Downvote again
-        $this->assertDatabaseCount('votes', 0); // Vote should be removed
+        $this->assertDatabaseCount('story_votes', 0); // Vote should be removed
         $story->refresh();
         $this->assertEquals(0, $story->upvote_count);
         $this->assertEquals(0, $story->downvote_count);
