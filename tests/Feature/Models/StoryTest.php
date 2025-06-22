@@ -124,6 +124,17 @@ class StoryTest extends TestCase
     }
 
     /**
+     * Test that formattedCommentCount formats the StoryComment count correctly with suffixes.
+     */
+    #[DataProvider('formattingProvider')]
+    public function test_formatted_comment_count_formats_correctly(int $count, string $expectedFormat): void
+    {
+        $story = Story::factory()->create(['comment_count' => $count]);
+
+        $this->assertEquals($expectedFormat, $story->formattedCommentCount());
+    }
+
+    /**
      * Test that formattedDownvoteCount formats the downvote count correctly with suffixes.
      */
     #[DataProvider('formattingProvider')]

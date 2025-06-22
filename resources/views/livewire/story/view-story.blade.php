@@ -3,9 +3,15 @@
         <div class="flex flex-col gap-y-2">
             {{ $story->title }}
 
-            <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
-                <p class="text-sm">{{ $story->formattedViewCount() }}</p>
-            </x-story.meta>
+            <div class="flex flex-row gap-2">
+                <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
+                    <p class="text-sm">{{ $story->formattedViewCount() }}</p>
+                </x-story.meta>
+
+                <x-story.meta icon="heroicon-m-chat-bubble-oval-left-ellipsis" iconClass="size-3">
+                    <p class="text-sm">{{ $story->formattedCommentCount() }}</p>
+                </x-story.meta>
+            </div>
         </div>
     </x-header>
 
@@ -24,6 +30,8 @@
                             <livewire:vote.downvote-action :story="$story" />
                         </div>
                     </x-filament::section>
+                    <livewire:story-comment.create-story-comment :story="$story" />
+                    <livewire:story-comment.story-comments-table :story="$story" />
                 </div>
                 <div class="sm:col-span-4">
                     <div>

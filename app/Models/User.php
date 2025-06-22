@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\SuperUserAuthorizable;
+use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
@@ -27,11 +28,14 @@ use LasseRafn\InitialAvatarGenerator\InitialAvatar;
 use Spatie\Color\Rgb;
 use Spatie\Permission\Traits\HasRoles;
 
+/**
+ * @method static UserFactory factory($count = null)
+ */
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
     use HasApiTokens;
 
-    /** @use HasFactory<\Database\Factories\UserFactory> */
+    /** @use HasFactory<UserFactory> */
     use HasFactory;
 
     use HasProfilePhoto;
@@ -92,6 +96,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    /**
+     * Get the story StoryComments created by the user.
+     *
+     * @return HasMany<StoryComment, $this>
+     */
+    public function storyComments(): HasMany
+    {
+        return $this->hasMany(StoryComment::class, 'creator_id');
     }
 
     /**
@@ -162,6 +176,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
 
     public function isReferenced(): bool
     {
+        if ($this->storyComments()->exists()) {
+            return true;
+        }
         if ($this->media()->exists()) {
             return true;
         }
