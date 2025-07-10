@@ -52,7 +52,7 @@ class StoryVoteResource extends Resource implements HasShieldPermissions
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Administration');
+        return trans_choice('story.resource.model_label', 1);
     }
 
     public static function getPages(): array
