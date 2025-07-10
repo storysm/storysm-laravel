@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use App\Models\Story;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;

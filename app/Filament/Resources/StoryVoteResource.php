@@ -2,7 +2,7 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\StoryVoteResource\Pages;
 use App\Models\StoryVote;

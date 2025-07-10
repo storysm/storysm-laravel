@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\HasCreatorAttribute;
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;

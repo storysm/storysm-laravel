@@ -2,7 +2,7 @@
 
 namespace App\Livewire\StoryVote;
 
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use App\Models\Story;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;

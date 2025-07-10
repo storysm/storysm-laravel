@@ -3,7 +3,7 @@
 namespace Tests\Feature\Models;
 
 use App\Enums\Story\Status;
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use App\Models\Story;
 use App\Models\StoryVote;
 use App\Models\User;

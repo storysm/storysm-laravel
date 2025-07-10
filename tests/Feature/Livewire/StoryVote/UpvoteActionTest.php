@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Livewire\StoryVote;
 
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use App\Livewire\StoryVote\UpvoteAction;
 use App\Models\Story;
 use App\Models\StoryVote;

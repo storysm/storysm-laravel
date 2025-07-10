@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Filament\Resources;
 
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use App\Filament\Resources\StoryVoteResource;
 use App\Filament\Resources\StoryVoteResource\Pages\ListStoryVotes;
 use App\Models\Permission;

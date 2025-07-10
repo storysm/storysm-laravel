@@ -142,4 +142,14 @@ class StoryComment extends Model
     {
         return $this->belongsTo(Story::class);
     }
+
+    /**
+     * Get the votes for the StoryComment.
+     *
+     * @return HasMany<StoryCommentVote, $this>
+     */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(StoryCommentVote::class, 'comment_id');
+    }
 }

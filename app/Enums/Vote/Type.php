@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Enums\StoryVote;
+namespace App\Enums\Vote;
 
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasIcon;

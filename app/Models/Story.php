@@ -4,8 +4,9 @@ namespace App\Models;
 
 use App\Concerns\CanFormatCount;
 use App\Concerns\HasCreatorAttribute;
+use App\Constants\VotingConstants;
 use App\Enums\Story\Status;
-use App\Enums\StoryVote\Type;
+use App\Enums\Vote\Type;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -46,12 +47,6 @@ class Story extends Model
 
     use HasTranslations;
     use HasUlids;
-
-    /**
-     * The penalty weight applied to downvotes when calculating the score.
-     * A weight of 2 means each downvote subtracts 2 from the score.
-     */
-    private const DOWNVOTE_PENALTY_WEIGHT = 1.1;
 
     /**
      * @var array<int, string>
@@ -274,7 +269,7 @@ class Story extends Model
         $this->upvote_count = $upvotes;
         $this->downvote_count = $downvotes;
         $this->vote_count = $upvotes + $downvotes;
-        $this->vote_score = $upvotes - ($downvotes * self::DOWNVOTE_PENALTY_WEIGHT);
+        $this->vote_score = $upvotes - ($downvotes * VotingConstants::DOWNVOTE_PENALTY_WEIGHT);
 
         $this->save();
     }
