@@ -12,10 +12,22 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('story_comments', function (Blueprint $table) {
-            $table->unsignedInteger('upvote_count')->default(0)->after('reply_count');
-            $table->unsignedInteger('downvote_count')->default(0)->after('upvote_count');
-            $table->integer('vote_count')->default(0)->after('downvote_count');
-            $table->integer('vote_score')->default(0)->after('vote_count');
+            $table->unsignedInteger('upvote_count')
+                ->default(0)
+                ->after('reply_count')
+                ->index();
+            $table->unsignedInteger('downvote_count')
+                ->default(0)
+                ->after('upvote_count')
+                ->index();
+            $table->unsignedBigInteger('vote_count')
+                ->default(0)
+                ->after('downvote_count')
+                ->index();
+            $table->decimal('vote_score', 8, 2)
+                ->default(0)
+                ->after('vote_count')
+                ->index();
         });
     }
 
@@ -25,7 +37,17 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('story_comments', function (Blueprint $table) {
-            $table->dropColumn(['upvote_count', 'downvote_count', 'vote_count', 'vote_score']);
+            $table->dropIndex(['upvote_count']);
+            $table->dropColumn('upvote_count');
+
+            $table->dropIndex(['downvote_count']);
+            $table->dropColumn('downvote_count');
+
+            $table->dropIndex(['vote_count']);
+            $table->dropColumn('vote_count');
+
+            $table->dropIndex(['vote_score']);
+            $table->dropColumn('vote_score');
         });
     }
 };
