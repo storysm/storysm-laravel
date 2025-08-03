@@ -2,11 +2,11 @@
 
 namespace App\Models;
 
+use App\Observers\StoryCommentVoteObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use App\Observers\StoryCommentVoteObserver;
 
 /**
  * @property string $id
@@ -47,16 +47,6 @@ class StoryCommentVote extends Model
     ];
 
     /**
-     * Get the user that owns the vote.
-     *
-     * @return BelongsTo<User, $this>
-     */
-    public function user(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'creator_id');
-    }
-
-    /**
      * Get the comment that the vote belongs to.
      *
      * @return BelongsTo<StoryComment, $this>
@@ -64,5 +54,15 @@ class StoryCommentVote extends Model
     public function comment(): BelongsTo
     {
         return $this->belongsTo(StoryComment::class, 'story_comment_id');
+    }
+
+    /**
+     * Get the user that owns the vote.
+     *
+     * @return BelongsTo<User, $this>
+     */
+    public function creator(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'creator_id');
     }
 }
