@@ -98,7 +98,7 @@ class StoryCommentsTable extends Component implements HasForms, HasTable
                 ->when($this->storyComment !== null, function (Builder $query) {
                     $query->where('parent_id', $this->storyComment?->id);
                 })
-                ->with('creator')
+                ->with(['creator', 'userVote'])
             )
             ->queryStringIdentifier('comments');
     }

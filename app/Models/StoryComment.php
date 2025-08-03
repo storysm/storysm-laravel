@@ -11,7 +11,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -151,5 +153,15 @@ class StoryComment extends Model
     public function votes(): HasMany
     {
         return $this->hasMany(StoryCommentVote::class, 'comment_id');
+    }
+
+    /**
+     * Get the user's vote for the StoryComment.
+     *
+     * @return HasOne<StoryCommentVote, $this>
+     */
+    public function userVote(): HasOne
+    {
+        return $this->hasOne(StoryCommentVote::class, 'comment_id')->where('creator_id', Auth::id());
     }
 }
