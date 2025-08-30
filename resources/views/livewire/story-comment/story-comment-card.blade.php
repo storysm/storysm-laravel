@@ -1,5 +1,5 @@
 <div>
-    <div class="flex flex-row items-start justify-between gap-2 text-sm">
+    <div class="flex flex-row items-start justify-between gap-2 text-sm @if($storyComment->vote_score < -5) opacity-50 @endif">
         <div class="flex flex-row gap-4">
             {{-- Avatar --}}
             <x-filament-panels::avatar.user :user="$storyComment->creator" />
