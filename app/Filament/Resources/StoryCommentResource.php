@@ -175,8 +175,6 @@ class StoryCommentResource extends Resource
                     ->label(__('story-comment.resource.upvote_count')),
                 Tables\Columns\TextColumn::make('downvote_count')
                     ->label(__('story-comment.resource.downvote_count')),
-                Tables\Columns\TextColumn::make('vote_score')
-                    ->label(__('story-comment.resource.vote_score')),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator'))) : null,
             ]))
