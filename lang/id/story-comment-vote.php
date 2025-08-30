@@ -14,4 +14,8 @@ return [
             ],
         ],
     ],
+    'resource' => [
+        'model_label' => 'Suara Komentar|Suara Komentar',
+    ],
+    'type' => 'Jenis Suara',
 ];

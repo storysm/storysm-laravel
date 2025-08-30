@@ -14,4 +14,8 @@ return [
             ],
         ],
     ],
+    'resource' => [
+        'model_label' => 'Comment Vote|Comment Votes',
+    ],
+    'type' => 'Vote Type',
 ];
