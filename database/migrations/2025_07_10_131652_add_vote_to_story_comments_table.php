@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('story_comments', function (Blueprint $table) {
-            $table->unsignedInteger('upvote_count')
+            $table->unsignedBigInteger('upvote_count')
                 ->default(0)
                 ->after('reply_count')
                 ->index();
-            $table->unsignedInteger('downvote_count')
+            $table->unsignedBigInteger('downvote_count')
                 ->default(0)
                 ->after('upvote_count')
                 ->index();
