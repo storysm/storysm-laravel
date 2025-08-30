@@ -4,6 +4,8 @@ namespace App\Livewire\StoryCommentVote;
 
 use App\Enums\Vote\Type;
 use App\Models\StoryComment;
+use DanHarrin\LivewireRateLimiting\Exceptions\TooManyRequestsException;
+use DanHarrin\LivewireRateLimiting\WithRateLimiting;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -21,6 +23,7 @@ class UpvoteAction extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
+    use WithRateLimiting;
 
     public StoryComment $storyComment;
 
@@ -35,6 +38,21 @@ class UpvoteAction extends Component implements HasActions, HasForms
 
         return Action::make('upvote')
             ->action(function () {
+                try {
+                    $this->rateLimit(30);
+                } catch (TooManyRequestsException $exception) {
+                    /** @var int $secondsUntilAvailable */
+                    $secondsUntilAvailable = $exception->secondsUntilAvailable;
+
+                    Notification::make()
+                        ->title(__('story-comment-vote.notification.rate_limited.title'))
+                        ->body(__('story-comment-vote.notification.rate_limited.body', ['seconds' => (string) $secondsUntilAvailable]))
+                        ->danger()
+                        ->send();
+
+                    return;
+                }
+
                 if (! Auth::check()) {
                     Notification::make()
                         ->title(__('story-comment-vote.notification.login_required.title'))
