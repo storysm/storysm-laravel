@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use App\Concerns\CanFormatCount;
+use App\Enums\Vote\Type;
+use App\Services\CommentVoteService;
 use Carbon\Carbon;
 use Database\Factories\StoryCommentFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -126,6 +128,22 @@ class StoryComment extends Model
     }
 
     /**
+     * Get the upvote count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedUpvoteCount(): string
+    {
+        return $this->formatCount($this->votes()->where('type', Type::Up)->count());
+    }
+
+    /**
+     * Get the downvote count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedDownvoteCount(): string
+    {
+        return $this->formatCount($this->votes()->where('type', Type::Down)->count());
+    }
+
+    /**
      * Get the parent of the StoryComment.
      *
      * @return BelongsTo<StoryComment, $this>
@@ -163,5 +181,45 @@ class StoryComment extends Model
     public function userVote(): HasOne
     {
         return $this->hasOne(StoryCommentVote::class, 'comment_id')->where('creator_id', Auth::id());
+    }
+
+    /**
+     * Get the current user's vote for the StoryComment.
+     */
+    public function currentUserVote(): ?StoryCommentVote
+    {
+        return $this->userVote()->first();
+    }
+
+    /**
+     * Handle voting for the StoryComment.
+     */
+    public function vote(Type $type): void
+    {
+        if (! Auth::check()) {
+            return;
+        }
+
+        $existingVote = $this->userVote()->first();
+
+        if ($existingVote) {
+            if ($existingVote->type === $type) {
+                // User is unvoting
+                $existingVote->delete();
+            } else {
+                // User is changing their vote
+                $existingVote->type = $type;
+                $existingVote->save();
+            }
+        } else {
+            // User is casting a new vote
+            $this->votes()->create([
+                'creator_id' => Auth::id(),
+                'type' => $type,
+            ]);
+        }
+
+        // Recalculate vote counts after any vote change
+        app(CommentVoteService::class)->recalculateVoteCounts($this);
     }
 }

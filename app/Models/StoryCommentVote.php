@@ -2,21 +2,23 @@
 
 namespace App\Models;
 
+use App\Enums\Vote\Type;
 use App\Observers\StoryCommentVoteObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Carbon;
 
 /**
  * @property string $id
  * @property string $creator_id
  * @property string $story_comment_id
- * @property string $vote_type
- * @property \Illuminate\Support\Carbon|null $created_at
- * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read \App\Models\User $user
- * @property-read \App\Models\StoryComment $comment
+ * @property Type $type
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * @property-read User $creator
+ * @property-read StoryComment $comment
  *
  * @method static \Database\Factories\StoryCommentVoteFactory factory(...$parameters)
  */
@@ -43,7 +45,16 @@ class StoryCommentVote extends Model
     protected $fillable = [
         'creator_id',
         'story_comment_id',
-        'vote_type',
+        'type',
+    ];
+
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array<string, string>
+     */
+    protected $casts = [
+        'type' => Type::class,
     ];
 
     /**
