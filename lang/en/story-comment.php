@@ -33,5 +33,9 @@ return [
         'replied_comment' => 'Replied Comment',
         'reply_count' => 'Reply Count',
         'reply_label' => 'Reply|Replies',
+        'upvote_count' => 'Upvotes',
+        'downvote_count' => 'Downvotes',
+        'vote_count' => 'Total Votes',
+        'vote_score' => 'Vote Score',
     ],
 ];
