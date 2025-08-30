@@ -60,7 +60,8 @@ class DownvoteAction extends Component implements HasActions, HasForms
             ->icon($active ? 'heroicon-m-hand-thumb-down' : 'heroicon-o-hand-thumb-down')
             ->label($this->storyComment->formattedDownvoteCount())
             ->outlined(! $active)
-            ->size(ActionSize::ExtraSmall);
+            ->size(ActionSize::ExtraSmall)
+            ->extraAttributes(['aria-pressed' => $active ? 'true' : 'false']);
     }
 
     #[On('story-comment-vote-updated')]

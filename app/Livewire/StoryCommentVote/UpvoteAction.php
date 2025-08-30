@@ -59,7 +59,8 @@ class UpvoteAction extends Component implements HasActions, HasForms
             ->icon($active ? 'heroicon-m-hand-thumb-up' : 'heroicon-o-hand-thumb-up')
             ->label($this->storyComment->formattedUpvoteCount())
             ->outlined(! $active)
-            ->size(ActionSize::ExtraSmall);
+            ->size(ActionSize::ExtraSmall)
+            ->extraAttributes(['aria-pressed' => $active ? 'true' : 'false']);
     }
 
     #[On('story-comment-vote-updated')]
