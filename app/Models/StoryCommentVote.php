@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Enums\Vote\Type;
 use App\Observers\StoryCommentVoteObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -29,6 +30,8 @@ class StoryCommentVote extends Model
      * @use HasFactory<\Database\Factories\StoryCommentVoteFactory>
      */
     use HasFactory;
+
+    use HasUlids;
 
     /**
      * The table associated with the model.

@@ -34,7 +34,7 @@ class StoryCommentVoteSeeder extends Seeder
                     StoryCommentVote::create([
                         'creator_id' => $user->id,
                         'story_comment_id' => $comment->id,
-                        'vote_type' => rand(0, 1) ? 'upvote' : 'downvote',
+                        'type' => rand(0, 1) ? 'upvote' : 'downvote',
                     ]);
                     $votedPairs[$pairKey] = true;
                     $createdVotes++;

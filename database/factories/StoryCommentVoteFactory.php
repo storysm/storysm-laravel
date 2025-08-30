@@ -29,7 +29,7 @@ class StoryCommentVoteFactory extends Factory
         return [
             'creator_id' => User::factory(),
             'story_comment_id' => StoryComment::factory(),
-            'vote_type' => $this->faker->randomElement(['upvote', 'downvote']),
+            'type' => $this->faker->randomElement(['upvote', 'downvote']),
         ];
     }
 }

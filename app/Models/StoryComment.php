@@ -170,7 +170,7 @@ class StoryComment extends Model
      */
     public function votes(): HasMany
     {
-        return $this->hasMany(StoryCommentVote::class, 'comment_id');
+        return $this->hasMany(StoryCommentVote::class, 'story_comment_id');
     }
 
     /**
@@ -180,7 +180,7 @@ class StoryComment extends Model
      */
     public function userVote(): HasOne
     {
-        return $this->hasOne(StoryCommentVote::class, 'comment_id')->where('creator_id', Auth::id());
+        return $this->hasOne(StoryCommentVote::class, 'story_comment_id')->where('creator_id', Auth::id());
     }
 
     /**
