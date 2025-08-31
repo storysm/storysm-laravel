@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\Vote\Type;
 use App\Models\StoryComment;
 use App\Models\StoryCommentVote;
 use App\Models\User;
@@ -29,7 +30,7 @@ class StoryCommentVoteFactory extends Factory
         return [
             'creator_id' => User::factory(),
             'story_comment_id' => StoryComment::factory(),
-            'type' => $this->faker->randomElement(['upvote', 'downvote']),
+            'type' => $this->faker->randomElement(Type::cases()),
         ];
     }
 }
