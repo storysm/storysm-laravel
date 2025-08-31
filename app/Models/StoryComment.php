@@ -4,7 +4,6 @@ namespace App\Models;
 
 use App\Concerns\CanFormatCount;
 use App\Enums\Vote\Type;
-use App\Services\CommentVoteService;
 use Carbon\Carbon;
 use Database\Factories\StoryCommentFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -132,7 +131,7 @@ class StoryComment extends Model
      */
     public function formattedUpvoteCount(): string
     {
-        return $this->formatCount($this->votes()->where('type', Type::Up)->count());
+        return $this->formatCount($this->upvote_count);
     }
 
     /**
@@ -140,7 +139,7 @@ class StoryComment extends Model
      */
     public function formattedDownvoteCount(): string
     {
-        return $this->formatCount($this->votes()->where('type', Type::Down)->count());
+        return $this->formatCount($this->downvote_count);
     }
 
     /**
@@ -218,8 +217,5 @@ class StoryComment extends Model
                 'type' => $type,
             ]);
         }
-
-        // Recalculate vote counts after any vote change
-        app(CommentVoteService::class)->recalculateVoteCounts($this);
     }
 }
