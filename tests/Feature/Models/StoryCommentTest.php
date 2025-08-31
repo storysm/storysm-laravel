@@ -2,10 +2,14 @@
 
 namespace Tests\Feature\Models;
 
+use App\Enums\Vote\Type;
 use App\Models\Story;
 use App\Models\StoryComment;
+use App\Models\StoryCommentVote;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Auth;
 use Tests\TestCase;
 
 class StoryCommentTest extends TestCase
@@ -196,5 +200,153 @@ class StoryCommentTest extends TestCase
         // Assert: Reload the parent and check if reply_count has decremented to 0
         $parentComment->refresh();
         $this->assertEquals(0, $parentComment->reply_count);
+    }
+
+    public function test_it_has_many_votes(): void
+    {
+        // Arrange
+        $storyComment = StoryComment::factory()->create();
+        StoryCommentVote::factory()->count(3)->create(['story_comment_id' => $storyComment->id]);
+
+        // Act
+        $votes = $storyComment->votes;
+
+        // Assert
+        $this->assertInstanceOf(Collection::class, $votes);
+        $this->assertCount(3, $votes);
+    }
+
+    public function test_it_has_one_user_vote_when_authenticated(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $storyComment = StoryComment::factory()->create();
+        $userVote = StoryCommentVote::factory()->create([
+            'story_comment_id' => $storyComment->id,
+            'creator_id' => $user->id,
+            'type' => Type::Up,
+        ]);
+
+        // Act
+        Auth::login($user);
+        $retrievedVote = $storyComment->userVote;
+
+        // Assert
+        $this->assertInstanceOf(StoryCommentVote::class, $retrievedVote);
+        $this->assertEquals($userVote->id, $retrievedVote->id);
+        $this->assertEquals($user->id, $retrievedVote->creator_id);
+    }
+
+    public function test_it_returns_null_for_user_vote_when_not_authenticated(): void
+    {
+        // Arrange
+        $storyComment = StoryComment::factory()->create();
+        StoryCommentVote::factory()->create([
+            'story_comment_id' => $storyComment->id,
+            'creator_id' => User::factory()->create()->id, // Another user's vote
+            'type' => Type::Up,
+        ]);
+
+        // Act
+        Auth::logout(); // Ensure no user is authenticated
+        $retrievedVote = $storyComment->userVote;
+
+        // Assert
+        $this->assertNull($retrievedVote);
+    }
+
+    public function test_it_returns_null_for_user_vote_when_authenticated_but_no_vote_exists(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $storyComment = StoryComment::factory()->create();
+
+        // Act
+        Auth::login($user);
+        $retrievedVote = $storyComment->userVote;
+
+        // Assert
+        $this->assertNull($retrievedVote);
+    }
+
+    public function test_a_user_can_cast_a_new_vote(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $storyComment = StoryComment::factory()->create();
+
+        // Act
+        Auth::login($user);
+        $storyComment->vote(Type::Up);
+
+        // Assert
+        $this->assertDatabaseHas('story_comment_votes', [
+            'story_comment_id' => $storyComment->id,
+            'creator_id' => $user->id,
+            'type' => Type::Up,
+        ]);
+        $this->assertEquals(1, $storyComment->votes()->count());
+    }
+
+    public function test_a_user_can_unvote_by_voting_with_the_same_type(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $storyComment = StoryComment::factory()->create();
+        StoryCommentVote::factory()->create([
+            'story_comment_id' => $storyComment->id,
+            'creator_id' => $user->id,
+            'type' => Type::Up,
+        ]);
+
+        // Act
+        Auth::login($user);
+        $storyComment->vote(Type::Up); // Vote again with the same type
+
+        // Assert
+        $this->assertDatabaseMissing('story_comment_votes', [
+            'story_comment_id' => $storyComment->id,
+            'creator_id' => $user->id,
+            'type' => Type::Up,
+        ]);
+        $this->assertEquals(0, $storyComment->votes()->count());
+    }
+
+    public function test_a_user_can_change_their_vote_type(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $storyComment = StoryComment::factory()->create();
+        $existingVote = StoryCommentVote::factory()->create([
+            'story_comment_id' => $storyComment->id,
+            'creator_id' => $user->id,
+            'type' => Type::Up,
+        ]);
+
+        // Act
+        Auth::login($user);
+        $storyComment->vote(Type::Down); // Change vote type
+
+        // Assert
+        $this->assertDatabaseHas('story_comment_votes', [
+            'id' => $existingVote->id,
+            'story_comment_id' => $storyComment->id,
+            'creator_id' => $user->id,
+            'type' => Type::Down, // Assert the type has changed
+        ]);
+        $this->assertEquals(1, $storyComment->votes()->count());
+    }
+
+    public function test_vote_method_does_nothing_if_user_is_not_authenticated(): void
+    {
+        // Arrange
+        $storyComment = StoryComment::factory()->create();
+
+        // Act
+        Auth::logout(); // Ensure no user is authenticated
+        $storyComment->vote(Type::Up);
+
+        // Assert
+        $this->assertDatabaseCount('story_comment_votes', 0);
     }
 }
