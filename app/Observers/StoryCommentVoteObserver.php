@@ -3,15 +3,15 @@
 namespace App\Observers;
 
 use App\Models\StoryCommentVote;
-use App\Services\CommentVoteService;
+use App\Services\StoryCommentVoteService;
 
 class StoryCommentVoteObserver
 {
-    protected CommentVoteService $commentVoteService;
+    protected StoryCommentVoteService $storyCommentVoteService;
 
-    public function __construct(CommentVoteService $commentVoteService)
+    public function __construct(StoryCommentVoteService $storyCommentVoteService)
     {
-        $this->commentVoteService = $commentVoteService;
+        $this->storyCommentVoteService = $storyCommentVoteService;
     }
 
     /**
@@ -19,7 +19,7 @@ class StoryCommentVoteObserver
      */
     public function created(StoryCommentVote $storyCommentVote): void
     {
-        $this->commentVoteService->recalculateVoteCounts($storyCommentVote->comment);
+        $this->storyCommentVoteService->recalculateVoteCounts($storyCommentVote->comment);
     }
 
     /**
@@ -27,7 +27,7 @@ class StoryCommentVoteObserver
      */
     public function updated(StoryCommentVote $storyCommentVote): void
     {
-        $this->commentVoteService->recalculateVoteCounts($storyCommentVote->comment);
+        $this->storyCommentVoteService->recalculateVoteCounts($storyCommentVote->comment);
     }
 
     /**
@@ -35,6 +35,6 @@ class StoryCommentVoteObserver
      */
     public function deleted(StoryCommentVote $storyCommentVote): void
     {
-        $this->commentVoteService->recalculateVoteCounts($storyCommentVote->comment);
+        $this->storyCommentVoteService->recalculateVoteCounts($storyCommentVote->comment);
     }
 }

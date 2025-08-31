@@ -6,7 +6,7 @@ use App\Constants\VotingConstants;
 use App\Enums\Vote\Type;
 use App\Models\StoryComment;
 
-class CommentVoteService
+class StoryCommentVoteService
 {
     /**
      * Recalculates and updates the denormalized vote counts for a given StoryComment.
