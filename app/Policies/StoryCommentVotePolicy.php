@@ -32,6 +32,7 @@ class StoryCommentVotePolicy
 
     /**
      * Determine whether the user can create the model.
+     * Handled via the frontend Livewire components, not the admin panel.
      */
     public function create(User $user): bool
     {
@@ -40,6 +41,7 @@ class StoryCommentVotePolicy
 
     /**
      * Determine whether the user can update the model.
+     * Handled via the frontend Livewire components, not the admin panel.
      */
     public function update(User $user, StoryCommentVote $storyCommentVote): bool
     {
