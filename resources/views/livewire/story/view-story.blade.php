@@ -26,8 +26,8 @@
                     </x-filament::section>
                     <x-filament::section>
                         <div class="flex flex-row space-x-2">
-                            <livewire:vote.upvote-action :story="$story" />
-                            <livewire:vote.downvote-action :story="$story" />
+                            <livewire:story-vote.upvote-action :story="$story" />
+                            <livewire:story-vote.downvote-action :story="$story" />
                         </div>
                     </x-filament::section>
                     <livewire:story-comment.create-story-comment :story="$story" />

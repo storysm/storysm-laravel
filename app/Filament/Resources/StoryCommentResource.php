@@ -171,6 +171,10 @@ class StoryCommentResource extends Resource
                     ->limit(30),
                 Tables\Columns\TextColumn::make('reply_count')
                     ->label(__('story-comment.resource.reply_count')),
+                Tables\Columns\TextColumn::make('upvote_count')
+                    ->label(__('story-comment.resource.upvote_count')),
+                Tables\Columns\TextColumn::make('downvote_count')
+                    ->label(__('story-comment.resource.downvote_count')),
                 static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator'))) : null,
             ]))

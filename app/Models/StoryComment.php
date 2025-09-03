@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Concerns\CanFormatCount;
+use App\Enums\Vote\Type;
 use Carbon\Carbon;
 use Database\Factories\StoryCommentFactory;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,7 +12,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Auth;
 use Spatie\Translatable\HasTranslations;
 
 /**
@@ -124,6 +127,22 @@ class StoryComment extends Model
     }
 
     /**
+     * Get the upvote count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedUpvoteCount(): string
+    {
+        return $this->formatCount($this->upvote_count);
+    }
+
+    /**
+     * Get the downvote count formatted with suffixes (K, M, B, T).
+     */
+    public function formattedDownvoteCount(): string
+    {
+        return $this->formatCount($this->downvote_count);
+    }
+
+    /**
      * Get the parent of the StoryComment.
      *
      * @return BelongsTo<StoryComment, $this>
@@ -141,5 +160,62 @@ class StoryComment extends Model
     public function story(): BelongsTo
     {
         return $this->belongsTo(Story::class);
+    }
+
+    /**
+     * Get the votes for the StoryComment.
+     *
+     * @return HasMany<StoryCommentVote, $this>
+     */
+    public function votes(): HasMany
+    {
+        return $this->hasMany(StoryCommentVote::class, 'story_comment_id');
+    }
+
+    /**
+     * Get the user's vote for the StoryComment.
+     *
+     * @return HasOne<StoryCommentVote, $this>
+     */
+    public function userVote(): HasOne
+    {
+        return $this->hasOne(StoryCommentVote::class, 'story_comment_id')->where('creator_id', Auth::id());
+    }
+
+    /**
+     * Get the current user's vote for the StoryComment.
+     */
+    public function currentUserVote(): ?StoryCommentVote
+    {
+        return $this->userVote()->first();
+    }
+
+    /**
+     * Handle voting for the StoryComment.
+     */
+    public function vote(Type $type): void
+    {
+        if (! Auth::check()) {
+            return;
+        }
+
+        $existingVote = $this->userVote()->first();
+
+        if ($existingVote) {
+            if ($existingVote->type === $type) {
+                // User is unvoting
+                $existingVote->delete();
+            } else {
+                // User is changing their vote
+                $existingVote->type = $type;
+                $existingVote->save();
+            }
+        } else {
+            // User is casting a new vote
+            $this->votes()->create([
+                'creator_id' => Auth::id(),
+                'type' => $type,
+            ]);
+        }
     }
 }

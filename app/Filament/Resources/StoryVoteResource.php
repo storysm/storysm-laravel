@@ -4,8 +4,8 @@ namespace App\Filament\Resources;
 
 use App\Enums\Vote\Type;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
-use App\Filament\Resources\VoteResource\Pages;
-use App\Models\Vote;
+use App\Filament\Resources\StoryVoteResource\Pages;
+use App\Models\StoryVote;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Facades\Filament;
 use Filament\Forms\Form;
@@ -14,9 +14,9 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class VoteResource extends Resource implements HasShieldPermissions
+class StoryVoteResource extends Resource implements HasShieldPermissions
 {
-    protected static ?string $model = Vote::class;
+    protected static ?string $model = StoryVote::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-hand-thumb-up';
 
@@ -32,7 +32,7 @@ class VoteResource extends Resource implements HasShieldPermissions
     }
 
     /**
-     * @return Builder<Vote>
+     * @return Builder<StoryVote>
      */
     public static function getEloquentQuery(): Builder
     {
@@ -47,18 +47,18 @@ class VoteResource extends Resource implements HasShieldPermissions
 
     public static function getModelLabel(): string
     {
-        return trans_choice('vote.resource.model_label', 1);
+        return trans_choice('story-vote.resource.model_label', 1);
     }
 
     public static function getNavigationGroup(): ?string
     {
-        return __('Administration');
+        return trans_choice('story.resource.model_label', 1);
     }
 
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListVotes::route('/'),
+            'index' => Pages\ListStoryVotes::route('/'),
         ];
     }
 
@@ -74,7 +74,7 @@ class VoteResource extends Resource implements HasShieldPermissions
 
     public static function getPluralModelLabel(): string
     {
-        return trans_choice('vote.resource.model_label', 2);
+        return trans_choice('story-vote.resource.model_label', 2);
     }
 
     public static function table(Table $table): Table
@@ -83,7 +83,7 @@ class VoteResource extends Resource implements HasShieldPermissions
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\ViewAction::make()
-                        ->url(fn (Vote $record) => route('stories.show', $record->story)),
+                        ->url(fn (StoryVote $record) => route('stories.show', $record->story)),
                     Tables\Actions\DeleteAction::make(),
                 ]),
             ])
@@ -98,11 +98,11 @@ class VoteResource extends Resource implements HasShieldPermissions
                 Tables\Columns\TextColumn::make('creator.name')
                     ->label(trans_choice('user.resource.model_label', 1)),
                 Tables\Columns\IconColumn::make('type')
-                    ->label(trans_choice('vote.resource.model_label', 1)),
+                    ->label(trans_choice('story-vote.resource.model_label', 1)),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('type')
-                    ->label(trans_choice('vote.resource.model_label', 1))
+                    ->label(trans_choice('story-vote.resource.model_label', 1))
                     ->options(Type::class),
             ]);
     }

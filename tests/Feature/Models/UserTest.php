@@ -3,8 +3,8 @@
 namespace Tests\Feature\Models;
 
 use App\Models\Story;
+use App\Models\StoryVote;
 use App\Models\User;
-use App\Models\Vote;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -22,17 +22,17 @@ class UserTest extends TestCase
         $story3 = Story::factory()->create();
 
         // Create votes for the user on story1 and story3
-        Vote::factory()->create([
+        StoryVote::factory()->create([
             'creator_id' => $user->id,
             'story_id' => $story1->id,
         ]);
-        Vote::factory()->create([
+        StoryVote::factory()->create([
             'creator_id' => $user->id,
             'story_id' => $story3->id,
         ]);
 
         // Ensure story2 is not voted on by this user
-        Vote::factory()->create([
+        StoryVote::factory()->create([
             'creator_id' => User::factory()->create()->id,
             'story_id' => $story2->id,
         ]);
@@ -49,10 +49,10 @@ class UserTest extends TestCase
     public function test_user_has_many_votes(): void
     {
         $user = User::factory()->create();
-        $votes = Vote::factory()->count(3)->for($user, 'creator')->create();
+        $storyVotes = StoryVote::factory()->count(3)->for($user, 'creator')->create();
 
-        $this->assertInstanceOf(Collection::class, $user->votes);
-        $this->assertCount(3, $user->votes);
-        $this->assertTrue($user->votes->contains($votes->firstOrFail()));
+        $this->assertInstanceOf(Collection::class, $user->storyVotes);
+        $this->assertCount(3, $user->storyVotes);
+        $this->assertTrue($user->storyVotes->contains($storyVotes->firstOrFail()));
     }
 }

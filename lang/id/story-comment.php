@@ -33,5 +33,9 @@ return [
         'replied_comment' => 'Komentar Dibalas',
         'reply_count' => 'Jumlah Balasan',
         'reply_label' => 'Balasan|Balasan',
+        'upvote_count' => 'Jumlah Upvote',
+        'downvote_count' => 'Jumlah Downvote',
+        'vote_count' => 'Total Suara',
+        'vote_score' => 'Skor Suara',
     ],
 ];

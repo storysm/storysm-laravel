@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Vote;
+namespace App\Livewire\StoryVote;
 
 use App\Enums\Vote\Type;
 use App\Models\Story;
@@ -16,7 +16,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 use Livewire\Component;
 
-class UpvoteAction extends Component implements HasActions, HasForms
+class DownvoteAction extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
@@ -28,20 +28,20 @@ class UpvoteAction extends Component implements HasActions, HasForms
         $this->story = $story;
     }
 
-    public function upvoteAction(): Action
+    public function downvoteAction(): Action
     {
-        $active = $this->story->currentUserVote()?->type === Type::Up;
+        $active = $this->story->currentUserVote()?->type === Type::Down;
 
-        return Action::make('upvote')
+        return Action::make('downvote')
             ->action(function () {
                 if (! Auth::check()) {
                     Notification::make()
-                        ->title(__('vote.notification.login_required.title'))
-                        ->body(__('vote.notification.login_required.body'))
+                        ->title(__('story-vote.notification.login_required.title'))
+                        ->body(__('story-vote.notification.login_required.body'))
                         ->warning()
                         ->actions([
                             Notifications\Actions\Action::make('login')
-                                ->label(__('vote.notification.login_required.action.login'))
+                                ->label(__('story-vote.notification.login_required.action.login'))
                                 ->url(route('login'))
                                 ->button(),
                         ])
@@ -50,13 +50,14 @@ class UpvoteAction extends Component implements HasActions, HasForms
                     return;
                 }
 
-                $this->story->vote(Type::Up);
+                $this->story->vote(Type::Down);
                 $this->story->refresh();
 
                 $this->dispatch('vote-updated', storyId: $this->story->id);
             })
-            ->icon($active ? 'heroicon-m-hand-thumb-up' : 'heroicon-o-hand-thumb-up')
-            ->label($this->story->formattedUpvoteCount())
+            ->color('danger')
+            ->icon($active ? 'heroicon-m-hand-thumb-down' : 'heroicon-o-hand-thumb-down')
+            ->label($this->story->formattedDownvoteCount())
             ->outlined(! $active);
     }
 
@@ -70,6 +71,6 @@ class UpvoteAction extends Component implements HasActions, HasForms
 
     public function render(): View
     {
-        return view('livewire.vote.upvote-action');
+        return view('livewire.story-vote.downvote-action');
     }
 }

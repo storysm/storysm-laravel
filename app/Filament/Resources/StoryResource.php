@@ -168,11 +168,11 @@ class StoryResource extends Resource implements HasShieldPermissions
                         };
                     }),
                 Tables\Columns\TextColumn::make('upvote_count')
-                    ->label(__('vote.resource.upvote_count'))
+                    ->label(__('story-vote.resource.upvote_count'))
                     ->state(fn (Story $record) => $record->formattedUpvoteCount())
                     ->tooltip(fn (Story $record) => $record->upvote_count > 999 ? $record->upvote_count : null),
                 Tables\Columns\TextColumn::make('downvote_count')
-                    ->label(__('vote.resource.downvote_count'))
+                    ->label(__('story-vote.resource.downvote_count'))
                     ->state(fn (Story $record) => $record->formattedDownvoteCount())
                     ->tooltip(fn (Story $record) => $record->downvote_count > 999 ? $record->downvote_count : null),
                 Tables\Columns\TextColumn::make('comment_count')

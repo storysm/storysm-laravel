@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Concerns\CanFormatCount;
 use App\Concerns\HasCreatorAttribute;
+use App\Constants\VotingConstants;
 use App\Enums\Story\Status;
 use App\Enums\Vote\Type;
 use Illuminate\Database\Eloquent\Builder;
@@ -46,12 +47,6 @@ class Story extends Model
 
     use HasTranslations;
     use HasUlids;
-
-    /**
-     * The penalty weight applied to downvotes when calculating the score.
-     * A weight of 2 means each downvote subtracts 2 from the score.
-     */
-    private const DOWNVOTE_PENALTY_WEIGHT = 1.1;
 
     /**
      * @var array<int, string>
@@ -106,7 +101,7 @@ class Story extends Model
     /**
      * Get the vote of the currently authenticated user for this story.
      */
-    public function currentUserVote(): ?Vote
+    public function currentUserVote(): ?StoryVote
     {
         $user = Auth::user();
 
@@ -114,8 +109,8 @@ class Story extends Model
             return null;
         }
 
-        // Use the votes relationship to find the vote by the current user
-        return $this->votes()->where('creator_id', $user->id)->first();
+        // Use the storyVotes relationship to find the vote by the current user
+        return $this->storyVotes()->where('creator_id', $user->id)->first();
     }
 
     /**
@@ -251,16 +246,16 @@ class Story extends Model
      */
     public function voters(): BelongsToMany
     {
-        return $this->belongsToMany(User::class, 'votes', 'story_id', 'creator_id')
+        return $this->belongsToMany(User::class, 'story_votes', 'story_id', 'creator_id')
             ->withTimestamps();
     }
 
     /**
-     * @return HasMany<Vote, $this>
+     * @return HasMany<StoryVote, $this>
      */
-    public function votes(): HasMany
+    public function storyVotes(): HasMany
     {
-        return $this->hasMany(Vote::class);
+        return $this->hasMany(StoryVote::class);
     }
 
     /**
@@ -268,13 +263,13 @@ class Story extends Model
      */
     public function updateVoteCountsAndScore(): void
     {
-        $upvotes = $this->votes()->where('type', Type::Up)->count();
-        $downvotes = $this->votes()->where('type', Type::Down)->count();
+        $upvotes = $this->storyVotes()->where('type', Type::Up)->count();
+        $downvotes = $this->storyVotes()->where('type', Type::Down)->count();
 
         $this->upvote_count = $upvotes;
         $this->downvote_count = $downvotes;
         $this->vote_count = $upvotes + $downvotes;
-        $this->vote_score = $upvotes - ($downvotes * self::DOWNVOTE_PENALTY_WEIGHT);
+        $this->vote_score = $upvotes - ($downvotes * VotingConstants::DOWNVOTE_PENALTY_WEIGHT);
 
         $this->save();
     }
@@ -309,7 +304,7 @@ class Story extends Model
             }
         } elseif ($type !== null) {
             // No existing vote, create a new one
-            $this->votes()->create([
+            $this->storyVotes()->create([
                 'creator_id' => $user->id,
                 'story_id' => $this->id,
                 'type' => $type,

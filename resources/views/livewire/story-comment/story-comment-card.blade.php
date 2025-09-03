@@ -1,5 +1,5 @@
 <div>
-    <div class="flex flex-row items-start justify-between gap-2 text-sm">
+    <div class="flex flex-row items-start justify-between gap-2 text-sm @if($storyComment->vote_score < -5) opacity-50 @endif">
         <div class="flex flex-row gap-4">
             {{-- Avatar --}}
             <x-filament-panels::avatar.user :user="$storyComment->creator" />
@@ -10,7 +10,7 @@
                         <p class="font-extrabold">{{ $storyComment->creator?->name }}</p>
                         <span class="text-gray-500 dark:text-gray-400">&middot;</span>
                         <p class="text-gray-500 dark:text-gray-400" title="{{ $storyComment->created_at }}">
-                            {{ $storyComment->created_at->diffForHumans() }}
+                            {{ $storyComment->created_at?->diffForHumans() }}
                         </p>
                     </div>
 
@@ -20,15 +20,20 @@
                     </p>
                 </div>
 
-                @if ($showReplyButton)
-                    <div>
-                        {{-- Replies --}}
-                        <x-filament::button :href="route('story-comments.show', $storyComment)" icon="heroicon-m-arrow-uturn-left" :outlined="!$hasUserReplied"
-                            size="xs" tag="a">
-                            {{ $storyComment->formattedReplyCount() }}
-                        </x-filament::button>
-                    </div>
-                @endif
+                {{-- Voting Actions --}}
+                <div class="flex flex-row items-center gap-2">
+                    <livewire:story-comment-vote.upvote-action :storyComment="$storyComment" />
+                    <livewire:story-comment-vote.downvote-action :storyComment="$storyComment" />
+                    @if ($showReplyButton)
+                        <div>
+                            {{-- Replies --}}
+                            <x-filament::button :href="route('story-comments.show', $storyComment)" icon="heroicon-m-arrow-uturn-left" :outlined="!$hasUserReplied"
+                                size="xs" tag="a">
+                                {{ $storyComment->formattedReplyCount() }}
+                            </x-filament::button>
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
 

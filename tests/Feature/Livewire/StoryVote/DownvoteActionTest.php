@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Feature\Livewire\Vote;
+namespace Tests\Feature\Livewire\StoryVote;
 
 use App\Enums\Vote\Type;
-use App\Livewire\Vote\DownvoteAction;
+use App\Livewire\StoryVote\DownvoteAction;
 use App\Models\Story;
+use App\Models\StoryVote;
 use App\Models\User;
-use App\Models\Vote;
 use Filament\Notifications\Notification;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Features\SupportTesting\Testable;
@@ -40,7 +40,7 @@ class DownvoteActionTest extends TestCase
         $testable->assertHasNoErrors();
         $testable->assertDispatched('vote-updated', storyId: $story->id);
 
-        $this->assertDatabaseHas('votes', [
+        $this->assertDatabaseHas('story_votes', [
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Down,
@@ -55,7 +55,7 @@ class DownvoteActionTest extends TestCase
         /** @var User */
         $user = User::factory()->create();
         $story = Story::factory()->create();
-        Vote::factory()->create([
+        StoryVote::factory()->create([
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Down,
@@ -74,7 +74,7 @@ class DownvoteActionTest extends TestCase
         $testable->assertHasNoErrors();
         $testable->assertDispatched('vote-updated', storyId: $story->id);
 
-        $this->assertDatabaseMissing('votes', [
+        $this->assertDatabaseMissing('story_votes', [
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Down,
@@ -89,7 +89,7 @@ class DownvoteActionTest extends TestCase
         /** @var User */
         $user = User::factory()->create();
         $story = Story::factory()->create();
-        Vote::factory()->create([
+        StoryVote::factory()->create([
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Up,
@@ -109,12 +109,12 @@ class DownvoteActionTest extends TestCase
         $testable->assertHasNoErrors();
         $testable->assertDispatched('vote-updated', storyId: $story->id);
 
-        $this->assertDatabaseHas('votes', [
+        $this->assertDatabaseHas('story_votes', [
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Down,
         ]);
-        $this->assertDatabaseMissing('votes', [
+        $this->assertDatabaseMissing('story_votes', [
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Up,
@@ -134,18 +134,18 @@ class DownvoteActionTest extends TestCase
 
         $testable->assertNotified(
             Notification::make()
-                ->title(__('vote.notification.login_required.title'))
-                ->body(__('vote.notification.login_required.body'))
+                ->title(__('story-vote.notification.login_required.title'))
+                ->body(__('story-vote.notification.login_required.body'))
                 ->warning()
                 ->actions([
                     \Filament\Notifications\Actions\Action::make('login')
-                        ->label(__('vote.notification.login_required.action.login'))
+                        ->label(__('story-vote.notification.login_required.action.login'))
                         ->url(route('login'))
                         ->button(),
                 ])
         );
 
-        $this->assertDatabaseMissing('votes', [
+        $this->assertDatabaseMissing('story_votes', [
             'story_id' => $story->id,
             'type' => Type::Down,
         ]);
@@ -183,13 +183,13 @@ class DownvoteActionTest extends TestCase
         $story = Story::factory()->create();
 
         // Create 5 downvotes by other users to set an initial count
-        Vote::factory()->count(5)->create([
+        StoryVote::factory()->count(5)->create([
             'story_id' => $story->id,
             'type' => Type::Down,
         ]);
         $story->updateVoteCountsAndScore(); // Calculate initial counts
         $story->refresh(); // Refresh model to get updated counts
-        
+
         $this->assertEquals(5, $story->downvote_count);
         $this->assertNull($story->currentUserVote()); // Ensure the current user has no vote initially
 
@@ -202,7 +202,7 @@ class DownvoteActionTest extends TestCase
         $testable->assertActionHasIcon('downvote', 'heroicon-o-hand-thumb-down'); // Outlined icon when not downvoted
 
         // Simulate user downvoting
-        Vote::factory()->create([
+        StoryVote::factory()->create([
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Down,
@@ -222,8 +222,8 @@ class DownvoteActionTest extends TestCase
         $testable->assertActionHasIcon('downvote', 'heroicon-m-hand-thumb-down'); // Solid icon when downvoted
 
         // Simulate user changing to upvote
-        Vote::where('creator_id', $user->id)->where('story_id', $story->id)->delete(); // Remove existing vote
-        Vote::factory()->create([
+        StoryVote::where('creator_id', $user->id)->where('story_id', $story->id)->delete(); // Remove existing vote
+        StoryVote::factory()->create([
             'creator_id' => $user->id,
             'story_id' => $story->id,
             'type' => Type::Up,
@@ -243,7 +243,7 @@ class DownvoteActionTest extends TestCase
         $testable->assertActionHasIcon('downvote', 'heroicon-o-hand-thumb-down'); // Outlined icon when not downvoted
 
         // Simulate user removing their vote (e.g., clicking upvote again)
-        Vote::where('creator_id', $user->id)->where('story_id', $story->id)->delete(); // Remove existing vote
+        StoryVote::where('creator_id', $user->id)->where('story_id', $story->id)->delete(); // Remove existing vote
         $story->updateVoteCountsAndScore(); // Recalculate counts
         $story->refresh(); // Refresh model
         $this->assertEquals(5, $story->downvote_count); // Downvote count remains 5
