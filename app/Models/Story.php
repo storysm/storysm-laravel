@@ -198,6 +198,17 @@ class Story extends Model
     }
 
     /**
+     * Get the languages associated with the story.
+     *
+     * @return BelongsToMany<Language, $this>
+     */
+    public function languages(): BelongsToMany
+    {
+        return $this->belongsToMany(Language::class)
+            ->withTimestamps();
+    }
+
+    /**
      * @param  Builder<Story>  $query
      */
     public function scopePending(Builder $query): void
