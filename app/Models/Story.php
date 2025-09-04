@@ -7,6 +7,8 @@ use App\Concerns\HasCreatorAttribute;
 use App\Constants\VotingConstants;
 use App\Enums\Story\Status;
 use App\Enums\Vote\Type;
+use App\Observers\StoryObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,6 +39,7 @@ use Spatie\Translatable\HasTranslations;
  * @property-read User $creator
  * @property-read ?Media $coverMedia
  */
+#[ObservedBy([StoryObserver::class])]
 class Story extends Model
 {
     use CanFormatCount;
