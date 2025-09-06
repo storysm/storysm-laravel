@@ -24,10 +24,12 @@ class LanguageResource extends Resource implements HasShieldPermissions
             ->schema([
                 Forms\Components\Section::make([
                     Forms\Components\TextInput::make('code')
+                        ->label(__('language.code'))
                         ->required()
                         ->maxLength(8)
                         ->unique(ignoreRecord: true),
                     Forms\Components\TextInput::make('name')
+                        ->label(__('language.name'))
                         ->required()
                         ->maxLength(255),
                 ]),
@@ -77,9 +79,11 @@ class LanguageResource extends Resource implements HasShieldPermissions
         return $table
             ->columns([
                 Tables\Columns\TextColumn::make('code')
+                    ->label(__('language.code'))
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('name')
+                    ->label(__('language.name'))
                     ->searchable()
                     ->sortable(),
             ])
