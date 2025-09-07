@@ -72,18 +72,48 @@ class StoryObserverTest extends TestCase
         // Update the story content with an unknown language code
         $story->update(['content' => ['en' => 'This is some content with [xx]Unknown[/xx] language.']]);
 
-        // Assert that 'en' language is  synchronized and 'xx' is not
-        $this->assertCount(1, $story->languages);
+        // Assert that 'en' language is synchronized and 'xx' is now created and synchronized
+        $this->assertCount(2, $story->languages);
         $this->assertTrue($story->languages->contains('code', 'en'));
-        $this->assertFalse($story->languages->contains('code', 'xx'));
+        $this->assertTrue($story->languages->contains('code', 'xx'));
 
-        // Assert that the unknown language is not created in the database
-        $this->assertDatabaseMissing('languages', ['code' => 'xx']);
+        // Assert that the unknown language is created in the database
+        $this->assertDatabaseHas('languages', ['code' => 'xx', 'name' => 'xx']);
 
         /** @var Expectation */
         $expectation = $log->shouldReceive('warning');
         $expectation->with(Mockery::on(function (string $message) {
-            return str_contains($message, 'Attempted to sync story with unknown language codes');
+            return str_contains($message, 'Attempted to sync story with unknown language codes. Creating new language entries.');
+        }));
+    }
+
+    /**
+     * Test that the StoryObserver creates real unknown language codes with correct names.
+     */
+    public function test_story_observer_creates_real_unknown_language_codes_with_correct_name(): void
+    {
+        $log = Log::spy();
+
+        // Ensure 'fr' language does not exist initially
+        $this->assertDatabaseMissing('languages', ['code' => 'fr']);
+
+        // Create a story with content in 'fr'
+        $story = Story::factory()->create(['content' => [
+            'fr' => 'Ceci est un contenu en français.',
+        ]]);
+
+        // Assert that 'fr' language is created in the database with the correct name
+        $this->assertDatabaseHas('languages', ['code' => 'fr', 'name' => 'French']);
+
+        // Assert that 'fr' language is synchronized with the story
+        $this->assertCount(1, $story->languages);
+        $this->assertTrue($story->languages->contains('code', 'fr'));
+
+        // Assert that a warning is logged
+        /** @var Expectation */
+        $expectation = $log->shouldReceive('warning');
+        $expectation->with(Mockery::on(function (string $message) {
+            return str_contains($message, 'Attempted to sync story with unknown language codes. Creating new language entries.');
         }));
     }
 
