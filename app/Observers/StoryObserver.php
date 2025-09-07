@@ -5,6 +5,7 @@ namespace App\Observers;
 use App\Models\Language;
 use App\Models\Story;
 use Illuminate\Support\Facades\Log;
+use Locale;
 
 class StoryObserver
 {
@@ -19,13 +20,20 @@ class StoryObserver
             $existingLanguages = Language::whereIn('code', $languageCodesInContent)->pluck('code', 'id');
             $languageIdsToSync = $existingLanguages->keys();
 
-            // Log a warning for any language codes that are in the content but not in the languages table.
             $unknownCodes = $languageCodesInContent->diff($existingLanguages->values());
             if ($unknownCodes->isNotEmpty()) {
-                Log::warning('Attempted to sync story with unknown language codes.', [
+                Log::warning('Attempted to sync story with unknown language codes. Creating new language entries.', [
                     'story_id' => $story->id,
                     'unknown_codes' => $unknownCodes->all(),
                 ]);
+
+                foreach ($unknownCodes as $code) {
+                    Language::firstOrCreate(['code' => $code], ['name' => Locale::getDisplayLanguage($code, 'en')]);
+                }
+
+                // Re-fetch existing languages to include newly created ones
+                $existingLanguages = Language::whereIn('code', $languageCodesInContent)->pluck('code', 'id');
+                $languageIdsToSync = $existingLanguages->keys();
             }
 
             // Automatically attaches new, detaches missing, and leaves existing relations.
