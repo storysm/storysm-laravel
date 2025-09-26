@@ -21,7 +21,7 @@ class GenreResource extends Resource implements HasShieldPermissions
 
     protected static ?string $model = Genre::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-bookmark';
 
     public static function form(Form $form): Form
     {
@@ -30,6 +30,7 @@ class GenreResource extends Resource implements HasShieldPermissions
                 Translate::make()
                     ->schema([
                         TextInput::make('name')
+                            ->label(__('genre.resource.name'))
                             ->required()
                             ->maxLength(255),
                         TiptapEditor::make('description')
@@ -39,6 +40,44 @@ class GenreResource extends Resource implements HasShieldPermissions
                     ->locales(static::getSortedLocales())
                     ->suffixLocaleLabel(),
             ]);
+    }
+
+    public static function getModelLabel(): string
+    {
+        return trans_choice('genre.resource.model_label', 1);
+    }
+
+    public static function getNavigationGroup(): ?string
+    {
+        return __('Administration');
+    }
+
+    public static function getPages(): array
+    {
+        return [
+            'index' => Pages\ListGenres::route('/'),
+            'create' => Pages\CreateGenre::route('/create'),
+            'edit' => Pages\EditGenre::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+        ];
+    }
+
+    public static function getPluralModelLabel(): string
+    {
+        return trans_choice('genre.resource.model_label', 2);
     }
 
     public static function table(Table $table): Table
@@ -64,9 +103,6 @@ class GenreResource extends Resource implements HasShieldPermissions
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
-            ->filters([
-                //
-            ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
@@ -78,35 +114,5 @@ class GenreResource extends Resource implements HasShieldPermissions
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
             ]);
-    }
-
-    public static function getRelations(): array
-    {
-        return [
-            //
-        ];
-    }
-
-    public static function getPages(): array
-    {
-        return [
-            'index' => Pages\ListGenres::route('/'),
-            'create' => Pages\CreateGenre::route('/create'),
-            'edit' => Pages\EditGenre::route('/{record}/edit'),
-        ];
-    }
-
-    /**
-     * @return string[]
-     */
-    public static function getPermissionPrefixes(): array
-    {
-        return [
-            'view',
-            'view_any',
-            'create',
-            'update',
-            'delete',
-        ];
     }
 }
