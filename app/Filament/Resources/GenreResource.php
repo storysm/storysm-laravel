@@ -2,15 +2,21 @@
 
 namespace App\Filament\Resources;
 
+use App\Concerns\HasLocales;
 use App\Filament\Resources\GenreResource\Pages;
 use App\Models\Genre;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use FilamentTiptapEditor\TiptapEditor;
+use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class GenreResource extends Resource
 {
+    use HasLocales;
+
     protected static ?string $model = Genre::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
@@ -19,7 +25,17 @@ class GenreResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Translate::make()
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        TiptapEditor::make('description')
+                            ->label(__('genre.resource.description')),
+                    ])
+                    ->columnSpanFull()
+                    ->locales(static::getSortedLocales())
+                    ->suffixLocaleLabel(),
             ]);
     }
 
