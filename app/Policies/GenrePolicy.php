@@ -27,14 +27,6 @@ class GenrePolicy
     }
 
     /**
-     * Determine whether the user can view all models.
-     */
-    public function viewAll(User $user): bool
-    {
-        return $user->can('view_all_genre');
-    }
-
-    /**
      * Determine whether the user can create models.
      */
     public function create(User $user): bool

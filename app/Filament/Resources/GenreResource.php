@@ -6,6 +6,7 @@ use App\Concerns\HasLocales;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\GenreResource\Pages;
 use App\Models\Genre;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -14,7 +15,7 @@ use Filament\Tables\Table;
 use FilamentTiptapEditor\TiptapEditor;
 use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
-class GenreResource extends Resource
+class GenreResource extends Resource implements HasShieldPermissions
 {
     use HasLocales;
 
@@ -92,6 +93,20 @@ class GenreResource extends Resource
             'index' => Pages\ListGenres::route('/'),
             'create' => Pages\CreateGenre::route('/create'),
             'edit' => Pages\EditGenre::route('/{record}/edit'),
+        ];
+    }
+
+    /**
+     * @return string[]
+     */
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
         ];
     }
 }
