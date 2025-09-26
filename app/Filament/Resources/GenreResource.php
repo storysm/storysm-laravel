@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Concerns\HasLocales;
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\GenreResource\Pages;
 use App\Models\Genre;
 use Filament\Forms\Components\TextInput;
@@ -43,17 +44,37 @@ class GenreResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\TextColumn::make('name')
+                    ->label(__('genre.resource.name'))
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('stories_count')
+                    ->counts('stories')
+                    ->label(__('genre.resource.stories_count'))
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('created_at')
+                    ->label(__('genre.resource.created_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('updated_at')
+                    ->label(__('genre.resource.updated_at'))
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\ActionGroup::make([
+                    Tables\Actions\EditAction::make(),
+                    Tables\Actions\DeleteAction::make(),
+                ]),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    ReferenceAwareDeleteBulkAction::make(),
                 ]),
             ]);
     }
