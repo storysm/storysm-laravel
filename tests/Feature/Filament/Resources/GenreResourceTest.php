@@ -114,6 +114,50 @@ class GenreResourceTest extends TestCase
         ]);
     }
 
+    public function test_genre_creation_with_existing_name_fails_validation(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        Genre::factory()->create([
+            'name' => [
+                'en' => 'Existing Genre EN',
+                'id' => 'Existing Genre ID',
+            ],
+        ]);
+
+        $livewire = Livewire::test(CreateGenre::class);
+        $livewire->fillForm([
+            'name' => [
+                'en' => 'Existing Genre EN',
+                'id' => 'New Genre ID',
+            ],
+            'description' => [
+                'en' => 'Some description',
+                'id' => 'Some description',
+            ],
+        ]);
+        $livewire->call('create');
+        $livewire->assertHasFormErrors([
+            'name.en',
+        ]);
+
+        $livewire = Livewire::test(CreateGenre::class);
+        $livewire->fillForm([
+            'name' => [
+                'en' => 'New Genre EN',
+                'id' => 'Existing Genre ID',
+            ],
+            'description' => [
+                'en' => 'Some description',
+                'id' => 'Some description',
+            ],
+        ]);
+        $livewire->call('create');
+        $livewire->assertHasFormErrors([
+            'name.id',
+        ]);
+    }
+
     public function test_admin_user_can_update_genre(): void
     {
         $this->actingAs($this->adminUser);
@@ -161,6 +205,19 @@ class GenreResourceTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_unauthorized_user_cannot_delete_genre(): void
+    {
+        $this->unauthorizedUser->givePermissionTo([
+            'view_any_genre',
+            'update_genre',
+        ]);
+        $this->actingAs($this->unauthorizedUser);
+        $genre = Genre::factory()->create();
+
+        Livewire::test(EditGenre::class, ['record' => $genre->getRouteKey()])
+            ->assertActionHidden('delete');
+    }
+
     public function test_genre_update_requires_name(): void
     {
         $this->actingAs($this->adminUser);
@@ -199,6 +256,22 @@ class GenreResourceTest extends TestCase
         ]);
     }
 
+    public function test_admin_user_cannot_delete_genre_assigned_to_story(): void
+    {
+        $this->actingAs($this->adminUser);
+        $genre = Genre::factory()->create();
+        $story = \App\Models\Story::factory()->create();
+        $story->genres()->attach($genre);
+
+        Livewire::test(EditGenre::class, ['record' => $genre->getRouteKey()])
+            ->call('mountAction', 'delete')
+            ->call('callMountedAction');
+
+        $this->assertDatabaseHas('genres', [
+            'id' => $genre->id,
+        ]);
+    }
+
     public function test_admin_user_can_bulk_delete_genres(): void
     {
         $this->actingAs($this->adminUser);
@@ -212,5 +285,20 @@ class GenreResourceTest extends TestCase
                 'id' => $genre->id,
             ]);
         }
+    }
+
+    public function test_admin_user_cannot_bulk_delete_genres_if_any_are_assigned_to_story(): void
+    {
+        $this->actingAs($this->adminUser);
+        $genres = Genre::factory()->count(3)->create();
+        $story = \App\Models\Story::factory()->create();
+        $story->genres()->attach($genres->first());
+
+        Livewire::test(ListGenres::class)
+            ->callTableBulkAction('delete', $genres);
+
+        $this->assertDatabaseHas('genres', [
+            'id' => $genres->first()?->id,
+        ]);
     }
 }
