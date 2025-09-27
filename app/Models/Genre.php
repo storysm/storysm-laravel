@@ -36,6 +36,11 @@ class Genre extends Model
      */
     protected $guarded = [];
 
+    public function isReferenced(): bool
+    {
+        return $this->stories()->exists();
+    }
+
     /**
      * @return BelongsToMany<Story, $this>
      */

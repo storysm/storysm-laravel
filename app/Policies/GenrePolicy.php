@@ -47,6 +47,10 @@ class GenrePolicy
      */
     public function delete(User $user, Genre $genre): bool
     {
+        if ($genre->isReferenced()) {
+            return false;
+        }
+
         return $user->can('delete_genre');
     }
 }
