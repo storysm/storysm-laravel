@@ -30,22 +30,28 @@ class GenreResource extends Resource implements HasShieldPermissions
         return $form
             ->schema([
                 Translate::make()
-                    ->schema(fn (string $locale): array => [
-                        TextInput::make('name')
-                            ->label(__('genre.resource.name'))
-                            ->required()
-                            ->maxLength(255)
-                            ->rules(function (Get $get) use ($locale) {
-                                /** @var string */
-                                $id = $get('id');
+                    ->schema(function (Get $get, string $locale): array {
+                        /** @var array<?string> */
+                        $names = $get('name');
+                        $required = collect($names)->every(fn ($item) => $item === null || trim($item) === '');
 
-                                return [
-                                    new UniqueJsonTranslation(table: 'genres', column: 'name', locale: $locale, ignoreId: $id),
-                                ];
-                            }),
-                        TiptapEditor::make('description')
-                            ->label(__('genre.resource.description')),
-                    ])
+                        return [
+                            TextInput::make('name')
+                                ->label(__('genre.resource.name'))
+                                ->required($required)
+                                ->maxLength(255)
+                                ->rules(function (Get $get) use ($locale) {
+                                    /** @var string */
+                                    $id = $get('id');
+
+                                    return [
+                                        new UniqueJsonTranslation(table: 'genres', column: 'name', locale: $locale, ignoreId: $id),
+                                    ];
+                                }),
+                            TiptapEditor::make('description')
+                                ->label(__('genre.resource.description')),
+                        ];
+                    })
                     ->columnSpanFull()
                     ->locales(static::getSortedLocales())
                     ->suffixLocaleLabel(),
