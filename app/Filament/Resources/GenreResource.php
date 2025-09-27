@@ -6,9 +6,11 @@ use App\Concerns\HasLocales;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\GenreResource\Pages;
 use App\Models\Genre;
+use App\Rules\UniqueJsonTranslation;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
+use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
@@ -28,11 +30,19 @@ class GenreResource extends Resource implements HasShieldPermissions
         return $form
             ->schema([
                 Translate::make()
-                    ->schema([
+                    ->schema(fn (string $locale): array => [
                         TextInput::make('name')
                             ->label(__('genre.resource.name'))
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->rules(function (Get $get) use ($locale) {
+                                /** @var string */
+                                $id = $get('id');
+
+                                return [
+                                    new UniqueJsonTranslation(table: 'genres', column: 'name', locale: $locale, ignoreId: $id),
+                                ];
+                            }),
                         TiptapEditor::make('description')
                             ->label(__('genre.resource.description')),
                     ])
