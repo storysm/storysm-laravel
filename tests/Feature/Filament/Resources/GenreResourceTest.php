@@ -92,6 +92,21 @@ class GenreResourceTest extends TestCase
             ->assertForbidden();
     }
 
+    public function test_user_with_only_view_permissions_cannot_create_genre(): void
+    {
+        $user = User::factory()->create();
+        $user->givePermissionTo(['view_any_genre', 'view_genre']);
+        $this->actingAs($user);
+
+        // Attempt to access the create page
+        $this->get(GenreResource::getUrl('create'))
+            ->assertForbidden();
+
+        // Attempt to create a genre via Livewire
+        $livewire = Livewire::test(CreateGenre::class);
+        $livewire->assertForbidden(); // Expecting a forbidden response
+    }
+
     public function test_genre_creation_requires_name(): void
     {
         $this->actingAs($this->adminUser);
