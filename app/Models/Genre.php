@@ -34,7 +34,7 @@ class Genre extends Model
     /*
      * @var string[]
      */
-    protected $guarded = [];
+    protected $fillable = ['name', 'description'];
 
     public function isReferenced(): bool
     {
