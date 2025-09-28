@@ -96,7 +96,6 @@ class StoryResource extends Resource implements HasShieldPermissions
                             Forms\Components\Select::make('genres')
                                 ->multiple()
                                 ->relationship('genres', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
-                                ->getOptionLabelUsing(fn (\App\Models\Genre $record): string => $record->name)
                                 ->preload()
                                 ->label(trans_choice('genre.resource.model_label', 2)),
                         ]),
