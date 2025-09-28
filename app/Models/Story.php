@@ -10,6 +10,7 @@ use App\Enums\Vote\Type;
 use App\Observers\StoryObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -38,6 +39,7 @@ use Spatie\Translatable\HasTranslations;
  * @property ?Carbon $updated_at
  * @property-read User $creator
  * @property-read ?Media $coverMedia
+ * @property Collection<int, \App\Models\Genre> $genres
  */
 #[ObservedBy([StoryObserver::class])]
 class Story extends Model
@@ -198,6 +200,17 @@ class Story extends Model
         }
 
         return false;
+    }
+
+    /**
+     * Get the genres associated with the story.
+     *
+     * @return BelongsToMany<Genre, $this>
+     */
+    public function genres(): BelongsToMany
+    {
+        return $this->belongsToMany(Genre::class)
+            ->withTimestamps();
     }
 
     /**

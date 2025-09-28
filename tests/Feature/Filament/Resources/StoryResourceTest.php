@@ -4,7 +4,10 @@ namespace Tests\Feature\Filament\Resources;
 
 use App\Enums\Story\Status;
 use App\Filament\Resources\StoryResource;
+use App\Filament\Resources\StoryResource\Pages\CreateStory;
+use App\Filament\Resources\StoryResource\Pages\EditStory;
 use App\Filament\Resources\StoryResource\Pages\ListStories;
+use App\Models\Genre;
 use App\Models\Permission;
 use App\Models\Story;
 use App\Models\User;
@@ -18,13 +21,25 @@ class StoryResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    private User $adminUser;
+
     private User $user;
 
     protected function setUp(): void
     {
         parent::setUp();
+        $this->adminUser = User::factory()->create();
         $this->user = User::factory()->create();
         $this->actingAs($this->user);
+
+        // Ensure permissions exist for Story resource
+        foreach (StoryResource::getPermissionPrefixes() as $prefix) {
+            Permission::firstOrCreate(['name' => $prefix.'_story']);
+        }
+
+        // Assign all story permissions to adminUser
+        $this->adminUser->givePermissionTo(collect(StoryResource::getPermissionPrefixes())->map(fn ($prefix) => $prefix.'_story')->toArray());
+
         Filament::setCurrentPanel(Filament::getPanel('admin'));
     }
 
@@ -174,5 +189,140 @@ class StoryResourceTest extends TestCase
         $table = $instance->getTable();
 
         $this->assertEquals($table->getRecordUrl($story), route('filament.admin.resources.stories.edit', $story));
+    }
+
+    public function test_admin_user_can_create_story_with_genres(): void
+    {
+        $this->actingAs($this->adminUser);
+        $genres = Genre::factory()->count(2)->create();
+
+        $livewire = Livewire::test(CreateStory::class);
+        $livewire->fillForm([
+            'title' => [
+                'en' => 'Test Story EN',
+                'id' => 'Test Story ID',
+            ],
+            'description' => [
+                'en' => 'Test Description EN',
+                'id' => 'Test Description ID',
+            ],
+            'genres' => $genres->pluck('id')->toArray(),
+        ]);
+        $livewire->call('create');
+        $livewire->assertHasNoFormErrors();
+
+        $story = Story::first();
+        $this->assertNotNull($story);
+        $this->assertCount(2, $story->genres);
+        $this->assertTrue($story->genres->contains('id', $genres[0]?->id));
+        $this->assertTrue($story->genres->contains('id', $genres[1]?->id));
+
+        $this->assertDatabaseHas('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $genres[0]?->id,
+        ]);
+        $this->assertDatabaseHas('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $genres[1]?->id,
+        ]);
+    }
+
+    public function test_admin_user_can_update_story_by_adding_genres(): void
+    {
+        $this->actingAs($this->adminUser);
+        $story = Story::factory()->create();
+        $initialGenre = Genre::factory()->create();
+        $story->genres()->attach($initialGenre);
+
+        $newGenres = Genre::factory()->count(2)->create();
+
+        $livewire = Livewire::test(EditStory::class, ['record' => $story->getRouteKey()]);
+        $livewire->fillForm([
+            'genres' => array_merge([$initialGenre->id], $newGenres->pluck('id')->toArray()),
+        ]);
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $story->refresh();
+        $this->assertCount(3, $story->genres);
+        $this->assertTrue($story->genres->contains($initialGenre));
+        $this->assertTrue($story->genres->contains('id', $newGenres[0]?->id));
+        $this->assertTrue($story->genres->contains('id', $newGenres[1]?->id));
+
+        $this->assertDatabaseHas('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $initialGenre->id,
+        ]);
+        $this->assertDatabaseHas('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $newGenres[0]?->id,
+        ]);
+        $this->assertDatabaseHas('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $newGenres[1]?->id,
+        ]);
+    }
+
+    public function test_admin_user_can_update_story_by_removing_genres(): void
+    {
+        $this->actingAs($this->adminUser);
+        $story = Story::factory()->create();
+        $genres = Genre::factory()->count(3)->create();
+        $story->genres()->attach($genres->pluck('id'));
+
+        // Remove one genre
+        $genresToKeep = [$genres[0]?->id, $genres[1]?->id];
+
+        $livewire = Livewire::test(EditStory::class, ['record' => $story->getRouteKey()]);
+        $livewire->fillForm([
+            'genres' => $genresToKeep,
+        ]);
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $story->refresh();
+        $this->assertCount(2, $story->genres);
+        $this->assertTrue($story->genres->contains('id', $genres[0]?->id));
+        $this->assertTrue($story->genres->contains('id', $genres[1]?->id));
+        $this->assertFalse($story->genres->contains('id', $genres[2]?->id));
+
+        $this->assertDatabaseHas('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $genres[0]?->id,
+        ]);
+        $this->assertDatabaseHas('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $genres[1]?->id,
+        ]);
+        $this->assertDatabaseMissing('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $genres[2]?->id,
+        ]);
+    }
+
+    public function test_admin_user_can_update_story_by_clearing_all_genres(): void
+    {
+        $this->actingAs($this->adminUser);
+        $story = Story::factory()->create();
+        $genres = Genre::factory()->count(2)->create();
+        $story->genres()->attach($genres->pluck('id'));
+
+        $livewire = Livewire::test(EditStory::class, ['record' => $story->getRouteKey()]);
+        $livewire->fillForm([
+            'genres' => [], // Clear all genres
+        ]);
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $story->refresh();
+        $this->assertCount(0, $story->genres);
+        $this->assertDatabaseMissing('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $genres[0]?->id,
+        ]);
+        $this->assertDatabaseMissing('genre_story', [
+            'story_id' => $story->id,
+            'genre_id' => $genres[1]?->id,
+        ]);
     }
 }

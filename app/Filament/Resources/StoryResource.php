@@ -92,6 +92,13 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ->label(__('story.resource.cover_media'))
                                 ->relationship('coverMedia', 'name'),
                         ]),
+                        Forms\Components\Section::make([
+                            Forms\Components\Select::make('genres')
+                                ->multiple()
+                                ->relationship('genres', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
+                                ->preload()
+                                ->label(trans_choice('genre.resource.model_label', 2)),
+                        ]),
                         Creator::getComponent(static::canViewAll()),
                     ])->columnSpan([
                         'default' => 1,
