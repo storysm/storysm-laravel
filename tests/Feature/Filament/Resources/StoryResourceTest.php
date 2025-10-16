@@ -264,6 +264,33 @@ class StoryResourceTest extends TestCase
         ]);
     }
 
+    public function test_admin_user_can_create_story_without_categories(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $livewire = Livewire::test(CreateStory::class);
+        $livewire->fillForm([
+            'title' => [
+                'en' => 'Test Story Without Categories EN',
+                'id' => 'Test Story Without Categories ID',
+            ],
+            'description' => [
+                'en' => 'Test Description Without Categories EN',
+                'id' => 'Test Description Without Categories ID',
+            ],
+            // Intentionally not setting 'categories' field
+        ]);
+        $livewire->call('create');
+        $livewire->assertHasNoFormErrors();
+
+        $story = Story::first();
+        $this->assertNotNull($story);
+        $this->assertCount(0, $story->categories);
+        $this->assertDatabaseMissing('category_story', [
+            'story_id' => $story->id,
+        ]);
+    }
+
     public function test_admin_user_can_update_story_by_adding_genres(): void
     {
         $this->actingAs($this->adminUser);
