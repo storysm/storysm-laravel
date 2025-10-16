@@ -98,4 +98,21 @@ class CategoryStoryRelationshipTest extends TestCase
         ]);
         $this->assertDatabaseHas('stories', ['id' => $story->id]); // Story should not be deleted
     }
+
+    public function test_is_referenced_method_returns_correct_value(): void
+    {
+        $category = Category::factory()->create();
+        $this->assertFalse($category->isReferenced());
+
+        $story = Story::factory()->create();
+        $category->stories()->attach($story->id);
+        $category->refresh();
+
+        $this->assertTrue($category->isReferenced());
+
+        $category->stories()->detach($story->id);
+        $category->refresh();
+
+        $this->assertFalse($category->isReferenced());
+    }
 }
