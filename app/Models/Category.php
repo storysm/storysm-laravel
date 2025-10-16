@@ -41,6 +41,11 @@ class Category extends Model
         'description',
     ];
 
+    public function isReferenced(): bool
+    {
+        return $this->stories()->exists();
+    }
+
     /**
      * Get the stories that belong to the category.
      *
