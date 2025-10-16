@@ -225,6 +225,17 @@ class Story extends Model
     }
 
     /**
+     * Get the categories associated with the story.
+     *
+     * @return BelongsToMany<Category, $this>
+     */
+    public function categories(): BelongsToMany
+    {
+        return $this->belongsToMany(Category::class)
+            ->withTimestamps();
+    }
+
+    /**
      * @param  Builder<Story>  $query
      */
     public function scopePending(Builder $query): void
