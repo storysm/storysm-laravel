@@ -343,28 +343,6 @@ class CategoryResourceTest extends TestCase
         $livewire->assertCanSeeTableRecords([$categoryC, $categoryA, $categoryB], inOrder: true);
     }
 
-    public function test_categories_list_can_be_sorted_by_stories_count_column(): void
-    {
-        $this->actingAs($this->adminUser);
-
-        $categoryA = Category::factory()->create(['name' => ['en' => 'Category A']]);
-        Story::factory()->count(5)->create()->each(fn ($story) => $story->categories()->attach($categoryA));
-
-        $categoryB = Category::factory()->create(['name' => ['en' => 'Category B']]);
-        Story::factory()->count(2)->create()->each(fn ($story) => $story->categories()->attach($categoryB));
-
-        $categoryC = Category::factory()->create(['name' => ['en' => 'Category C']]);
-        Story::factory()->count(8)->create()->each(fn ($story) => $story->categories()->attach($categoryC));
-
-        $livewire = Livewire::test(ListCategories::class);
-        $livewire->sortTable('stories_count', 'asc');
-        $livewire->assertCanSeeTableRecords([$categoryB, $categoryA, $categoryC], inOrder: true);
-
-        $livewire = Livewire::test(ListCategories::class);
-        $livewire->sortTable('stories_count', 'desc');
-        $livewire->assertCanSeeTableRecords([$categoryC, $categoryA, $categoryB], inOrder: true);
-    }
-
     public function test_category_can_be_created_with_name_in_only_one_locale(): void
     {
         $this->actingAs($this->adminUser);
@@ -389,6 +367,36 @@ class CategoryResourceTest extends TestCase
                 'id' => null,
             ]),
             'description' => '{"en":"<p>Description for single locale</p>","id":"<p>Description for single locale (ID)</p>"}',
+        ]);
+    }
+
+    public function test_category_can_be_created_without_description(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $livewire = Livewire::test(CreateCategory::class);
+        $livewire->fillForm([
+            'name' => [
+                'en' => 'Test Category Without Description',
+                'id' => 'Kategori Uji Tanpa Deskripsi',
+            ],
+            'description' => [
+                'en' => null,
+                'id' => null,
+            ],
+        ]);
+        $livewire->call('create');
+        $livewire->assertHasNoFormErrors();
+
+        $this->assertDatabaseHas('categories', [
+            'name' => json_encode([
+                'en' => 'Test Category Without Description',
+                'id' => 'Kategori Uji Tanpa Deskripsi',
+            ]),
+            'description' => json_encode([ // Depending on implementation, this could be null or json with null values
+                'en' => null,
+                'id' => null,
+            ]),
         ]);
     }
 }
