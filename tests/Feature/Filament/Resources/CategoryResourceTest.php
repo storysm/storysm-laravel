@@ -355,7 +355,7 @@ class CategoryResourceTest extends TestCase
             ],
             'description' => [
                 'en' => 'Description for single locale',
-                'id' => null,
+                'id' => 'Description for single locale (ID)',
             ],
         ]);
         $livewire->call('create');
@@ -366,7 +366,7 @@ class CategoryResourceTest extends TestCase
                 'en' => 'Single Locale Category',
                 'id' => null,
             ]),
-            'description' => '{"en":"<p>Description for single locale</p>","id":null}',
+            'description' => '{"en":"<p>Description for single locale</p>","id":"<p>Description for single locale (ID)</p>"}',
         ]);
     }
 }
