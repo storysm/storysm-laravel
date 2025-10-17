@@ -343,6 +343,28 @@ class CategoryResourceTest extends TestCase
         $livewire->assertCanSeeTableRecords([$categoryC, $categoryA, $categoryB], inOrder: true);
     }
 
+    public function test_categories_list_can_be_sorted_by_stories_count_column(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $categoryA = Category::factory()->create(['name' => ['en' => 'Category A']]);
+        Story::factory()->count(5)->create()->each(fn ($story) => $story->categories()->attach($categoryA));
+
+        $categoryB = Category::factory()->create(['name' => ['en' => 'Category B']]);
+        Story::factory()->count(2)->create()->each(fn ($story) => $story->categories()->attach($categoryB));
+
+        $categoryC = Category::factory()->create(['name' => ['en' => 'Category C']]);
+        Story::factory()->count(8)->create()->each(fn ($story) => $story->categories()->attach($categoryC));
+
+        $livewire = Livewire::test(ListCategories::class);
+        $livewire->sortTable('stories_count', 'asc');
+        $livewire->assertCanSeeTableRecords([$categoryB, $categoryA, $categoryC], inOrder: true);
+
+        $livewire = Livewire::test(ListCategories::class);
+        $livewire->sortTable('stories_count', 'desc');
+        $livewire->assertCanSeeTableRecords([$categoryC, $categoryA, $categoryB], inOrder: true);
+    }
+
     public function test_category_can_be_created_with_name_in_only_one_locale(): void
     {
         $this->actingAs($this->adminUser);
