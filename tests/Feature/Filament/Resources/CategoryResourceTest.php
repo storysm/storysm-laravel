@@ -111,22 +111,23 @@ class CategoryResourceTest extends TestCase
     public function test_category_creation_requires_name(): void
     {
         $this->actingAs($this->adminUser);
+        /** @var string */
+        $defaultLocale = config('app.locale');
 
         $livewire = Livewire::test(CreateCategory::class);
         $livewire->fillForm([
             'name' => [
-                'en' => '',
+                $defaultLocale => '',
                 'id' => '',
             ],
             'description' => [
-                'en' => 'Some description',
+                $defaultLocale => 'Some description',
                 'id' => 'Some description',
             ],
         ]);
         $livewire->call('create');
         $livewire->assertHasFormErrors([
-            'name.en' => 'required',
-            'name.id' => 'required',
+            'name.'.$defaultLocale => 'required',
         ]);
     }
 
@@ -237,9 +238,12 @@ class CategoryResourceTest extends TestCase
     public function test_category_update_requires_name(): void
     {
         $this->actingAs($this->adminUser);
+        /** @var string */
+        $defaultLocale = config('app.locale');
+
         $category = Category::factory()->create([
             'name' => [
-                'en' => 'Original Name EN',
+                $defaultLocale => 'Original Name EN',
                 'id' => 'Original Name ID',
             ],
         ]);
@@ -247,14 +251,13 @@ class CategoryResourceTest extends TestCase
         $livewire = Livewire::test(EditCategory::class, ['record' => $category->getRouteKey()]);
         $livewire->fillForm([
             'name' => [
-                'en' => '',
+                $defaultLocale => '',
                 'id' => '',
             ],
         ]);
         $livewire->call('save');
         $livewire->assertHasFormErrors([
-            'name.en' => 'required',
-            'name.id' => 'required',
+            'name.'.$defaultLocale => 'required',
         ]);
     }
 

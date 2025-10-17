@@ -29,15 +29,11 @@ class CategoryResource extends Resource implements HasShieldPermissions
     {
         return $form->schema([
             Translate::make()
-                ->schema(function (Get $get, string $locale): array {
-                    /** @var array<?string> */
-                    $names = $get('name');
-                    $required = collect($names)->every(fn ($item) => $item === null || trim($item) === '');
-
+                ->schema(function (string $locale): array {
                     return [
                         TextInput::make('name')
                             ->label(__('category.resource.name'))
-                            ->required($required)
+                            ->required($locale === config('app.locale'))
                             ->maxLength(255)
                             ->rules(function (Get $get) use ($locale) {
                                 /** @var string */
