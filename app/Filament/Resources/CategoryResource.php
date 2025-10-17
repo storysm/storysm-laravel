@@ -44,8 +44,7 @@ class CategoryResource extends Resource implements HasShieldPermissions
                                 ];
                             }),
                         TiptapEditor::make('description')
-                            ->label(__('category.resource.description'))
-                            ->required(),
+                            ->label(__('category.resource.description')),
                     ];
                 })
                 ->columnSpanFull()
