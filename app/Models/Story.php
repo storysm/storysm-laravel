@@ -225,6 +225,16 @@ class Story extends Model
     }
 
     /**
+     * Get the licenses associated with the story.
+     *
+     * @return BelongsToMany<License, $this>
+     */
+    public function licenses(): BelongsToMany
+    {
+        return $this->belongsToMany(License::class, 'license_story');
+    }
+
+    /**
      * Get the categories associated with the story.
      *
      * @return BelongsToMany<Category, $this>
