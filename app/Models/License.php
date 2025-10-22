@@ -50,6 +50,14 @@ class License extends Model
     ];
 
     /**
+     * Determine if the license is referenced by any models.
+     */
+    public function isReferenced(): bool
+    {
+        return $this->stories()->exists();
+    }
+
+    /**
      * Get the stories associated with the license.
      *
      * @return BelongsToMany<Story, $this>
