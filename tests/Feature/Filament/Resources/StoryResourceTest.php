@@ -9,6 +9,7 @@ use App\Filament\Resources\StoryResource\Pages\EditStory;
 use App\Filament\Resources\StoryResource\Pages\ListStories;
 use App\Models\Category;
 use App\Models\Genre;
+use App\Models\License;
 use App\Models\Permission;
 use App\Models\Story;
 use App\Models\User;
@@ -288,6 +289,137 @@ class StoryResourceTest extends TestCase
         $this->assertCount(0, $story->categories);
         $this->assertDatabaseMissing('category_story', [
             'story_id' => $story->id,
+        ]);
+    }
+
+    public function test_admin_user_can_create_story_with_licenses(): void
+    {
+        $this->actingAs($this->adminUser);
+        $licenses = License::factory()->count(2)->create();
+
+        $livewire = Livewire::test(CreateStory::class);
+        $livewire->fillForm([
+            'title' => [
+                'en' => 'Test Story with Licenses EN',
+                'id' => 'Test Story with Licenses ID',
+            ],
+            'description' => [
+                'en' => 'Test Description EN',
+                'id' => 'Test Description ID',
+            ],
+            'licenses' => $licenses->pluck('id')->toArray(),
+        ]);
+        $livewire->call('create');
+        $livewire->assertHasNoFormErrors();
+
+        $story = Story::latest()->first(); // Use latest() to get the newly created story
+        $this->assertNotNull($story);
+        $this->assertCount(2, $story->licenses);
+        $this->assertTrue($story->licenses->contains('id', $licenses[0]?->id));
+        $this->assertTrue($story->licenses->contains('id', $licenses[1]?->id));
+
+        $this->assertDatabaseHas('license_story', [
+            'story_id' => $story->id,
+            'license_id' => $licenses[0]?->id,
+        ]);
+        $this->assertDatabaseHas('license_story', [
+            'story_id' => $story->id,
+            'license_id' => $licenses[1]?->id,
+        ]);
+    }
+
+    public function test_admin_user_can_create_story_without_licenses(): void
+    {
+        $this->actingAs($this->adminUser);
+
+        $livewire = Livewire::test(CreateStory::class);
+        $livewire->fillForm([
+            'title' => [
+                'en' => 'Test Story Without Licenses EN',
+                'id' => 'Test Story Without Licenses ID',
+            ],
+            'description' => [
+                'en' => 'Test Description Without Licenses EN',
+                'id' => 'Test Description Without Licenses ID',
+            ],
+            // Intentionally not setting 'licenses' field
+        ]);
+        $livewire->call('create');
+        $livewire->assertHasNoFormErrors();
+
+        $story = Story::latest()->first();
+        $this->assertNotNull($story);
+        $this->assertCount(0, $story->licenses);
+        $this->assertDatabaseMissing('license_story', [
+            'story_id' => $story->id,
+        ]);
+    }
+
+    public function test_admin_user_can_update_story_licenses(): void
+    {
+        $this->actingAs($this->adminUser);
+        $story = Story::factory()->create();
+        $initialLicense = License::factory()->create();
+        $newLicenses = License::factory()->count(2)->create();
+        $story->licenses()->attach($initialLicense);
+
+        $this->assertCount(1, $story->licenses()->get());
+        $this->assertDatabaseHas('license_story', ['story_id' => $story->id, 'license_id' => $initialLicense->id]);
+
+        $livewire = Livewire::test(EditStory::class, ['record' => $story->getRouteKey()]);
+        $livewire->fillForm([
+            'licenses' => [
+                $newLicenses[0]?->id,
+                $newLicenses[1]?->id,
+            ],
+        ]);
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $story->refresh();
+        $this->assertCount(2, $story->licenses);
+        $this->assertTrue($story->licenses->contains('id', $newLicenses[0]?->id));
+        $this->assertTrue($story->licenses->contains('id', $newLicenses[1]?->id));
+        $this->assertFalse($story->licenses->contains('id', $initialLicense->id));
+
+        $this->assertDatabaseMissing('license_story', [
+            'story_id' => $story->id,
+            'license_id' => $initialLicense->id,
+        ]);
+        $this->assertDatabaseHas('license_story', [
+            'story_id' => $story->id,
+            'license_id' => $newLicenses[0]?->id,
+        ]);
+    }
+
+    public function test_admin_user_can_remove_all_licenses_from_story(): void
+    {
+        $this->actingAs($this->adminUser);
+        $story = Story::factory()->create();
+        $licenses = License::factory()->count(2)->create();
+        $story->licenses()->attach($licenses->pluck('id'));
+
+        $this->assertCount(2, $story->licenses()->get());
+        $this->assertDatabaseHas('license_story', ['story_id' => $story->id, 'license_id' => $licenses[0]?->id]);
+
+        $livewire = Livewire::test(EditStory::class, ['record' => $story->getRouteKey()]);
+        // Remove all licenses by passing an empty array
+        $livewire->fillForm([
+            'licenses' => [],
+        ]);
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $story->refresh();
+        $this->assertCount(0, $story->licenses);
+
+        $this->assertDatabaseMissing('license_story', [
+            'story_id' => $story->id,
+            'license_id' => $licenses[0]?->id,
+        ]);
+        $this->assertDatabaseMissing('license_story', [
+            'story_id' => $story->id,
+            'license_id' => $licenses[1]?->id,
         ]);
     }
 
