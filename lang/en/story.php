@@ -18,6 +18,9 @@ return [
             'publish' => 'Publish',
         ],
         'title' => 'Title',
+        'awaiting_rating' => 'Awaiting Rating',
+        'rated_stories' => 'Rated Stories',
+        'rating_status' => 'Rating Status',
     ],
     'table' => [
         'view_all' => 'View All Stories',

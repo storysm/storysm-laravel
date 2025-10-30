@@ -242,6 +242,17 @@ class StoryResource extends Resource implements HasShieldPermissions
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
             ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('age_rating_effective_value')
+                    ->label(__('story.resource.rating_status'))
+                    ->trueLabel(__('story.resource.awaiting_rating'))
+                    ->falseLabel(__('story.resource.rated_stories'))
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNull('age_rating_effective_value'),
+                        false: fn (Builder $query) => $query->whereNotNull('age_rating_effective_value'),
+                        blank: fn (Builder $query) => $query,
+                    ),
+            ])
             ->recordUrl(fn (Story $record) => route('filament.admin.resources.stories.edit', $record));
     }
 }
