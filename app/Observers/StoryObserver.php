@@ -24,7 +24,7 @@ class StoryObserver
     {
         // Load age ratings if not already loaded, or if the relationship might have changed
         // This ensures we have the latest ratings, especially if they were just synced.
-        $story->loadMissing('ageRatings');
+        $story->load('ageRatings');
 
         /** @var ?int */
         $maxAgeRepresentation = $story->ageRatings->max('age_representation');
