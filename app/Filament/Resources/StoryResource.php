@@ -115,6 +115,15 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ->searchable()
                                 ->label(trans_choice('license.resource.model_label', 2)),
                         ]),
+                        Forms\Components\Section::make([
+                            Forms\Components\Select::make('ageRatings')
+                                ->multiple()
+                                ->relationship('ageRatings', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
+                                ->preload()
+                                ->searchable()
+                                ->label(trans_choice('age_rating.resource.model_label', 2))
+                                ->hidden(! static::canViewAll()),
+                        ]),
                         Creator::getComponent(static::canViewAll()),
                     ])->columnSpan([
                         'default' => 1,
