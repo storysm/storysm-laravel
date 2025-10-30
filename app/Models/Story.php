@@ -71,6 +71,7 @@ class Story extends Model
         'vote_count' => 'integer',
         'vote_score' => 'float',
         'comment_count' => 'integer',
+        'age_rating_effective_value' => 'integer',
     ];
 
     /**
