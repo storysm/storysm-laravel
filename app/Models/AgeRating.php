@@ -21,8 +21,8 @@ class AgeRating extends Model
 {
     /** @use HasFactory<\Database\Factories\AgeRatingFactory> */
     use HasFactory;
-    use HasTranslations;
 
+    use HasTranslations;
     use HasUlids;
 
     /**
@@ -51,6 +51,14 @@ class AgeRating extends Model
     protected $casts = [
         'age_representation' => 'integer',
     ];
+
+    /**
+     * Determine if the age rating is referenced by any stories.
+     */
+    public function isReferenced(): bool
+    {
+        return $this->stories()->exists();
+    }
 
     /**
      * Get the stories associated with the age rating.
