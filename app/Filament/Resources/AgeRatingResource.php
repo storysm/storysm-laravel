@@ -8,6 +8,7 @@ use App\Filament\Resources\AgeRatingResource\Pages;
 use App\Models\AgeRating;
 use App\Rules\UniqueJsonTranslation;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
+use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -51,12 +52,14 @@ class AgeRatingResource extends Resource implements HasShieldPermissions
                     ->columnSpanFull()
                     ->locales(static::getSortedLocales())
                     ->suffixLocaleLabel(),
-                TextInput::make('age_representation')
-                    ->label(__('age_rating.resource.age_representation'))
-                    ->required()
-                    ->integer()
-                    ->minValue(0)
-                    ->columnSpanFull(),
+                Section::make([
+                    TextInput::make('age_representation')
+                        ->label(__('age_rating.resource.age_representation'))
+                        ->required()
+                        ->integer()
+                        ->minValue(0)
+                        ->columnSpanFull(),
+                ]),
             ]);
     }
 
