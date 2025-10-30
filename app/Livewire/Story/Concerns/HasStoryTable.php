@@ -3,8 +3,10 @@
 namespace App\Livewire\Story\Concerns;
 
 use App\Models\Story;
+use App\Scopes\GuestStoryFilterScope;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 
 trait HasStoryTable
 {
@@ -14,6 +16,10 @@ trait HasStoryTable
     protected function getStoryTable(Table $table): Table
     {
         $query = Story::published();
+
+        if (Auth::guest()) {
+            $query->withGlobalScope('guest_filter', new GuestStoryFilterScope);
+        }
 
         return $table
             ->query($query)

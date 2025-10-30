@@ -8,7 +8,6 @@ use App\Constants\VotingConstants;
 use App\Enums\Story\Status;
 use App\Enums\Vote\Type;
 use App\Observers\StoryObserver;
-use App\Scopes\GuestStoryFilterScope;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -53,14 +52,6 @@ class Story extends Model
 
     use HasTranslations;
     use HasUlids;
-
-    /**
-     * The "booted" method of the model.
-     */
-    protected static function booted(): void
-    {
-        static::addGlobalScope(new GuestStoryFilterScope);
-    }
 
     /**
      * @var array<int, string>

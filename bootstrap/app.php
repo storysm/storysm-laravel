@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureJsonRequest;
+use App\Http\Middleware\RedirectRestrictedContent;
 use App\Http\Middleware\SetDeviceFromHeader;
 use App\Http\Middleware\SetLocaleFromHeader;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
@@ -22,7 +23,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(ProtectAgainstSpam::class);
         $middleware->append(SetDeviceFromHeader::class);
         $middleware->append(SetLocaleFromHeader::class);
-        $middleware->web(append: [SetLocaleFromQueryAndSession::class]);
+        $middleware->web(append: [
+            SetLocaleFromQueryAndSession::class,
+            RedirectRestrictedContent::class,
+        ]);
         $middleware->statefulApi();
 
         $middleware->alias([
