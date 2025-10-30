@@ -86,6 +86,16 @@ class Story extends Model
     ];
 
     /**
+     * Get the age ratings associated with the story.
+     *
+     * @return BelongsToMany<AgeRating, $this>
+     */
+    public function ageRatings(): BelongsToMany
+    {
+        return $this->belongsToMany(AgeRating::class, 'age_rating_story');
+    }
+
+    /**
      * Get the storyComments for the story.
      *
      * @return HasMany<StoryComment, $this>
