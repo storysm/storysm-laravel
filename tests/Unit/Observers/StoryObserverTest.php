@@ -44,7 +44,6 @@ class StoryObserverTest extends TestCase
 
         $ageRating2 = AgeRating::factory()->create(['age_representation' => 15]);
         $story->ageRatings()->attach($ageRating2->id);
-        $story->load('ageRatings'); // Explicitly reload the relationship
         $story->save();
 
         $this->assertEquals(15, $story->age_rating_effective_value);
@@ -62,7 +61,6 @@ class StoryObserverTest extends TestCase
         $this->assertEquals(15, $story->age_rating_effective_value);
 
         $story->ageRatings()->detach($ageRating2->id);
-        $story->load('ageRatings'); // Explicitly reload the relationship
         $story->save();
 
         $this->assertEquals(10, $story->age_rating_effective_value);
@@ -79,7 +77,6 @@ class StoryObserverTest extends TestCase
         $this->assertEquals(10, $story->age_rating_effective_value);
 
         $story->ageRatings()->detach($ageRating->id);
-        $story->load('ageRatings'); // Explicitly reload the relationship
         $story->save();
 
         $this->assertNull($story->age_rating_effective_value);
@@ -99,8 +96,7 @@ class StoryObserverTest extends TestCase
         $ageRating->save();
 
         // Re-attach to trigger observer on story, or reload story and save
-        // For simplicity, we'll just re-load and save the story to trigger the observer
-        $story->load('ageRatings');
+        // For simplicity, we'll just save the story to trigger the observer
         $story->save();
 
         $this->assertEquals(20, $story->age_rating_effective_value);
