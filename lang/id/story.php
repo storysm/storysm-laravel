@@ -18,6 +18,9 @@ return [
             'publish' => 'Terbit',
         ],
         'title' => 'Judul',
+        'awaiting_rating' => 'Menunggu Penilaian',
+        'rated_stories' => 'Cerita Dinilai',
+        'rating_status' => 'Status Penilaian',
     ],
     'table' => [
         'view_all' => 'Lihat Semua Cerita',

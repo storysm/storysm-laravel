@@ -2,6 +2,7 @@
 
 namespace Tests\Unit\Models;
 
+use App\Models\AgeRating;
 use App\Models\Genre;
 use App\Models\Story;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -35,5 +36,34 @@ class StoryTest extends TestCase
         $this->assertEquals('story_id', $relation->getForeignPivotKeyName());
         $this->assertEquals('genre_id', $relation->getRelatedPivotKeyName());
         $this->assertEquals(Genre::class, $relation->getRelated()->getMorphClass());
+    }
+
+    public function test_a_story_can_have_multiple_age_ratings(): void
+    {
+        $story = Story::factory()->create();
+        $ageRatings = AgeRating::factory()->count(3)->create();
+
+        $story->ageRatings()->attach($ageRatings->pluck('id'));
+
+        $this->assertCount(3, $story->ageRatings);
+        $firstAgeRating = $ageRatings->first();
+        $this->assertNotNull($firstAgeRating);
+        $this->assertTrue($story->ageRatings->contains($firstAgeRating));
+    }
+
+    public function test_age_ratings_can_be_detached_from_a_story(): void
+    {
+        $story = Story::factory()->create();
+        $ageRatings = AgeRating::factory()->count(3)->create();
+
+        $story->ageRatings()->attach($ageRatings->pluck('id'));
+        $this->assertCount(3, $story->ageRatings);
+
+        $firstAgeRating = $ageRatings->first();
+        $this->assertNotNull($firstAgeRating);
+        $story->ageRatings()->detach($firstAgeRating);
+        $story->load('ageRatings'); // Reload the relationship
+
+        $this->assertCount(2, $story->ageRatings);
     }
 }

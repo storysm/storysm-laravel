@@ -4,6 +4,7 @@ namespace App\Livewire\Auth;
 
 use Filament\Forms\Components\Actions\Action;
 use Filament\Forms\Components\Checkbox;
+use Filament\Forms\Components\Hidden;
 use Filament\Forms\Components\Section;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -30,7 +31,13 @@ class Login extends Component implements HasForms
 
     public function mount(): void
     {
-        $this->form->fill();
+        $data = [];
+
+        if (request()->has('next')) {
+            $data['next'] = request()->input('next');
+        }
+
+        $this->form->fill($data);
     }
 
     public function form(Form $form): Form
@@ -59,6 +66,8 @@ class Login extends Component implements HasForms
                         Checkbox::make('remember')
                             ->label(__('Remember me'))
                             ->extraInputAttributes(['name' => 'remember']),
+                        Hidden::make('next')
+                            ->extraAttributes(['name' => 'next']),
                     ])
                     ->footerActions(array_filter([
                         Action::make('login')

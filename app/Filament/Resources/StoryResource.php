@@ -115,6 +115,15 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ->searchable()
                                 ->label(trans_choice('license.resource.model_label', 2)),
                         ]),
+                        Forms\Components\Section::make([
+                            Forms\Components\Select::make('ageRatings')
+                                ->multiple()
+                                ->relationship('ageRatings', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
+                                ->preload()
+                                ->searchable()
+                                ->label(trans_choice('age_rating.resource.model_label', 2))
+                                ->hidden(! static::canViewAll()),
+                        ]),
                         Creator::getComponent(static::canViewAll()),
                     ])->columnSpan([
                         'default' => 1,
@@ -232,6 +241,17 @@ class StoryResource extends Resource implements HasShieldPermissions
                 Tables\Actions\BulkActionGroup::make([
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
+            ])
+            ->filters([
+                Tables\Filters\TernaryFilter::make('age_rating_effective_value')
+                    ->label(__('story.resource.rating_status'))
+                    ->trueLabel(__('story.resource.awaiting_rating'))
+                    ->falseLabel(__('story.resource.rated_stories'))
+                    ->queries(
+                        true: fn (Builder $query) => $query->whereNull('age_rating_effective_value'),
+                        false: fn (Builder $query) => $query->whereNotNull('age_rating_effective_value'),
+                        blank: fn (Builder $query) => $query,
+                    ),
             ])
             ->recordUrl(fn (Story $record) => route('filament.admin.resources.stories.edit', $record));
     }

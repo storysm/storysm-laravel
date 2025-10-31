@@ -71,6 +71,7 @@ class Story extends Model
         'vote_count' => 'integer',
         'vote_score' => 'float',
         'comment_count' => 'integer',
+        'age_rating_effective_value' => 'integer',
     ];
 
     /**
@@ -84,6 +85,16 @@ class Story extends Model
         'vote_score',
         'comment_count',
     ];
+
+    /**
+     * Get the age ratings associated with the story.
+     *
+     * @return BelongsToMany<AgeRating, $this>
+     */
+    public function ageRatings(): BelongsToMany
+    {
+        return $this->belongsToMany(AgeRating::class, 'age_rating_story');
+    }
 
     /**
      * Get the storyComments for the story.
