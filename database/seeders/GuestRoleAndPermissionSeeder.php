@@ -2,9 +2,9 @@
 
 namespace Database\Seeders;
 
+use App\Models\Permission;
+use App\Models\Role;
 use Illuminate\Database\Seeder;
-use Spatie\Permission\Models\Permission;
-use Spatie\Permission\Models\Role;
 
 class GuestRoleAndPermissionSeeder extends Seeder
 {
@@ -14,12 +14,12 @@ class GuestRoleAndPermissionSeeder extends Seeder
     public function run(): void
     {
         // Create the 'act_as_guest' permission
-        Permission::firstOrCreate(['name' => 'act_as_guest', 'guard_name' => 'web']);
+        $permission = Permission::firstOrCreate(['name' => 'act_as_guest', 'guard_name' => 'web']);
 
         // Create the 'Guest' role
         $role = Role::firstOrCreate(['name' => 'Guest', 'guard_name' => 'web']);
 
         // Assign the 'act_as_guest' permission to the 'Guest' role
-        $role->givePermissionTo('act_as_guest');
+        $role->givePermissionTo($permission);
     }
 }
