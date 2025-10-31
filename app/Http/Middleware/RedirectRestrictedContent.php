@@ -26,7 +26,7 @@ class RedirectRestrictedContent
                 if ($story instanceof Story) {
                     $guestAgeLimit = Config::get('age_rating.guest_limit_years', 16);
 
-                    if (is_null($story->age_rating_effective_value) || $story->age_rating_effective_value > $guestAgeLimit) {
+                    if (is_null($story->age_rating_effective_value) || $story->age_rating_effective_value >= $guestAgeLimit) {
                         // Store the intended URL before redirecting to login
                         return redirect()->route('login', ['next' => $request->fullUrl()]);
                     }
