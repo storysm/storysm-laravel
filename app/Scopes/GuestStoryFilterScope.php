@@ -21,7 +21,7 @@ class GuestStoryFilterScope implements Scope
         if (Auth::guest()) {
             $guestAgeLimit = Config::get('age_rating.guest_limit_years', 16);
             $builder->whereNotNull('age_rating_effective_value')
-                ->where('age_rating_effective_value', '<=', $guestAgeLimit);
+                ->where('age_rating_effective_value', '<', $guestAgeLimit);
         }
     }
 }
