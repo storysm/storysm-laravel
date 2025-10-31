@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Constants\Permissions;
+use App\Constants\Roles;
 use App\Models\Permission;
 use App\Models\Role;
 use Illuminate\Database\Seeder;
@@ -15,13 +17,13 @@ class GuestRoleAndPermissionSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            // Create the 'act_as_guest' permission
-            $permission = Permission::firstOrCreate(['name' => 'act_as_guest', 'guard_name' => 'web']);
+            // Create the ACT_AS_GUEST permission
+            $permission = Permission::firstOrCreate(['name' => Permissions::ACT_AS_GUEST, 'guard_name' => 'web']);
 
-            // Create the 'Guest' role
-            $role = Role::firstOrCreate(['name' => 'Guest', 'guard_name' => 'web']);
+            // Create the GUEST role
+            $role = Role::firstOrCreate(['name' => Roles::GUEST, 'guard_name' => 'web']);
 
-            // Assign the 'act_as_guest' permission to the 'Guest' role
+            // Assign the ACT_AS_GUEST permission to the GUEST role
             $role->givePermissionTo($permission);
         });
     }

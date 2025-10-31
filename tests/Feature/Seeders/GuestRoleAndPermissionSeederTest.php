@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\Seeders;
 
+use App\Constants\Permissions;
+use App\Constants\Roles;
 use App\Models\Permission;
 use App\Models\Role;
 use Database\Seeders\GuestRoleAndPermissionSeeder;
@@ -18,14 +20,14 @@ class GuestRoleAndPermissionSeederTest extends TestCase
         $this->seed(GuestRoleAndPermissionSeeder::class);
 
         // Assert that the 'Guest' role exists
-        $guestRole = Role::where('name', 'Guest')->first();
+        $guestRole = Role::where('name', Roles::GUEST)->first();
         $this->assertNotNull($guestRole, 'Guest role should exist.');
 
         // Assert that the 'act_as_guest' permission exists
-        $actAsGuestPermission = Permission::where('name', 'act_as_guest')->first();
+        $actAsGuestPermission = Permission::where('name', Permissions::ACT_AS_GUEST)->first();
         $this->assertNotNull($actAsGuestPermission, 'act_as_guest permission should exist.');
 
         // Assert that the 'Guest' role has the 'act_as_guest' permission
-        $this->assertTrue($guestRole->hasPermissionTo('act_as_guest'), 'Guest role should have act_as_guest permission.');
+        $this->assertTrue($guestRole->hasPermissionTo(Permissions::ACT_AS_GUEST), 'Guest role should have act_as_guest permission.');
     }
 }
