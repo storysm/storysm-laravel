@@ -30,4 +30,17 @@ class GuestRoleAndPermissionSeederTest extends TestCase
         // Assert that the 'Guest' role has the 'act_as_guest' permission
         $this->assertTrue($guestRole->hasPermissionTo(Permissions::ACT_AS_GUEST), 'Guest role should have act_as_guest permission.');
     }
+
+    public function test_seeder_is_idempotent(): void
+    {
+        // Run the seeder twice
+        $this->seed(GuestRoleAndPermissionSeeder::class);
+        $this->seed(GuestRoleAndPermissionSeeder::class);
+
+        // Assert that only one 'Guest' role exists
+        $this->assertSame(1, Role::where('name', Roles::GUEST)->count(), 'There should be exactly one Guest role.');
+
+        // Assert that only one 'act_as_guest' permission exists
+        $this->assertSame(1, Permission::where('name', Permissions::ACT_AS_GUEST)->count(), 'There should be exactly one act_as_guest permission.');
+    }
 }
