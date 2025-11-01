@@ -18,6 +18,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             StoryCommentSeeder::class,
             StoryCommentVoteSeeder::class,
+            GuestRoleAndPermissionSeeder::class,
         ]);
     }
 }
