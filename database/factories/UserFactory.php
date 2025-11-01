@@ -2,7 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Constants\Roles;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -15,6 +19,11 @@ class UserFactory extends Factory
      * The current password being used by the factory.
      */
     protected static ?string $password;
+
+    /**
+     * The Guest role instance, cached after the first lookup.
+     */
+    protected static ?Role $guestRole = null;
 
     /**
      * Define the model's default state.
@@ -44,5 +53,25 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    /**
+     * Indicate that the user should have the "Guest" role.
+     */
+    public function guest(): static
+    {
+        if (static::$guestRole === null) {
+            static::$guestRole = Role::where('name', Roles::GUEST)->first();
+        }
+
+        $guestRole = static::$guestRole;
+
+        if (! $guestRole) {
+            throw new ModelNotFoundException('Guest role not found. Please ensure database seeders have been run.');
+        }
+
+        return $this->afterCreating(function (User $user) use ($guestRole) {
+            $user->assignRole($guestRole);
+        });
     }
 }
