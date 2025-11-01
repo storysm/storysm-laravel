@@ -17,13 +17,13 @@ class GuestRoleAndPermissionSeeder extends Seeder
     public function run(): void
     {
         DB::transaction(function () {
-            // Create the ACT_AS_GUEST permission
-            $permission = Permission::firstOrCreate(['name' => Permissions::ACT_AS_GUEST, 'guard_name' => 'web']);
+            // Create the ACT_AS_GUEST_USER permission
+            $permission = Permission::firstOrCreate(['name' => Permissions::ACT_AS_GUEST_USER, 'guard_name' => 'web']);
 
             // Create the GUEST role
             $role = Role::firstOrCreate(['name' => Roles::GUEST, 'guard_name' => 'web']);
 
-            // Assign the ACT_AS_GUEST permission to the GUEST role
+            // Assign the ACT_AS_GUEST_USER permission to the GUEST role
             $role->givePermissionTo($permission);
         });
     }

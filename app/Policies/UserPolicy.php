@@ -2,12 +2,21 @@
 
 namespace App\Policies;
 
+use App\Constants\Permissions;
 use App\Models\User;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class UserPolicy
 {
     use HandlesAuthorization;
+
+    /**
+     * Determine whether the user can view any models.
+     */
+    public function actAsGuest(User $user): bool
+    {
+        return $user->can(Permissions::ACT_AS_GUEST_USER);
+    }
 
     /**
      * Determine whether the user can view any models.
