@@ -6,6 +6,7 @@ use App\Constants\Roles;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
@@ -56,9 +57,10 @@ class UserFactory extends Factory
     {
         return $this->afterCreating(function (User $user) {
             $guestRole = Role::where('name', Roles::GUEST)->first();
-            if ($guestRole) {
-                $user->assignRole($guestRole);
+            if (! $guestRole) {
+                throw new ModelNotFoundException('Guest role not found.');
             }
+            $user->assignRole($guestRole);
         });
     }
 }
