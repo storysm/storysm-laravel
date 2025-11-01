@@ -60,15 +60,18 @@ class UserFactory extends Factory
      */
     public function guest(): static
     {
-        return $this->afterCreating(function (User $user) {
-            if (static::$guestRole === null) {
-                static::$guestRole = Role::where('name', Roles::GUEST)->first();
-            }
+        if (static::$guestRole === null) {
+            static::$guestRole = Role::where('name', Roles::GUEST)->first();
+        }
 
-            if (! static::$guestRole) {
-                throw new ModelNotFoundException('Guest role not found.');
-            }
-            $user->assignRole(static::$guestRole);
+        $guestRole = static::$guestRole;
+
+        if (! $guestRole) {
+            throw new ModelNotFoundException('Guest role not found.');
+        }
+
+        return $this->afterCreating(function (User $user) use ($guestRole) {
+            $user->assignRole($guestRole);
         });
     }
 }
