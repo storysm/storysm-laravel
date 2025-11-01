@@ -1,5 +1,7 @@
 <?php
 
+namespace Tests\Feature\Factories;
+
 use App\Constants\Roles;
 use App\Models\Role;
 use App\Models\User;
