@@ -12,8 +12,7 @@ class UserFactoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** @test */
-    public function a_user_created_with_guest_state_has_the_guest_role(): void
+    public function test_a_user_created_with_guest_state_has_the_guest_role(): void
     {
         // Ensure the 'Guest' role exists in the database
         Role::create(['name' => Roles::GUEST, 'guard_name' => 'web']);
@@ -23,8 +22,7 @@ class UserFactoryTest extends TestCase
         $this->assertTrue($user->hasRole(Roles::GUEST));
     }
 
-    /** @test */
-    public function a_user_created_without_guest_state_does_not_have_the_guest_role(): void
+    public function test_a_user_created_without_guest_state_does_not_have_the_guest_role(): void
     {
         // Ensure the 'Guest' role exists, but the user shouldn't get it
         Role::create(['name' => Roles::GUEST, 'guard_name' => 'web']);
@@ -34,8 +32,7 @@ class UserFactoryTest extends TestCase
         $this->assertFalse($user->hasRole(Roles::GUEST));
     }
 
-    /** @test */
-    public function guest_state_throws_exception_if_guest_role_does_not_exist(): void
+    public function test_guest_state_throws_exception_if_guest_role_does_not_exist(): void
     {
         // Do NOT create the 'Guest' role in the database
 
