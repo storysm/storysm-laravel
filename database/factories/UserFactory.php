@@ -2,6 +2,9 @@
 
 namespace Database\Factories;
 
+use App\Constants\Roles;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -44,5 +47,18 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => [
             'email_verified_at' => null,
         ]);
+    }
+
+    /**
+     * Indicate that the user should have the "Guest" role.
+     */
+    public function guest(): static
+    {
+        return $this->afterCreating(function (User $user) {
+            $guestRole = Role::where('name', Roles::GUEST)->first();
+            if ($guestRole) {
+                $user->assignRole($guestRole);
+            }
+        });
     }
 }
