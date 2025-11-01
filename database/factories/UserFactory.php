@@ -21,6 +21,11 @@ class UserFactory extends Factory
     protected static ?string $password;
 
     /**
+     * The Guest role instance, cached after the first lookup.
+     */
+    protected static ?Role $guestRole = null;
+
+    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -56,11 +61,14 @@ class UserFactory extends Factory
     public function guest(): static
     {
         return $this->afterCreating(function (User $user) {
-            $guestRole = Role::where('name', Roles::GUEST)->first();
-            if (! $guestRole) {
+            if (static::$guestRole === null) {
+                static::$guestRole = Role::where('name', Roles::GUEST)->first();
+            }
+
+            if (! static::$guestRole) {
                 throw new ModelNotFoundException('Guest role not found.');
             }
-            $user->assignRole($guestRole);
+            $user->assignRole(static::$guestRole);
         });
     }
 }
