@@ -67,7 +67,7 @@ class UserFactory extends Factory
         $guestRole = static::$guestRole;
 
         if (! $guestRole) {
-            throw new ModelNotFoundException('Guest role not found.');
+            throw new ModelNotFoundException('Guest role not found. Please ensure database seeders have been run.');
         }
 
         return $this->afterCreating(function (User $user) use ($guestRole) {
