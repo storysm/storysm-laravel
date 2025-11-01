@@ -2,17 +2,20 @@
 
 namespace App\Filament\Resources;
 
+use App\Constants\Permissions;
 use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
 use App\Filament\Resources\UserResource\Pages;
 use App\Models\User;
 use Awcodes\Curator\Components\Forms\CuratorPicker;
 use Awcodes\Curator\Components\Tables\CuratorColumn;
+use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Actions\DeleteAction;
 use Filament\Tables\Actions\EditAction;
+use Filament\Tables\Filters\TernaryFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\Hash;
@@ -20,7 +23,7 @@ use Illuminate\Support\Str;
 use Laravel\Fortify\Fortify;
 use Laravel\Jetstream\Jetstream;
 
-class UserResource extends Resource
+class UserResource extends Resource implements HasShieldPermissions
 {
     protected static ?string $model = User::class;
 
@@ -89,6 +92,21 @@ class UserResource extends Resource
         return __('Administration');
     }
 
+    /**
+     * @return string[]
+     */
+    public static function getPermissionPrefixes(): array
+    {
+        return [
+            'act_as_guest',
+            'view',
+            'view_any',
+            'create',
+            'update',
+            'delete',
+        ];
+    }
+
     public static function getPluralModelLabel(): string
     {
         return trans_choice('user.resource.model_label', 2);
@@ -141,7 +159,21 @@ class UserResource extends Resource
                     ->dateTime(),
             ]))
             ->filters([
-                //
+                TernaryFilter::make('user_type')
+                    ->label(__('user.resource.user_type_label'))
+                    ->trueLabel(__('user.resource.guest_users_label'))
+                    ->falseLabel(__('user.resource.regular_users_label'))
+                    ->queries(
+                        true: function (Builder $query) {
+                            /** @var Builder<User> $query */
+                            return $query->permission(Permissions::ACT_AS_GUEST_USER);
+                        },
+                        false: function (Builder $query) {
+                            /** @var Builder<User> $query */
+                            return $query->withoutPermission(Permissions::ACT_AS_GUEST_USER);
+                        },
+                    )
+                    ->native(false),
             ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
