@@ -9,5 +9,6 @@ return [
         'user_type_label' => 'Tipe Pengguna',
         'guest_users_label' => 'Pengguna Tamu',
         'regular_users_label' => 'Pengguna Reguler',
+        'guest_user_notice' => 'Karya ini diposting atas nama penulis oleh staf kami. Penulis tidak akan dapat menanggapi komentar.',
     ],
 ];

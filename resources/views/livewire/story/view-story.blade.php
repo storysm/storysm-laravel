@@ -30,6 +30,15 @@
                             <livewire:story-vote.downvote-action :story="$story" />
                         </div>
                     </x-filament::section>
+                    @if ($story->creator->can(\App\Constants\Permissions::ACT_AS_GUEST_USER))
+                        <x-filament::section class="">
+                            <div class="flex flex-row gap-x-2">
+                                <x-filament::icon icon="heroicon-o-information-circle"
+                                    class="w-5 h-5 mt-1 text-warning-500 dark:text-warning-400" />
+                                <p>{{ __('user.resource.guest_user_notice') }}</p>
+                            </div>
+                        </x-filament::section>
+                    @endif
                     <livewire:story-comment.create-story-comment :story="$story" />
                     <livewire:story-comment.story-comments-table :story="$story" />
                 </div>
