@@ -2,13 +2,12 @@
 
 namespace Tests\Feature\E2E;
 
-use App\Constants\Permissions;
 use App\Constants\Roles;
 use App\Enums\Story\Status;
-use App\Models\Permission;
 use App\Models\Role;
 use App\Models\Story;
 use App\Models\User;
+use Database\Seeders\GuestRoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -24,14 +23,14 @@ class GuestUserNoticeTest extends TestCase
     {
         parent::setUp();
 
-        // Setup Roles and Permissions
-        $permission = Permission::firstOrCreate(['name' => Permissions::ACT_AS_GUEST_USER, 'guard_name' => 'web']);
-        $role = Role::firstOrCreate(['name' => Roles::GUEST, 'guard_name' => 'web']);
-        $role->givePermissionTo($permission);
+        // Seed Roles and Permissions
+        $this->seed(GuestRoleAndPermissionSeeder::class);
 
         // Create users
         $this->guestUser = User::factory()->create();
-        $this->guestUser->assignRole($role);
+        /** @var Role */
+        $guestRole = Role::where('name', Roles::GUEST)->first();
+        $this->guestUser->assignRole($guestRole);
 
         $this->regularUser = User::factory()->create();
 
