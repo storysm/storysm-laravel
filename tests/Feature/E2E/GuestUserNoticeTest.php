@@ -12,7 +12,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
-class GuestAuthorNoticeTest extends TestCase
+class GuestUserNoticeTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -38,7 +38,7 @@ class GuestAuthorNoticeTest extends TestCase
         $this->actingAs($this->regularUser);
     }
 
-    public function test_guest_author_notice_is_displayed_for_guest_author(): void
+    public function test_guest_user_notice_is_displayed_for_guest_user(): void
     {
         // Create a story by a guest user
         $story = Story::factory()->create([
@@ -49,11 +49,11 @@ class GuestAuthorNoticeTest extends TestCase
         // Visit the story page
         $response = $this->get(route('stories.show', $story));
 
-        // Assert that the guest author notice is present
+        // Assert that the guest user notice is present
         $response->assertSee(__('user.resource.guest_user_notice'));
     }
 
-    public function test_guest_author_notice_is_not_displayed_for_regular_author(): void
+    public function test_guest_user_notice_is_not_displayed_for_regular_user(): void
     {
         // Create a story by a regular user
         $story = Story::factory()->create([
@@ -64,7 +64,7 @@ class GuestAuthorNoticeTest extends TestCase
         // Visit the story page
         $response = $this->get(route('stories.show', $story));
 
-        // Assert that the guest author notice is absent
+        // Assert that the guest user notice is absent
         $response->assertDontSee(__('user.resource.guest_user_notice'));
     }
 }
