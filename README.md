@@ -44,6 +44,12 @@ ULIDs are used as the default ID type.
     php artisan key:generate
     ```
 
+1. Generate the `API_KEY`:
+
+    ```
+    php artisan api-key:generate
+    ```
+
 1. Create the symbolic link for storage:
 
     ```
@@ -54,6 +60,12 @@ ULIDs are used as the default ID type.
 
     ```
     php artisan migrate
+    ```
+
+1. Run the seeder to create custom permissions:
+
+    ```
+    php artisan seed:permissions
     ```
 
 1. Run the app:
@@ -98,29 +110,14 @@ To develop a universal app, follow the additional instructions below:
     ```
 
 1. Run the app:
+
     ```
     composer run dev:host
     ```
 
-## LLM Commands
-
-This app includes LLM (Language Model) commands to assist with generating commit messages and pull request messages.
-
-To generate a commit message based on staged changes:
-
-```
-php artisan llm:commit
-```
-
-To generate a pull request message based on a commit range:
-
-```
-php artisan llm:pr
-```
-
 ## Upstream
 
-Apply any changes available from the Starter Kit Laravel [main branch](https://github.com/spektasoft/starter-kit-laravel/compare/a545523f50f944330e357895e15e9843e056ee67...main).
+Apply any changes available from the Starter Kit Laravel [main branch](https://github.com/spektasoft/starter-kit-laravel/compare/e3f32e9fb876e299aaa9cc3522614a418acfbf50..main).
 
 ## License
 

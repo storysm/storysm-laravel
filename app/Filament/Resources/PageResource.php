@@ -2,10 +2,13 @@
 
 namespace App\Filament\Resources;
 
-use App\Concerns\HasLocales;
 use App\Enums\Page\Status;
+use App\Filament\Actions\Tables\ReferenceAwareDeleteBulkAction;
+use App\Filament\Exports\PageExporter;
 use App\Filament\Resources\PageResource\Pages;
 use App\Filament\Resources\UserResource\Utils\Creator;
+use App\Filament\Tables\Columns\TranslatableTextColumn;
+use App\Forms\Components\LocalesAwareTranslate;
 use App\Models\Page;
 use App\Models\User;
 use BezhanSalleh\FilamentShield\Contracts\HasShieldPermissions;
@@ -14,15 +17,13 @@ use Filament\Forms\Form;
 use Filament\Forms\Get;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Actions\ExportBulkAction;
 use Filament\Tables\Table;
 use FilamentTiptapEditor\TiptapEditor;
 use Illuminate\Database\Eloquent\Builder;
-use SolutionForest\FilamentTranslateField\Forms\Component\Translate;
 
 class PageResource extends Resource implements HasShieldPermissions
 {
-    use HasLocales;
-
     protected static ?string $model = Page::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-document';
@@ -41,7 +42,7 @@ class PageResource extends Resource implements HasShieldPermissions
                     'sm' => 6,
                 ])->schema([
                     Forms\Components\Group::make([
-                        Translate::make()
+                        LocalesAwareTranslate::make()
                             ->schema(function (Get $get) {
                                 /** @var array<?string> */
                                 $titles = $get('title');
@@ -52,18 +53,11 @@ class PageResource extends Resource implements HasShieldPermissions
                                         ->label(__('page.resource.title'))
                                         ->lazy()
                                         ->required($required),
+                                    TiptapEditor::make('content')
+                                        ->label(__('page.resource.content')),
                                 ];
                             })
                             ->columnSpanFull()
-                            ->locales(static::getSortedLocales())
-                            ->suffixLocaleLabel(),
-                        Translate::make()
-                            ->schema([
-                                TiptapEditor::make('content')
-                                    ->label(__('page.resource.content')),
-                            ])
-                            ->columnSpanFull()
-                            ->locales(static::getSortedLocales())
                             ->suffixLocaleLabel(),
                     ])->columnSpan([
                         'default' => 1,
@@ -142,14 +136,16 @@ class PageResource extends Resource implements HasShieldPermissions
     public static function table(Table $table): Table
     {
         return $table
-            ->columns(array_filter([
-                Tables\Columns\TextColumn::make('title')
-                    ->label(__('page.resource.title')),
+            ->columns([
+                TranslatableTextColumn::make('title')
+                    ->label(__('page.resource.title'))
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge(),
-                static::canViewAll() ? Tables\Columns\TextColumn::make('creator.name')
+                Tables\Columns\TextColumn::make('creator.name')
                     ->label(ucfirst(__('validation.attributes.creator')))
-                    ->searchable() : null,
+                    ->searchable()
+                    ->visible(static::canViewAll()),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->label(ucfirst(__('validation.attributes.created_at')))
@@ -160,7 +156,7 @@ class PageResource extends Resource implements HasShieldPermissions
                     ->label(ucfirst(__('validation.attributes.updated_at')))
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-            ]))
+            ])
             ->actions([
                 Tables\Actions\ActionGroup::make([
                     Tables\Actions\EditAction::make(),
@@ -169,7 +165,9 @@ class PageResource extends Resource implements HasShieldPermissions
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    ReferenceAwareDeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(PageExporter::class),
                 ]),
             ]);
     }

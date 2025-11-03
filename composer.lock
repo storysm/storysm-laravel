@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "bf630837cfc29fb8911f14130d5853f5",
+    "content-hash": "b3041ea34cad33284f1661450a768251",
     "packages": [
         {
             "name": "adhocore/jwt",
@@ -9374,16 +9374,16 @@
         },
         {
             "name": "solution-forest/filament-translate-field",
-            "version": "1.4.0",
+            "version": "1.4.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/solutionforest/filament-translate-field.git",
-                "reference": "483f66a71a770f139c15cfc69d408f8ce4025173"
+                "reference": "5a920abebfd9ad69495abe50ac75808166fc31ad"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/solutionforest/filament-translate-field/zipball/483f66a71a770f139c15cfc69d408f8ce4025173",
-                "reference": "483f66a71a770f139c15cfc69d408f8ce4025173",
+                "url": "https://api.github.com/repos/solutionforest/filament-translate-field/zipball/5a920abebfd9ad69495abe50ac75808166fc31ad",
+                "reference": "5a920abebfd9ad69495abe50ac75808166fc31ad",
                 "shasum": ""
             },
             "require": {
@@ -9446,7 +9446,7 @@
                 "issues": "https://github.com/solution-forest/filament-translate-field/issues",
                 "source": "https://github.com/solution-forest/filament-translate-field"
             },
-            "time": "2025-02-27T05:38:46+00:00"
+            "time": "2025-04-11T10:06:49+00:00"
         },
         {
             "name": "spatie/browsershot",

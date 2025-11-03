@@ -7,29 +7,61 @@ use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasAvatar;
 use Filament\Panel;
-use Filament\Support\Facades\FilamentColor;
+use Illuminate\Auth\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\DatabaseNotification;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Session;
+use Laravel\Fortify\Features as FortifyFeatures;
 use Laravel\Fortify\Fortify;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\Features;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Jetstream\Jetstream;
 use Laravel\Sanctum\HasApiTokens;
-use LasseRafn\InitialAvatarGenerator\InitialAvatar;
-use Spatie\Color\Rgb;
 use Spatie\Permission\Traits\HasRoles;
 
 /**
- * @method static UserFactory factory($count = null)
+ * @property string $id
+ * @property ?string $profile_photo_media_id
+ * @property string $name
+ * @property string $email
+ * @property ?Carbon $email_verified_at
+ * @property string $password
+ * @property ?string $two_factor_secret
+ * @property ?string $two_factor_recovery_codes
+ * @property ?string $two_factor_confirmed_at
+ * @property ?string $remember_token
+ * @property ?string $current_team_id
+ * @property ?string $profile_photo_path
+ * @property ?Carbon $created_at
+ * @property ?Carbon $updated_at
+ * @property-read Collection<int, DatabaseNotification> $notifications
+ * @property-read ?int $notifications_count
+ * @property-read Collection<int, PersonalAccessToken> $tokens
+ * @property-read ?int $tokens_count
+ * @property-read Media|null $profilePhotoMedia
+ * @property-read Collection<int, Role> $roles
+ * @property-read ?int $roles_count
+ * @property-read string $profile_photo_url
+ * @property-read Collection<int, Export> $exports
+ * @property-read Collection<int, Import> $imports
+ *
+ * @method static UserFactory factory($count = null, $state = [])
+ * @method static Builder|User newModelQuery()
+ * @method static Builder|User newQuery()
+ * @method static Builder|User permission($permissions)
+ * @method static Builder|User query()
+ * @method static Builder|User role($roles, $guard = null)
  */
 class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerifyEmail
 {
@@ -128,6 +160,22 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
         ])->save();
     }
 
+    /**
+     * @return HasMany<Import, $this>
+     */
+    public function imports(): HasMany
+    {
+        return $this->hasMany(Import::class, 'creator_id');
+    }
+
+    /**
+     * @return HasMany<Export, $this>
+     */
+    public function exports(): HasMany
+    {
+        return $this->hasMany(Export::class, 'creator_id');
+    }
+
     public function getFilamentAvatarUrl(): ?string
     {
         if (Jetstream::managesProfilePhotos() && $this->profilePhotoMedia !== null) {
@@ -138,45 +186,15 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             return null;
         }
 
-        $sessionKey = 'avatar-'.$this->id;
-
-        if (Session::has($sessionKey)) {
-            /** @var string */
-            $encodedImage = Session::get($sessionKey);
-
-            return $encodedImage;
-        }
-
-        $avatar = new InitialAvatar;
-        /** @var string */
-        $foregroundColor = config('avatar.colors.foreground', '#ffffff');
-        /** @var string */
-        $backgroundColor = config('avatar.colors.background', '#000000');
-
-        if ($backgroundColor === 'primary') {
-            /** @var Rgb */
-            $backgroundColorRgb = Rgb::fromString('rgb('.FilamentColor::getColors()['primary'][500].')');
-            $backgroundColorHex = $backgroundColorRgb->toHex();
-            $backgroundColor = $backgroundColorHex->__toString();
-        }
-
-        $image = $avatar
-            ->background($backgroundColor)
-            ->color($foregroundColor)
-            ->name($this->name)
-            ->size(64)
-            ->generate();
-
-        $encodedImage = $image->encode('data-url')->encoded;
-
-        Session::put($sessionKey, $encodedImage);
-
-        return $encodedImage;
+        return null;
     }
 
     public function isReferenced(): bool
     {
-        if ($this->storyComments()->exists()) {
+        if ($this->exports()->exists()) {
+            return true;
+        }
+        if ($this->imports()->exists()) {
             return true;
         }
         if ($this->media()->exists()) {
@@ -186,6 +204,9 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
             return true;
         }
         if ($this->stories()->exists()) {
+            return true;
+        }
+        if ($this->storyComments()->exists()) {
             return true;
         }
 
@@ -230,6 +251,16 @@ class User extends Authenticatable implements FilamentUser, HasAvatar, MustVerif
     public function profilePhotoMedia(): BelongsTo
     {
         return $this->belongsTo(Media::class, 'profile_photo_media_id');
+    }
+
+    /**
+     * Send the email verification notification.
+     */
+    public function sendEmailVerificationNotification(): void
+    {
+        if (FortifyFeatures::enabled(FortifyFeatures::emailVerification())) {
+            $this->notify(new VerifyEmail);
+        }
     }
 
     /**

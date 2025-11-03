@@ -2,12 +2,12 @@
 
 namespace App\Models;
 
+use App\Concerns\HandlesTranslatableAttributes;
 use App\Concerns\HasCreatorAttribute;
 use App\Enums\Page\Status;
 use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\Translatable\HasTranslations;
 
 /**
  * @property string $id
@@ -18,15 +18,17 @@ use Spatie\Translatable\HasTranslations;
  * @property Status $status
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * @method static \Database\Factories\PageFactory factory(...$parameters)
  */
 class Page extends Model
 {
+    use HandlesTranslatableAttributes;
+
     use HasCreatorAttribute;
 
     /** @use HasFactory<\Database\Factories\PageFactory> */
     use HasFactory;
-
-    use HasTranslations;
     use HasUlids;
 
     /**
@@ -41,10 +43,10 @@ class Page extends Model
         'status' => Status::class,
     ];
 
-    /*
-     * @var string[]
+    /**
+     * @var list<string>
      */
-    protected $guarded = [];
+    protected $fillable = ['creator_id', 'title', 'content', 'status'];
 
     public function isReferenced(): bool
     {
