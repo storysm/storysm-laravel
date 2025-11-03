@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Filament\E2E;
+namespace Tests\Feature\E2E;
 
 use App\Filament\Resources\LicenseResource;
 use App\Filament\Resources\StoryResource;
