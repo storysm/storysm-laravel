@@ -5,9 +5,11 @@ namespace App\Providers\Filament;
 use App\Colors\Color;
 use App\Filament\Pages\Backups;
 use App\Filament\Resources\MediaResource;
+use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PermissionResource;
 use App\Filament\Resources\RoleResource;
 use App\Filament\Resources\UserResource;
+use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -21,7 +23,6 @@ use Filament\Panel;
 use Filament\PanelProvider;
 use Filament\View\PanelsRenderHook;
 use Filament\Widgets;
-use Illuminate\Auth\Middleware\EnsureEmailIsVerified;
 use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
 use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
@@ -73,12 +74,14 @@ class AdminPanelProvider extends PanelProvider
                 SetLocaleFromQueryAndSession::class,
             ])
             ->authMiddleware([
-                EnsureEmailIsVerified::class,
+                EnsureEmailIsVerifiedWithFortify::class,
                 Authenticate::class,
             ])
             ->navigationGroups([
                 NavigationGroup::make()
                     ->label(fn () => __('Administration')),
+                NavigationGroup::make()
+                    ->label(fn () => __('Data Management')),
                 NavigationGroup::make()
                     ->label(fn () => __('filament-spatie-backup::backup.pages.backups.navigation.group')),
                 NavigationGroup::make()
@@ -101,6 +104,7 @@ class AdminPanelProvider extends PanelProvider
                     ])
                     ->includes([
                         MediaResource::class,
+                        PageResource::class,
                         UserResource::class,
                         PermissionResource::class,
                         RoleResource::class,
@@ -139,6 +143,7 @@ class AdminPanelProvider extends PanelProvider
             ->viteTheme('resources/css/app.css')
             ->widgets([
                 \Awcodes\Overlook\Widgets\OverlookWidget::class,
-            ]);
+            ])
+            ->databaseNotifications();
     }
 }

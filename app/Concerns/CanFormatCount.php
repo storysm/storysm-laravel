@@ -17,9 +17,9 @@ trait CanFormatCount
     /**
      * Formats an integer with suffixes (K, M, B, T).
      */
-    protected function formatCount(int $count): string
+    protected function formatCount(?int $count): string
     {
-        if ($count === 0) {
+        if ($count === 0 || $count === null) {
             return '0';
         }
 

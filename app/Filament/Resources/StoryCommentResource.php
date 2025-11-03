@@ -130,6 +130,7 @@ class StoryCommentResource extends Resource
             $storyCommentId = Request::query('parent_id');
 
             if ($storyCommentId) {
+                /** @var ?StoryComment */
                 $record = StoryComment::find($storyCommentId);
             }
         } elseif ($page instanceof Pages\EditStoryComment) {

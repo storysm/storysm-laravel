@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\EnsureJsonRequest;
 use App\Http\Middleware\RedirectRestrictedContent;
 use App\Http\Middleware\SetDeviceFromHeader;
@@ -19,7 +20,7 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware) {
+    ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(ProtectAgainstSpam::class);
         $middleware->append(SetDeviceFromHeader::class);
         $middleware->append(SetLocaleFromHeader::class);
@@ -33,8 +34,9 @@ return Application::configure(basePath: dirname(__DIR__))
             'json' => EnsureJsonRequest::class,
             'verify.api.artisan' => VerifyApiArtisan::class,
             'verify.api.key' => VerifyApiKey::class,
+            'verified' => EnsureEmailIsVerifiedWithFortify::class,
         ]);
     })
-    ->withExceptions(function (Exceptions $exceptions) {
+    ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();

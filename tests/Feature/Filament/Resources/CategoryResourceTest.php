@@ -12,6 +12,7 @@ use App\Models\Story;
 use App\Models\User;
 use Filament\Facades\Filament;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
 use Tests\TestCase;
 
@@ -372,6 +373,7 @@ class CategoryResourceTest extends TestCase
 
     public function test_category_can_be_created_without_description(): void
     {
+        Config::set('app.supported_locales', ['en', 'id']);
         $this->actingAs($this->adminUser);
 
         $livewire = Livewire::test(CreateCategory::class);
@@ -394,7 +396,6 @@ class CategoryResourceTest extends TestCase
                 'id' => 'Kategori Uji Tanpa Deskripsi',
             ]),
             'description' => json_encode([ // Depending on implementation, this could be null or json with null values
-                'en' => null,
                 'id' => null,
             ]),
         ]);
