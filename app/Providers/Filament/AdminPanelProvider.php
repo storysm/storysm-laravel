@@ -8,6 +8,8 @@ use App\Filament\Resources\MediaResource;
 use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PermissionResource;
 use App\Filament\Resources\RoleResource;
+use App\Filament\Resources\StoryCommentResource;
+use App\Filament\Resources\StoryResource;
 use App\Filament\Resources\UserResource;
 use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
@@ -79,6 +81,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->navigationGroups([
                 NavigationGroup::make()
+                    ->label(fn () => trans_choice('story.resource.model_label', 1)),
+                NavigationGroup::make()
                     ->label(fn () => __('Administration')),
                 NavigationGroup::make()
                     ->label(fn () => __('Data Management')),
@@ -103,6 +107,8 @@ class AdminPanelProvider extends PanelProvider
                         'md' => 4,
                     ])
                     ->includes([
+                        StoryResource::class,
+                        StoryCommentResource::class,
                         MediaResource::class,
                         PageResource::class,
                         UserResource::class,
