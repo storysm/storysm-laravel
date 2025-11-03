@@ -16,9 +16,10 @@ class WebRoutesTest extends TestCase
 
     public function test_guest_can_access_home_page(): void
     {
+        // @phpstan-ignore-next-line
         $this->get('/')
             ->assertOk()
-            ->assertViewIs('welcome');
+            ->assertSeeLivewire(\App\Livewire\Home::class);
     }
 
     public function test_unverified_user_cannot_access_home_page(): void
@@ -42,10 +43,11 @@ class WebRoutesTest extends TestCase
             'email_verified_at' => Carbon::now(),
         ]);
 
+        // @phpstan-ignore-next-line
         $this->actingAs($user)
             ->get('/')
             ->assertOk()
-            ->assertViewIs('welcome');
+            ->assertSeeLivewire(\App\Livewire\Home::class);
     }
 
     public function test_guest_can_access_a_page_php_route(): void
