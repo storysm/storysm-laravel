@@ -13,9 +13,6 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
 
-/**
- * @group e2e
- */
 class LicenseWorkflowTest extends TestCase
 {
     use RefreshDatabase;
