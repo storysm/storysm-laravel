@@ -4,6 +4,7 @@ namespace Tests\Feature\Livewire\Story;
 
 use App\Livewire\Story\ListStories;
 use App\Models\Story;
+use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -20,6 +21,9 @@ class ListStoriesTest extends TestCase
 
     public function test_component_renders_and_contains_stories_in_table(): void
     {
+        // Without login, user cannot access unrated stories
+        $this->actingAs(User::factory()->create());
+
         /** @var Story[] */
         $stories = Story::factory()
             ->count(5)
