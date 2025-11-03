@@ -23,6 +23,7 @@ class ListStoryComments extends ListRecords
             return [];
         }
 
+        /** @var ?StoryComment */
         $parentComment = StoryComment::find($parentId);
         if (! $parentComment) {
             return [];
