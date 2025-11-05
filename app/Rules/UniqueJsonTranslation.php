@@ -9,9 +9,13 @@ use Illuminate\Support\Facades\DB;
 class UniqueJsonTranslation implements ValidationRule
 {
     protected string $table;
+
     protected string $column;
+
     protected string $locale;
+
     protected ?string $ignoreId; // Changed to string for ULID support
+
     protected string $idColumn; // To specify the ID column name
 
     public function __construct(string $table, string $column, string $locale, ?string $ignoreId = null, string $idColumn = 'id')
@@ -33,7 +37,7 @@ class UniqueJsonTranslation implements ValidationRule
         }
 
         if ($query->exists()) {
-            $fail(__('genre.unique_json_translation'));
+            $fail(__('rule.unique_json_translation'));
         }
     }
 }
