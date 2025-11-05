@@ -4,9 +4,11 @@
             {{ $story->title }}
 
             <div class="flex flex-row gap-2">
-                <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
-                    <p class="text-sm">{{ $story->formattedViewCount() }}</p>
-                </x-story.meta>
+                @if ($story->view_count > 500)
+                    <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
+                        <p class="text-sm">{{ $story->formattedViewCount() }}</p>
+                    </x-story.meta>
+                @endif
 
                 <x-story.meta icon="heroicon-m-chat-bubble-oval-left-ellipsis" iconClass="size-3">
                     <p class="text-sm">{{ $story->formattedCommentCount() }}</p>

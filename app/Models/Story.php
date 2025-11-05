@@ -29,6 +29,7 @@ use Spatie\Translatable\HasTranslations;
  * @property string $title
  * @property string $content
  * @property Status $status
+ * @property int $view_count
  * @property int $upvote_count
  * @property int $downvote_count
  * @property int $vote_count
