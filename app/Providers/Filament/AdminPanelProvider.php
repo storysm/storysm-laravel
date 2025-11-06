@@ -139,7 +139,6 @@ class AdminPanelProvider extends PanelProvider
             @googlefonts('sans')
             @googlefonts('logo')
             BLADE))
-            ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
             ->spa()
             ->sidebarFullyCollapsibleOnDesktop()
             ->sidebarWidth('14rem')

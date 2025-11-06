@@ -37,11 +37,6 @@
                     </div>
                 @endauth
 
-                <!-- Language Switcher -->
-                <div class="relative">
-                    <x-navigation-menu.language-switcher />
-                </div>
-
                 <!-- Menu -->
                 <div>
                     @guest
