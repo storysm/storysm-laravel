@@ -35,6 +35,7 @@ use Spatie\Translatable\HasTranslations;
  * @property int $vote_count
  * @property float $vote_score
  * @property int $storyComment_count
+ * @property int $age_rating_effective_value
  * @property ?Carbon $published_at
  * @property ?Carbon $created_at
  * @property ?Carbon $updated_at
