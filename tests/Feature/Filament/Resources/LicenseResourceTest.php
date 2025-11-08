@@ -14,6 +14,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Str;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -215,5 +216,58 @@ class LicenseResourceTest extends TestCase
         foreach ($unreferencedLicenses as $license) {
             $this->assertDatabaseMissing('licenses', ['id' => $license->id]);
         }
+    }
+
+    public function test_translatable_name_requires_at_least_one_translation(): void
+    {
+        Config::set('app.supported_locales', ['en', 'es']);
+        $this->actingAs($this->adminUser);
+
+        $license = License::factory()->create([
+            'name' => [
+                'en' => 'English Name',
+                'es' => 'Spanish Name',
+            ],
+        ]);
+
+        $livewire = Livewire::test(EditLicense::class, [
+            'record' => $license->id,
+        ]);
+
+        // Attempt to save with all names empty
+        $livewire->fillForm([
+            'name' => [
+                'en' => '',
+                'es' => '',
+            ],
+        ]);
+
+        $livewire->call('save');
+
+        // Assert validation errors for both locales
+        $livewire->assertHasFormErrors([
+            'name.en' => 'required',
+            'name.es' => 'required',
+        ]);
+
+        // Assert that the license name has not changed
+        $license->refresh();
+        $this->assertEquals('English Name', $license->getTranslation('name', 'en'));
+        $this->assertEquals('Spanish Name', $license->getTranslation('name', 'es'));
+
+        // Attempt to save with one name provided
+        $livewire->fillForm([
+            'name' => [
+                'en' => 'New English Name',
+                'es' => '',
+            ],
+        ]);
+
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $license->refresh();
+        $this->assertEquals('New English Name', $license->getTranslation('name', 'en'));
+        $this->assertNotNull($license->getTranslation('name', 'es'));
     }
 }
