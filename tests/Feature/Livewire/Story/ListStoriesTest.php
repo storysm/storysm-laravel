@@ -39,4 +39,27 @@ class ListStoriesTest extends TestCase
             $component->assertSee($story->creator->name);
         }
     }
+
+    public function test_story_view_count_is_conditionally_displayed_in_table(): void
+    {
+        $this->actingAs(User::factory()->create());
+
+        // Story with view count <= 500 (should not be displayed)
+        $storyLowViews = Story::factory()
+            ->ensurePublished()
+            ->create(['view_count' => 499]);
+
+        // Story with view count > 500 (should be displayed)
+        $storyHighViews = Story::factory()
+            ->ensurePublished()
+            ->create(['view_count' => 501]);
+
+        $component = Livewire::test(ListStories::class);
+
+        // Assert that the high view count is visible
+        $component->assertSee($storyHighViews->formattedViewCount());
+
+        // Assert that the low view count is NOT visible
+        $component->assertDontSeeHtml('<p class="text-sm">'.$storyLowViews->formattedViewCount().'</p>');
+    }
 }
