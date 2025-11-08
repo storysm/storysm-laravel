@@ -15,21 +15,27 @@ class ImportResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+
+        Permission::firstOrCreate(['name' => 'view_any_import']);
+        $this->user->givePermissionTo('view_any_import');
+    }
+
     public function test_import_table_can_be_rendered(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         $this->get(ImportResource::getUrl('index'))->assertSuccessful();
     }
 
     public function test_columns_are_displayed(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         Import::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
             'importer' => 'App\\Importers\\PageImporter',
             'file_name' => 'import_test.csv',
             'file_path' => '/tmp/import_test.csv',
@@ -56,33 +62,27 @@ class ImportResourceTest extends TestCase
 
     public function test_get_eloquent_query_filters_results_for_non_view_all_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         $otherUser = User::factory()->create();
 
         // Ensure the user does NOT have 'view_all_import' permission
         // No permission assignment needed here as it's the default state
 
-        Import::factory()->create(['user_id' => $user->id, 'creator_id' => $user->id]);
+        Import::factory()->create(['user_id' => $this->user->id, 'creator_id' => $this->user->id]);
         Import::factory()->create(['user_id' => $otherUser->id, 'creator_id' => $otherUser->id]); // Another user's import
 
         $imports = ImportResource::getEloquentQuery()->get();
 
         $this->assertCount(1, $imports);
-        $this->assertEquals($user->id, $imports->first()?->user_id);
+        $this->assertEquals($this->user->id, $imports->first()?->user_id);
     }
 
     public function test_get_eloquent_query_does_not_filter_results_for_view_all_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // Assign 'view_all_import' permission to the user
         Permission::firstOrCreate(['name' => 'view_all_import']);
-        $user->givePermissionTo('view_all_import');
+        $this->user->givePermissionTo('view_all_import');
 
-        Import::factory()->create(['user_id' => $user->id]);
+        Import::factory()->create(['user_id' => $this->user->id]);
         Import::factory()->create(['user_id' => User::factory()->create()->id]); // Another user's import
 
         $imports = ImportResource::getEloquentQuery()->get();
@@ -92,14 +92,11 @@ class ImportResourceTest extends TestCase
 
     public function test_user_name_column_visibility_for_view_all_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // Assign 'view_all_import' permission to the user
         Permission::firstOrCreate(['name' => 'view_all_import']);
-        $user->givePermissionTo('view_all_import');
+        $this->user->givePermissionTo('view_all_import');
 
-        Import::factory()->create(['user_id' => $user->id]);
+        Import::factory()->create(['user_id' => $this->user->id]);
 
         Livewire::test(ListImports::class)
             ->assertTableColumnVisible('user.name');
@@ -107,13 +104,10 @@ class ImportResourceTest extends TestCase
 
     public function test_user_name_column_hidden_for_non_view_all_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // Ensure the user does NOT have 'view_all_import' permission
         // No permission assignment needed here as it's the default state
 
-        Import::factory()->create(['user_id' => $user->id]);
+        Import::factory()->create(['user_id' => $this->user->id]);
 
         Livewire::test(ListImports::class)
             ->assertTableColumnHidden('user.name');
@@ -121,11 +115,8 @@ class ImportResourceTest extends TestCase
 
     public function test_importer_column_format_state_using(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         Import::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
             'importer' => 'App\\Importers\\ProductImporter',
         ]);
 
