@@ -32,6 +32,12 @@ class ExportResourceTest extends TestCase
         $this->get(ExportResource::getUrl('index'))->assertSuccessful();
     }
 
+    public function test_export_table_cannot_be_rendered_without_permission(): void
+    {
+        $this->user->revokePermissionTo('view_any_export');
+        $this->get(ExportResource::getUrl('index'))->assertForbidden();
+    }
+
     public function test_columns_are_displayed(): void
     {
         Export::factory()->create([
