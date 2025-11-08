@@ -20,6 +20,19 @@ Route::group(['middleware' => ['auth:sanctum', 'json']], function () {
     require __DIR__.'/resources/user.php';
 });
 
+Route::get('/age-rating-guidelines', function () {
+    $record = Page::whereStatus(Status::Publish)
+        ->find(config('page.age_ratings'));
+
+    return view('age-ratings', ['record' => $record]);
+})->name('age-ratings.show');
+Route::get('/cookie-policy', function () {
+    $record = Page::whereStatus(Status::Publish)
+        ->find(config('page.cookie'));
+
+    return view('cookie', ['record' => $record]);
+})->name('cookie.show');
+
 if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
     Route::get('/terms-of-service', function () {
         $record = Page::whereStatus(Status::Publish)

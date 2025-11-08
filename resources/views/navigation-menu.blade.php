@@ -88,8 +88,20 @@
                         {{ trans_choice('story.resource.model_label', 2) }}
                     </span>
                 </x-nav-link>
+                <x-menu-border />
+                <x-nav-link wire:navigate href="{{ route('age-ratings.show') }}" :active="request()->routeIs('age-ratings.show')"
+                    icon="heroicon-o-shield-check">
+                    <span class="flex items-center gap-2">
+                        {{ __('guide.age_ratings') }}
+                    </span>
+                </x-nav-link>
+                <x-nav-link wire:navigate href="{{ route('cookie.show') }}" :active="request()->routeIs('cookie.show')"
+                    icon="heroicon-o-clipboard-document-list">
+                    <span class="flex items-center gap-2">
+                        {{ __('guide.cookie') }}
+                    </span>
+                </x-nav-link>
                 @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-                    <x-menu-border />
                     <x-nav-link wire:navigate href="{{ route('terms.show') }}" :active="request()->routeIs('terms.show')"
                         icon="heroicon-o-scale">
                         <span class="flex items-center gap-2">

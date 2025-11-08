@@ -1,6 +1,33 @@
 <?php
 
 return [
+
+    /*
+    |--------------------------------------------------------------------------
+    | Age Rating Guidelines
+    |--------------------------------------------------------------------------
+    |
+    | This refers to the ID of the age rating guidelines page. By specifying the
+    | page ID, you can easily manage and update the age rating guidelines link.
+    | Setting it to null will disable the age rating guidelines feature.
+    |
+    */
+
+    'age_ratings' => env('PAGE_AGE_RATINGS_ID', null),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cookie Policy
+    |--------------------------------------------------------------------------
+    |
+    | This refers to the ID of the cookie policy page. By specifying the
+    | page ID, you can easily manage and update the cookie policy link.
+    | Setting it to null will disable the cookie policy feature.
+    |
+    */
+
+    'cookie' => env('PAGE_COOKIE_ID', null),
+
     /*
     |--------------------------------------------------------------------------
     | Privacy Policy
@@ -26,4 +53,5 @@ return [
     */
 
     'terms' => env('PAGE_TERMS_ID', null),
+
 ];
