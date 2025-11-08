@@ -64,7 +64,10 @@ class ExportResource extends Resource implements HasShieldPermissions
      */
     public static function getPermissionPrefixes(): array
     {
-        return ['view_all'];
+        return [
+            'view_all',
+            'view_any',
+        ];
     }
 
     public static function getPluralModelLabel(): string
