@@ -82,7 +82,7 @@ class CategoryStoryRelationshipTest extends TestCase
         $this->assertDatabaseHas('categories', ['id' => $category->id]); // Category should not be deleted
     }
 
-    public function test_deleting_a_category_detaches_its_stories(): void
+    public function test_deleting_a_category_with_linked_stories_throws_query_exception_instead_of_detaching(): void
     {
         $story = Story::factory()->create();
         $category = Category::factory()->create();
@@ -90,13 +90,10 @@ class CategoryStoryRelationshipTest extends TestCase
         $category->stories()->attach($story->id);
         $this->assertCount(1, $category->stories);
 
-        $category->delete();
+        // Expect a QueryException because of restrictOnDelete
+        $this->expectException(\Illuminate\Database\QueryException::class);
 
-        $this->assertDatabaseMissing('category_story', [
-            'story_id' => $story->id,
-            'category_id' => $category->id,
-        ]);
-        $this->assertDatabaseHas('stories', ['id' => $story->id]); // Story should not be deleted
+        $category->delete();
     }
 
     public function test_is_referenced_method_returns_correct_value(): void
@@ -114,5 +111,19 @@ class CategoryStoryRelationshipTest extends TestCase
         $category->refresh();
 
         $this->assertFalse($category->isReferenced());
+    }
+
+    public function test_deleting_category_with_linked_stories_throws_query_exception(): void
+    {
+        $category = Category::factory()->create();
+        $story = Story::factory()->create();
+
+        // Link the category to the story
+        $story->categories()->attach($category->id);
+
+        // Expect a QueryException when trying to delete the category
+        $this->expectException(\Illuminate\Database\QueryException::class);
+
+        $category->delete();
     }
 }
