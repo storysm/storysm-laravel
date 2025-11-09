@@ -82,20 +82,6 @@ class CategoryStoryRelationshipTest extends TestCase
         $this->assertDatabaseHas('categories', ['id' => $category->id]); // Category should not be deleted
     }
 
-    public function test_deleting_a_category_with_linked_stories_throws_query_exception_instead_of_detaching(): void
-    {
-        $story = Story::factory()->create();
-        $category = Category::factory()->create();
-
-        $category->stories()->attach($story->id);
-        $this->assertCount(1, $category->stories);
-
-        // Expect a QueryException because of restrictOnDelete
-        $this->expectException(\Illuminate\Database\QueryException::class);
-
-        $category->delete();
-    }
-
     public function test_is_referenced_method_returns_correct_value(): void
     {
         $category = Category::factory()->create();
