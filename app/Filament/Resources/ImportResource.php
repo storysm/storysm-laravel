@@ -64,7 +64,10 @@ class ImportResource extends Resource implements HasShieldPermissions
     /** @return array<string> */
     public static function getPermissionPrefixes(): array
     {
-        return ['view_all'];
+        return [
+            'view_all',
+            'view_any',
+        ];
     }
 
     public static function getPluralModelLabel(): string

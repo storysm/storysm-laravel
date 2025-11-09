@@ -248,4 +248,57 @@ class AgeRatingResourceTest extends TestCase
         $story->refresh();
         $this->assertNull($story->age_rating_effective_value);
     }
+
+    public function test_translatable_name_requires_at_least_one_translation(): void
+    {
+        Config::set('app.supported_locales', ['en', 'es']);
+        $this->actingAs($this->adminUser);
+
+        $ageRating = AgeRating::factory()->create([
+            'name' => [
+                'en' => 'English Name',
+                'es' => 'Spanish Name',
+            ],
+        ]);
+
+        $livewire = Livewire::test(EditAgeRating::class, [
+            'record' => $ageRating->id,
+        ]);
+
+        // Attempt to save with all names empty
+        $livewire->fillForm([
+            'name' => [
+                'en' => '',
+                'es' => '',
+            ],
+        ]);
+
+        $livewire->call('save');
+
+        // Assert validation errors for both locales
+        $livewire->assertHasFormErrors([
+            'name.en' => 'required',
+            'name.es' => 'required',
+        ]);
+
+        // Assert that the age rating name has not changed
+        $ageRating->refresh();
+        $this->assertEquals('English Name', $ageRating->getTranslation('name', 'en'));
+        $this->assertEquals('Spanish Name', $ageRating->getTranslation('name', 'es'));
+
+        // Attempt to save with one name provided
+        $livewire->fillForm([
+            'name' => [
+                'en' => 'New English Name',
+                'es' => '',
+            ],
+        ]);
+
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $ageRating->refresh();
+        $this->assertEquals('New English Name', $ageRating->getTranslation('name', 'en'));
+        $this->assertNotNull($ageRating->getTranslation('name', 'es'));
+    }
 }

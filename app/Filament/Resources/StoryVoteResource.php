@@ -20,6 +20,8 @@ class StoryVoteResource extends Resource implements HasShieldPermissions
 
     protected static ?string $navigationIcon = 'heroicon-o-hand-thumb-up';
 
+    protected static ?int $navigationSort = 2;
+
     public static function canViewAll(): bool
     {
         return static::can('viewAll');

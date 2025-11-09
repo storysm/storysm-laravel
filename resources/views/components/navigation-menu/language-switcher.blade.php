@@ -14,8 +14,6 @@
         </button>
     </x-slot>
     <x-filament::dropdown.list class="space-y-1" x-data="languageSwitcher" x-init="switchLanguage('{{ $currentLocale }}')">
-        <x-navigation-menu.language-switcher-item locale="id" languageName="Bahasa Indonesia" :currentLocale="$currentLocale"
-            x-on:click="switchLanguage('id')" />
         <x-navigation-menu.language-switcher-item locale="en" languageName="English" :currentLocale="$currentLocale"
             x-on:click="switchLanguage('en')" />
     </x-filament::dropdown.list>

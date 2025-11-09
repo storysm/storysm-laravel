@@ -28,10 +28,11 @@
 
         {{-- Right: Content (2/3 width) --}}
         <div class="flex flex-col justify-between p-2 space-y-1 basis-2/3">
-            <div class="flex flex-row">
+
+            <div class="flex flex-row justify-between">
                 {{-- Title --}}
                 <a wire:navigate href="{{ route('stories.show', ['story' => $story]) }}">
-                    <p class="text-lg font-semibold line-clamp-2" title="{{ $story->title }}">
+                    <p class="text-lg font-semibold line-clamp-1 lg:line-clamp-2" title="{{ $story->title }}">
                         {{ $story->title }}
                     </p>
                 </a>
@@ -40,20 +41,50 @@
 
             {{-- Creator --}}
             <x-story.meta icon="heroicon-m-user" title="{{ $story->creator->name }}">
-                <p class="text-sm">{{ $story->creator->name }}</p>
+                <p class="text-sm line-clamp-1">{{ $story->creator->name }}</p>
+            </x-story.meta>
+
+            {{-- Published Date --}}
+            <x-story.meta icon="heroicon-m-calendar" title="{{ $story->published_at?->format('M d, Y') ?? 'N/A' }}">
+                <p class="text-xs line-clamp-1">{{ $story->published_at?->diffForHumans() ?? 'N/A' }}</p>
+            </x-story.meta>
+
+            {{-- License --}}
+            <x-story.meta icon="heroicon-m-document-text">
+                <p class="text-xs line-clamp-1">{{ $story->licenses->first()?->name ?? 'N/A' }}</p>
             </x-story.meta>
 
             <span class="flex-grow"></span>
 
-            <div class="flex flex-row gap-2">
-                {{-- View Count --}}
-                <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
-                    <p class="text-xs">{{ $story->formattedViewCount() }}</p>
-                </x-story.meta>
+            <div class="flex flex-row justify-between">
+                <div class="flex flex-row gap-2">
+                    {{-- View Count --}}
+                    @if ($story->view_count > 500)
+                        <x-story.meta icon="heroicon-m-eye" iconClass="size-3">
+                            <p class="text-xs line-clamp-1">{{ $story->formattedViewCount() }}</p>
+                        </x-story.meta>
+                    @endif
 
-                {{-- StoryComment Count --}}
-                <x-story.meta icon="heroicon-m-chat-bubble-oval-left-ellipsis" iconClass="size-3">
-                    <p class="text-xs">{{ $story->formattedCommentCount() }}</p>
+                    {{-- StoryComment Count --}}
+                    <x-story.meta icon="heroicon-m-chat-bubble-oval-left-ellipsis" iconClass="size-3">
+                        <p class="text-xs line-clamp-1">{{ $story->formattedCommentCount() }}</p>
+                    </x-story.meta>
+
+                    {{-- Upvote Count --}}
+                    <x-story.meta icon="heroicon-m-hand-thumb-up" iconClass="size-3">
+                        <p class="text-xs line-clamp-1">{{ $story->formattedUpvoteCount() }}</p>
+                    </x-story.meta>
+                </div>
+
+                {{-- Age Rating --}}
+                <x-story.meta icon="heroicon-m-shield-check">
+                    <p class="text-xs line-clamp-1">
+                        @if ($story->age_rating_effective_value)
+                            {{ $story->age_rating_effective_value }}+
+                        @else
+                            N/A
+                        @endif
+                    </p>
                 </x-story.meta>
             </div>
         </div>

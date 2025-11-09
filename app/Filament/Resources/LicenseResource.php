@@ -30,11 +30,15 @@ class LicenseResource extends Resource implements HasShieldPermissions
         return $form
             ->schema([
                 Translate::make()
-                    ->schema(function (string $locale): array {
+                    ->schema(function (Get $get, string $locale): array {
+                        /** @var array<?string> */
+                        $names = $get('name');
+                        $required = collect($names)->every(fn ($item) => $item === null || trim($item) === '');
+
                         return [
                             TextInput::make('name')
                                 ->label(__('license.resource.name'))
-                                ->required($locale === config('app.locale'))
+                                ->required($required)
                                 ->maxLength(255)
                                 ->rules(function (Get $get) use ($locale) {
                                     /** @var string */

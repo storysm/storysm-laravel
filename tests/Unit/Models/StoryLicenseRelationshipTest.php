@@ -60,7 +60,7 @@ class StoryLicenseRelationshipTest extends TestCase
         $this->assertDatabaseHas('licenses', ['id' => $license->id]);
     }
 
-    public function test_deleting_a_license_detaches_the_stories(): void
+    public function test_deleting_a_license_with_linked_stories_throws_query_exception_instead_of_detaching(): void
     {
         $story = Story::factory()->create();
         $license = License::factory()->create();
@@ -72,14 +72,10 @@ class StoryLicenseRelationshipTest extends TestCase
             'license_id' => $license->id,
         ]);
 
+        // Expect a QueryException because of restrictOnDelete
+        $this->expectException(\Illuminate\Database\QueryException::class);
+
         // Delete the license
         $license->delete();
-
-        // Assert the story still exists, but the pivot entry is gone (testing `onDelete('cascade')` on license_story migration)
-        $this->assertDatabaseMissing('license_story', [
-            'story_id' => $story->id,
-            'license_id' => $license->id,
-        ]);
-        $this->assertDatabaseHas('stories', ['id' => $story->id]);
     }
 }

@@ -315,4 +315,23 @@ class ViewStoryTest extends TestCase
         // The component's view will re-render after the refresh.
         $testable->assertSee($story->formattedCommentCount());
     }
+
+    public function test_view_count_is_conditionally_displayed(): void
+    {
+        // Story with view count <= 500 (should not be displayed)
+        $storyLowViews = Story::factory()
+            ->ensurePublished()
+            ->create(['view_count' => 499]);
+
+        Livewire::test(ViewStory::class, ['story' => $storyLowViews])
+            ->assertDontSeeHtml('<p class="text-sm">'.$storyLowViews->formattedViewCount().'</p>');
+
+        // Story with view count > 500 (should be displayed)
+        $storyHighViews = Story::factory()
+            ->ensurePublished()
+            ->create(['view_count' => 501]);
+
+        Livewire::test(ViewStory::class, ['story' => $storyHighViews])
+            ->assertSeeHtml('<p class="text-sm">'.$storyHighViews->formattedViewCount().'</p>');
+    }
 }

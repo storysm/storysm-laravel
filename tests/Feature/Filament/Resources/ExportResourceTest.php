@@ -15,21 +15,33 @@ class ExportResourceTest extends TestCase
 {
     use RefreshDatabase;
 
+    protected User $user;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+        $this->actingAs($this->user);
+
+        Permission::firstOrCreate(['name' => 'view_any_export']);
+        $this->user->givePermissionTo('view_any_export');
+    }
+
     public function test_export_table_can_be_rendered(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         $this->get(ExportResource::getUrl('index'))->assertSuccessful();
+    }
+
+    public function test_export_table_cannot_be_rendered_without_permission(): void
+    {
+        $this->user->revokePermissionTo('view_any_export');
+        $this->get(ExportResource::getUrl('index'))->assertForbidden();
     }
 
     public function test_columns_are_displayed(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         Export::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
             'exporter' => 'App\\Exporters\\PageExporter',
             'file_name' => 'test.csv',
             'file_disk' => 'local',
@@ -48,11 +60,8 @@ class ExportResourceTest extends TestCase
 
     public function test_download_actions_are_present(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         $export = Export::factory()->create([
-            'user_id' => $user->id,
+            'user_id' => $this->user->id,
             'file_name' => 'test.csv',
             'file_disk' => 'local',
         ]);
@@ -64,13 +73,10 @@ class ExportResourceTest extends TestCase
 
     public function test_get_eloquent_query_filters_results_for_non_admin_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // Create an export with the current user as the user_id
-        Export::factory()->create(['user_id' => $user->id, 'creator_id' => User::factory()->create()->id]);
+        Export::factory()->create(['user_id' => $this->user->id, 'creator_id' => User::factory()->create()->id]);
         // Create an export with the current user as the creator_id
-        Export::factory()->create(['user_id' => User::factory()->create()->id, 'creator_id' => $user->id]);
+        Export::factory()->create(['user_id' => User::factory()->create()->id, 'creator_id' => $this->user->id]);
         // Create an export that should not be included in the results
         Export::factory()->create(['user_id' => User::factory()->create()->id, 'creator_id' => User::factory()->create()->id]);
 
@@ -78,25 +84,22 @@ class ExportResourceTest extends TestCase
 
         $this->assertCount(2, $exports);
 
-        $this->assertTrue($exports->contains(function ($export) use ($user) {
-            return $export->user_id === $user->id;
+        $this->assertTrue($exports->contains(function ($export) {
+            return $export->user_id === $this->user->id;
         }));
 
-        $this->assertTrue($exports->contains(function ($export) use ($user) {
-            return $export->creator_id === $user->id;
+        $this->assertTrue($exports->contains(function ($export) {
+            return $export->creator_id === $this->user->id;
         }));
     }
 
     public function test_get_eloquent_query_does_not_filter_results_for_view_all_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // Assign 'view_all_export' permission to the user
         Permission::firstOrCreate(['name' => 'view_all_export']);
-        $user->givePermissionTo('view_all_export');
+        $this->user->givePermissionTo('view_all_export');
 
-        Export::factory()->create(['user_id' => $user->id]);
+        Export::factory()->create(['user_id' => $this->user->id]);
         Export::factory()->create(['user_id' => User::factory()->create()->id]); // Another user's export
 
         $exports = ExportResource::getEloquentQuery()->get();
@@ -106,14 +109,11 @@ class ExportResourceTest extends TestCase
 
     public function test_user_name_column_visibility_for_view_all_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // Assign 'view_all_export' permission to the user
         Permission::firstOrCreate(['name' => 'view_all_export']);
-        $user->givePermissionTo('view_all_export');
+        $this->user->givePermissionTo('view_all_export');
 
-        Export::factory()->create(['user_id' => $user->id]);
+        Export::factory()->create(['user_id' => $this->user->id]);
 
         Livewire::test(ListExports::class)
             ->assertTableColumnVisible('user.name');
@@ -121,13 +121,10 @@ class ExportResourceTest extends TestCase
 
     public function test_user_name_column_hidden_for_non_view_all_users(): void
     {
-        $user = User::factory()->create();
-        $this->actingAs($user);
-
         // Ensure the user does NOT have 'view_all_export' permission
         // No permission assignment needed here as it's the default state
 
-        Export::factory()->create(['user_id' => $user->id]);
+        Export::factory()->create(['user_id' => $this->user->id]);
 
         Livewire::test(ListExports::class)
             ->assertTableColumnHidden('user.name');
@@ -136,11 +133,9 @@ class ExportResourceTest extends TestCase
     public function test_correct_records_are_listed(): void
     {
         // Arrange
-        $userA = User::factory()->create();
+        $userA = $this->user;
         $userB = User::factory()->create();
         $userC = User::factory()->create();
-
-        $this->actingAs($userA);
 
         Export::factory()->create([
             'user_id' => $userA->id,

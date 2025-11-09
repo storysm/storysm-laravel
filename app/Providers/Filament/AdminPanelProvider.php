@@ -8,6 +8,8 @@ use App\Filament\Resources\MediaResource;
 use App\Filament\Resources\PageResource;
 use App\Filament\Resources\PermissionResource;
 use App\Filament\Resources\RoleResource;
+use App\Filament\Resources\StoryCommentResource;
+use App\Filament\Resources\StoryResource;
 use App\Filament\Resources\UserResource;
 use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\SetLocaleFromQueryAndSession;
@@ -43,9 +45,7 @@ class AdminPanelProvider extends PanelProvider
             ->id('admin')
             ->path('admin')
             ->brandLogo(fn () => view('components.app-logo-icon', [
-                'attributes' => new ComponentAttributeBag([
-                    'class' => 'size-9 fill-current text-black dark:text-white',
-                ]),
+                'attributes' => new ComponentAttributeBag,
             ]))
             ->colors([
                 'primary' => Color::Driftwood,
@@ -59,7 +59,6 @@ class AdminPanelProvider extends PanelProvider
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\\Filament\\Widgets')
             ->widgets([
                 Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
@@ -78,6 +77,8 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->navigationGroups([
+                NavigationGroup::make()
+                    ->label(fn () => trans_choice('story.resource.model_label', 1)),
                 NavigationGroup::make()
                     ->label(fn () => __('Administration')),
                 NavigationGroup::make()
@@ -103,6 +104,8 @@ class AdminPanelProvider extends PanelProvider
                         'md' => 4,
                     ])
                     ->includes([
+                        StoryResource::class,
+                        StoryCommentResource::class,
                         MediaResource::class,
                         PageResource::class,
                         UserResource::class,
@@ -135,7 +138,6 @@ class AdminPanelProvider extends PanelProvider
             @googlefonts('sans')
             @googlefonts('logo')
             BLADE))
-            ->renderHook(PanelsRenderHook::USER_MENU_BEFORE, fn () => Blade::render('<x-navigation-menu.language-switcher />'))
             ->spa()
             ->sidebarFullyCollapsibleOnDesktop()
             ->sidebarWidth('14rem')

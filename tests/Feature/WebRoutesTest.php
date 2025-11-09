@@ -86,4 +86,50 @@ class WebRoutesTest extends TestCase
             ->get(route('pages.show', $page))
             ->assertOk();
     }
+
+    public function test_guest_can_access_age_rating_guidelines_page(): void
+    {
+        $page = Page::factory()->create(['status' => Status::Publish]);
+        config()->set('page.age_ratings', $page->id);
+
+        $this->get('/age-rating-guidelines')
+            ->assertOk();
+    }
+
+    public function test_guest_cannot_access_unpublished_age_rating_guidelines_page(): void
+    {
+        $page = Page::factory()->create(['status' => Status::Draft]);
+        config()->set('page.age_ratings', $page->id);
+
+        $this->get('/age-rating-guidelines')
+            ->assertNotFound();
+
+        // Test for non-existent page ID
+        config()->set('page.age_ratings', 99999); // A non-existent ID
+        $this->get('/age-rating-guidelines')
+            ->assertNotFound();
+    }
+
+    public function test_guest_can_access_cookie_policy_page(): void
+    {
+        $page = Page::factory()->create(['status' => Status::Publish]);
+        config()->set('page.cookie', $page->id);
+
+        $this->get('/cookie-policy')
+            ->assertOk();
+    }
+
+    public function test_guest_cannot_access_unpublished_cookie_policy_page(): void
+    {
+        $page = Page::factory()->create(['status' => Status::Draft]);
+        config()->set('page.cookie', $page->id);
+
+        $this->get('/cookie-policy')
+            ->assertNotFound();
+
+        // Test for non-existent page ID
+        config()->set('page.cookie', 99999); // A non-existent ID
+        $this->get('/cookie-policy')
+            ->assertNotFound();
+    }
 }

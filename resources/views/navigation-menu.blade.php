@@ -24,7 +24,7 @@
                 <!-- Logo -->
                 <div class="flex items-center shrink-0">
                     <a wire:navigate href="{{ route('home') }}">
-                        <x-app-logo-icon class="text-black fill-current size-9 dark:text-white" />
+                        <x-app-logo-icon />
                     </a>
                 </div>
             </div>
@@ -36,11 +36,6 @@
                         @livewire('database-notifications')
                     </div>
                 @endauth
-
-                <!-- Language Switcher -->
-                <div class="relative">
-                    <x-navigation-menu.language-switcher />
-                </div>
 
                 <!-- Menu -->
                 <div>
@@ -93,8 +88,20 @@
                         {{ trans_choice('story.resource.model_label', 2) }}
                     </span>
                 </x-nav-link>
+                <x-menu-border />
+                <x-nav-link wire:navigate href="{{ route('age-ratings.show') }}" :active="request()->routeIs('age-ratings.show')"
+                    icon="heroicon-o-shield-check">
+                    <span class="flex items-center gap-2">
+                        {{ __('guide.age_ratings') }}
+                    </span>
+                </x-nav-link>
+                <x-nav-link wire:navigate href="{{ route('cookie.show') }}" :active="request()->routeIs('cookie.show')"
+                    icon="heroicon-o-clipboard-document-list">
+                    <span class="flex items-center gap-2">
+                        {{ __('guide.cookie') }}
+                    </span>
+                </x-nav-link>
                 @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-                    <x-menu-border />
                     <x-nav-link wire:navigate href="{{ route('terms.show') }}" :active="request()->routeIs('terms.show')"
                         icon="heroicon-o-scale">
                         <span class="flex items-center gap-2">

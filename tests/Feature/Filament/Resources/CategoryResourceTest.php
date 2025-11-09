@@ -400,4 +400,57 @@ class CategoryResourceTest extends TestCase
             ]),
         ]);
     }
+
+    public function test_translatable_name_requires_at_least_one_translation(): void
+    {
+        Config::set('app.supported_locales', ['en', 'es']);
+        $this->actingAs($this->adminUser);
+
+        $category = Category::factory()->create([
+            'name' => [
+                'en' => 'English Name',
+                'es' => 'Spanish Name',
+            ],
+        ]);
+
+        $livewire = Livewire::test(EditCategory::class, [
+            'record' => $category->id,
+        ]);
+
+        // Attempt to save with all names empty
+        $livewire->fillForm([
+            'name' => [
+                'en' => '',
+                'es' => '',
+            ],
+        ]);
+
+        $livewire->call('save');
+
+        // Assert validation errors for both locales
+        $livewire->assertHasFormErrors([
+            'name.en' => 'required',
+            'name.es' => 'required',
+        ]);
+
+        // Assert that the category name has not changed
+        $category->refresh();
+        $this->assertEquals('English Name', $category->getTranslation('name', 'en'));
+        $this->assertEquals('Spanish Name', $category->getTranslation('name', 'es'));
+
+        // Attempt to save with one name provided
+        $livewire->fillForm([
+            'name' => [
+                'en' => 'New English Name',
+                'es' => '',
+            ],
+        ]);
+
+        $livewire->call('save');
+        $livewire->assertHasNoFormErrors();
+
+        $category->refresh();
+        $this->assertEquals('New English Name', $category->getTranslation('name', 'en'));
+        $this->assertNotNull($category->getTranslation('name', 'es'));
+    }
 }
