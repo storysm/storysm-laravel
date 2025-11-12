@@ -193,6 +193,14 @@ class StoryResource extends Resource implements HasShieldPermissions
                             default => $state,
                         };
                     }),
+                Tables\Columns\TextColumn::make('age')
+                    ->label(__('story.resource.age'))
+                    ->getStateUsing(function (Story $record): string {
+                        if ($record->age_rating_effective_value === null) {
+                            return '';
+                        }
+                        return "{$record->age_rating_effective_value}+";
+                    }),
                 Tables\Columns\TextColumn::make('upvote_count')
                     ->label(__('story-vote.resource.upvote_count'))
                     ->state(fn (Story $record) => $record->formattedUpvoteCount())
