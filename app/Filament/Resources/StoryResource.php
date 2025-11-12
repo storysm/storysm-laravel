@@ -242,6 +242,7 @@ class StoryResource extends Resource implements HasShieldPermissions
                     ReferenceAwareDeleteBulkAction::make(),
                 ]),
             ])
+            ->defaultSort('published_at', 'desc')
             ->filters([
                 Tables\Filters\TernaryFilter::make('age_rating_effective_value')
                     ->label(__('story.resource.rating_status'))

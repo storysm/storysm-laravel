@@ -49,6 +49,7 @@ trait HasStoryTable
                             ->label(ucfirst(__('validation.attributes.updated_at')))
                             ->sortable(),
                     ]),
-            ]);
+            ])
+            ->defaultSort('published_at', 'desc');
     }
 }
