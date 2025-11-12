@@ -18,7 +18,7 @@ return [
     */
     'profiles' => [
         'default' => [
-            'bold', 'italic', 'lead', 'small', '|', 'heading', 'hr', 'bullet-list', 'ordered-list', 'checked-list', '|', 'link', 'media', 'oembed', '|', 'source',
+            'bold', 'italic', 'lead', 'small', '|', 'heading', 'hr', 'bullet-list', 'ordered-list', 'checked-list', 'blockquote', '|', 'link', 'media', 'oembed', '|', 'source',
         ],
         'simple' => ['heading', 'hr', 'bullet-list', 'ordered-list', 'checked-list', '|', 'bold', 'italic', 'lead', 'small', '|', 'link', 'media'],
         'minimal' => ['bold', 'italic', 'link', 'bullet-list', 'ordered-list'],
