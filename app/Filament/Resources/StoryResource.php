@@ -98,24 +98,18 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ->relationship('genres', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
                                 ->preload()
                                 ->label(trans_choice('genre.resource.model_label', 2)),
-                        ]),
-                        Forms\Components\Section::make([
                             Forms\Components\Select::make('categories')
                                 ->multiple()
                                 ->relationship('categories', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
                                 ->preload()
                                 ->searchable()
                                 ->label(trans_choice('category.resource.model_label', 2)),
-                        ]),
-                        Forms\Components\Section::make([
                             Forms\Components\Select::make('licenses')
                                 ->multiple()
                                 ->relationship('licenses', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
                                 ->preload()
                                 ->searchable()
                                 ->label(trans_choice('license.resource.model_label', 2)),
-                        ]),
-                        Forms\Components\Section::make([
                             Forms\Components\Select::make('ageRatings')
                                 ->multiple()
                                 ->relationship('ageRatings', 'name', fn (Builder $query) => $query->orderBy('name->'.app()->getLocale()))
