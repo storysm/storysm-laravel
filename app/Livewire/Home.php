@@ -11,6 +11,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Query\Builder;
 use Livewire\Component;
 
 class Home extends Component implements HasForms, HasTable
@@ -25,6 +26,7 @@ class Home extends Component implements HasForms, HasTable
         $this->disableSort($table);
 
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->limit(12))
             ->searchable(false)
             ->paginated(false)
             ->headerActions([
