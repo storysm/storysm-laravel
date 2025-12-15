@@ -50,6 +50,6 @@ trait HasStoryTable
                             ->sortable(),
                     ]),
             ])
-            ->defaultSort('published_at', 'desc');
+            ->defaultSort('updated_at', 'desc');
     }
 }
