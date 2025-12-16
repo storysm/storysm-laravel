@@ -7,6 +7,7 @@ use App\Filament\Resources\StoryResource;
 use App\Filament\Resources\StoryResource\Pages\CreateStory;
 use App\Filament\Resources\StoryResource\Pages\EditStory;
 use App\Filament\Resources\StoryResource\Pages\ListStories;
+use App\Models\AgeRating;
 use App\Models\Category;
 use App\Models\Genre;
 use App\Models\License;
@@ -619,5 +620,32 @@ class StoryResourceTest extends TestCase
             'story_id' => $story->id,
             'category_id' => $categories[1]?->id,
         ]);
+    }
+
+    public function test_age_column_renders_correct_state_based_on_effective_value(): void
+    {
+        // Create an admin user to access the resource
+        $this->actingAs($this->adminUser);
+
+        // Case 1: Null (No Age Rating attached)
+        $storyNull = Story::factory()->create();
+
+        // Case 2: 13 (Age Rating with value 13 attached)
+        // Note: Ensure 'value' matches the actual column name in your AgeRating table (e.g., 'min_age' or 'rating')
+        $ageRating13 = AgeRating::factory()->create(['age_representation' => 13]);
+        $story13 = Story::factory()->create();
+        $ageRating13->stories()->attach($story13);
+        $story13->save(); // Trigger the observer
+
+        // Case 3: 0 (Age Rating with value 0 attached)
+        $ageRating0 = AgeRating::factory()->create(['age_representation' => 0]);
+        $story0 = Story::factory()->create();
+        $ageRating0->stories()->attach($story0);
+        $story0->save(); // Trigger the observer
+
+        Livewire::test(ListStories::class)
+            ->assertTableColumnStateSet('age', '', record: $storyNull)
+            ->assertTableColumnStateSet('age', '13+', record: $story13)
+            ->assertTableColumnStateSet('age', '0+', record: $story0);
     }
 }
