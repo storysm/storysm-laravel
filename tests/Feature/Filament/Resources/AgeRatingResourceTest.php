@@ -11,6 +11,7 @@ use App\Models\Story;
 use App\Models\User;
 use Filament\Actions\DeleteAction;
 use Filament\Facades\Filament;
+use Filament\Tables\Actions\ActionGroup;
 use Filament\Tables\Actions\DeleteBulkAction;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
@@ -300,5 +301,29 @@ class AgeRatingResourceTest extends TestCase
         $ageRating->refresh();
         $this->assertEquals('New English Name', $ageRating->getTranslation('name', 'en'));
         $this->assertNotNull($ageRating->getTranslation('name', 'es'));
+    }
+
+    public function test_age_rating_actions_are_rendered_within_a_dropdown_group_component(): void
+    {
+        $this->actingAs($this->adminUser);
+        AgeRating::factory()->create();
+
+        $component = Livewire::test(ListAgeRatings::class);
+
+        $component
+            ->assertTableActionExists('edit')
+            ->assertTableActionExists('delete');
+
+        /** @var ListAgeRatings $instance */
+        $instance = $component->instance();
+        $table = $instance->getTable();
+        $actions = $table->getActions();
+
+        /** @var ?ActionGroup $group */
+        $group = collect($actions)->first(fn ($action) => $action instanceof ActionGroup);
+
+        $this->assertNotNull($group, 'No ActionGroup found in table actions.');
+        $this->assertArrayHasKey('edit', $group->getFlatActions(), 'Edit action is missing from the group.');
+        $this->assertArrayHasKey('delete', $group->getFlatActions(), 'Delete action is missing from the group.');
     }
 }
