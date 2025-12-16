@@ -8,6 +8,7 @@ use App\Models\Language;
 use App\Models\Permission;
 use App\Models\User;
 use Filament\Facades\Filament;
+use Filament\Tables\Actions\ActionGroup;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -219,5 +220,29 @@ class LanguageResourceTest extends TestCase
                 'id' => $language->id,
             ]);
         }
+    }
+
+    public function test_language_actions_are_rendered_within_a_dropdown_group_component(): void
+    {
+        $this->actingAs($this->adminUser);
+        Language::factory()->create();
+
+        $component = Livewire::test(ListLanguages::class);
+
+        $component
+            ->assertTableActionExists('edit')
+            ->assertTableActionExists('delete');
+
+        /** @var ListLanguages $instance */
+        $instance = $component->instance();
+        $table = $instance->getTable();
+        $actions = $table->getActions();
+
+        /** @var ?ActionGroup $group */
+        $group = collect($actions)->first(fn ($action) => $action instanceof ActionGroup);
+
+        $this->assertNotNull($group, 'No ActionGroup found in table actions.');
+        $this->assertArrayHasKey('edit', $group->getFlatActions(), 'Edit action is missing from the group.');
+        $this->assertArrayHasKey('delete', $group->getFlatActions(), 'Delete action is missing from the group.');
     }
 }
