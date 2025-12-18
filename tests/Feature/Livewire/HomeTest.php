@@ -3,6 +3,8 @@
 namespace Tests\Feature\Livewire;
 
 use App\Livewire\Home;
+use App\Models\Story;
+use App\Models\User;
 use Filament\Tables;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Livewire\Features\SupportTesting\Testable;
@@ -61,5 +63,62 @@ class HomeTest extends TestCase
         $this->assertEquals('heroicon-o-arrow-right', $action->getIcon());
         $this->assertEquals(\Filament\Support\Enums\IconPosition::After, $action->getIconPosition());
         $this->assertEquals(route('stories.index'), $action->getUrl());
+    }
+
+    public function test_home_table_limits_records_to_twelve(): void
+    {
+        // Create a user for story ownership
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // Create 20 stories in the database
+        Story::factory()->count(20)->ensurePublished()->create([
+            'creator_id' => $user->id,
+        ]);
+
+        // Get the table data by accessing the component directly
+        /** @var Home */
+        $component = Livewire::test(Home::class)->instance();
+        $table = $component->getTable();
+
+        // Get the query builder from the table
+        $query = $table->getQuery();
+
+        // Execute the query and count the results
+        $results = $query->get();
+        $resultCount = $results->count();
+
+        // Assert that we get exactly 12 records (the limit)
+        $this->assertEquals(12, $resultCount, 'Home table should limit results to exactly 12 records');
+
+        // Additional assertion: ensure we don't get all 20 records
+        $this->assertLessThan(20, $resultCount, 'Home table should not return all 20 records');
+    }
+
+    public function test_home_table_with_less_than_twelve_records(): void
+    {
+        // Create a user for story ownership
+        $user = User::factory()->create();
+        $this->actingAs($user);
+
+        // Create only 5 stories in the database
+        Story::factory()->count(5)->ensurePublished()->create([
+            'creator_id' => $user->id,
+        ]);
+
+        // Get the table data by accessing the component directly
+        /** @var Home */
+        $component = Livewire::test(Home::class)->instance();
+        $table = $component->getTable();
+
+        // Get the query builder from the table
+        $query = $table->getQuery();
+
+        // Execute the query and count the results
+        $results = $query->get();
+        $resultCount = $results->count();
+
+        // Assert that we get all 5 records (since there are fewer than the limit)
+        $this->assertEquals(5, $resultCount, 'Home table should return all records when less than limit');
     }
 }

@@ -18,6 +18,7 @@ return [
             'publish' => 'Terbit',
         ],
         'title' => 'Judul',
+        'age' => 'Usia',
         'awaiting_rating' => 'Menunggu Penilaian',
         'rated_stories' => 'Cerita Dinilai',
         'rating_status' => 'Status Penilaian',

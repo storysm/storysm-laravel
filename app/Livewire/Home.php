@@ -11,10 +11,13 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Livewire\Component;
 
 class Home extends Component implements HasForms, HasTable
 {
+    const HOME_PAGE_LIMIT = 12;
+
     use HasStoryTable;
     use InteractsWithForms;
     use InteractsWithTable;
@@ -25,6 +28,7 @@ class Home extends Component implements HasForms, HasTable
         $this->disableSort($table);
 
         return $table
+            ->modifyQueryUsing(fn (Builder $query) => $query->limit(self::HOME_PAGE_LIMIT))
             ->searchable(false)
             ->paginated(false)
             ->headerActions([
