@@ -1,11 +1,9 @@
-import { AlpineComponent } from "alpinejs";
-
 const Alpine = window.Alpine;
 
 type ReaderTheme = "light" | "sepia" | "dark";
 type ReaderFont = "sans" | "serif" | "mono";
 
-interface ReaderState {
+interface ReaderStore {
     theme: ReaderTheme;
     font: ReaderFont;
     fontSize: number;
@@ -13,26 +11,24 @@ interface ReaderState {
     fullscreen: boolean;
     showToolbar: boolean;
     lastScrollY: number;
-    showResetModal: boolean;
+
+    init: () => void;
     persist: () => void;
     handleScroll: (e: Event) => void;
     toggleFullscreen: () => void;
     resetToDefaults: () => void;
-    confirmReset: () => void;
-    cancelReset: () => void;
 }
 
 const STORAGE_KEY = "story_reader_prefs";
 
-// Default values
 const DEFAULTS = {
-    theme: "light" as ReaderTheme,
+    theme: "dark" as ReaderTheme,
     font: "sans" as ReaderFont,
     fontSize: 100,
     maxWidth: 65,
 };
 
-const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
+Alpine.store("reader", {
     theme: DEFAULTS.theme,
     font: DEFAULTS.font,
     fontSize: DEFAULTS.fontSize,
@@ -40,7 +36,6 @@ const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
     fullscreen: false,
     showToolbar: true,
     lastScrollY: 0,
-    showResetModal: false,
 
     init() {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -52,13 +47,21 @@ const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
             this.maxWidth = prefs.maxWidth || DEFAULTS.maxWidth;
         }
 
-        this.$watch("theme", () => this.persist());
-        this.$watch("font", () => this.persist());
-        this.$watch("fontSize", () => this.persist());
-        this.$watch("maxWidth", () => this.persist());
+        // Watchers are not natively available in stores effectively without effects,
+        // but we can just call persist() in the setters or use Alpine.effect if needed.
+        // For simplicity in a store, we call persist manually or use a simple effect hook if available.
+        // Here, we'll hook into Alpine.effect to watch state changes.
+        Alpine.effect(() => {
+            // Access properties to register dependency
+            const _t = this.theme;
+            const _f = this.font;
+            const _s = this.fontSize;
+            const _w = this.maxWidth;
+            this.persist();
+        });
 
-        this.$watch("fullscreen", (val) => {
-            if (val) {
+        Alpine.effect(() => {
+            if (this.fullscreen) {
                 document.body.classList.add("overflow-hidden");
             } else {
                 document.body.classList.remove("overflow-hidden");
@@ -87,6 +90,7 @@ const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
             ? target.scrollTop
             : window.scrollY;
 
+        // Logic: Show toolbar if scrolling up or near top
         if (currentScroll < this.lastScrollY || currentScroll < 100) {
             this.showToolbar = true;
         } else {
@@ -102,21 +106,10 @@ const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
     },
 
     resetToDefaults() {
-        this.showResetModal = true;
-    },
-
-    confirmReset() {
         this.theme = DEFAULTS.theme;
         this.font = DEFAULTS.font;
         this.fontSize = DEFAULTS.fontSize;
         this.maxWidth = DEFAULTS.maxWidth;
         this.persist();
-        this.showResetModal = false;
     },
-
-    cancelReset() {
-        this.showResetModal = false;
-    },
-});
-
-Alpine.data("reader", readerComponentFactory);
+} as ReaderStore);

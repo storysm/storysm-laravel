@@ -1,5 +1,6 @@
-<div x-data="reader" @scroll.window.throttle.50ms="if(!fullscreen) handleScroll($event)" class="relative">
-    <div x-show="!fullscreen">
+<div x-data @scroll.window.throttle.50ms="if(!$store.reader.fullscreen) $store.reader.handleScroll($event)"
+    class="relative">
+    <div x-show="!$store.reader.fullscreen">
         <x-header :breadcrumbs="$this->getBreadcrumbs()" :actions="$this->getActions()">
             <div class="flex flex-col gap-y-2">
                 {{ $story->title }}
@@ -46,51 +47,52 @@
         </x-header>
     </div>
 
-    <x-story.reader-controls :story="$story" />
-
     <x-container>
         <section class="flex flex-col gap-y-8">
             <div class="grid items-start w-full grid-cols-1 gap-4 lg:grid-cols-12">
                 <div class="flex flex-col gap-4 transition-colors duration-300"
                     x-bind:class="{
-                        'fixed inset-0 z-50 overflow-y-auto p-4 md:p-12 lg:col-span-12': fullscreen,
-                        'lg:col-start-3 lg:col-span-8': !fullscreen,
-                        'bg-white': theme === 'light' && fullscreen,
-                        'bg-sepia-100': theme === 'sepia' && fullscreen,
-                        'bg-gray-900': theme === 'dark' && fullscreen
+                        'fixed inset-0 z-30 overflow-y-auto p-4 md:p-12 lg:col-span-12': $store.reader.fullscreen,
+                        'lg:col-start-3 lg:col-span-8': !$store.reader.fullscreen,
+                        'bg-white': $store.reader.theme === 'light' && $store.reader.fullscreen,
+                        'bg-sepia-100': $store.reader.theme === 'sepia' && $store.reader.fullscreen,
+                        'bg-gray-900': $store.reader.theme === 'dark' && $store.reader.fullscreen
                     }"
-                    @scroll.throttle.50ms="if(fullscreen) handleScroll($event)">
-                    <x-filament::section x-bind:class="fullscreen ? 'shadow-none !bg-transparent border-0' : ''">
+                    @scroll.throttle.50ms="if($store.reader.fullscreen) $store.reader.handleScroll($event)">
+                    <x-filament::section
+                        x-bind:class="$store.reader.fullscreen ? 'shadow-none !bg-transparent border-0' : ''">
 
                         <div class="mx-auto transition-all duration-300 max-w-none"
                             x-bind:class="{
-                                'prose dark:prose-invert': !fullscreen,
-                                'prose': theme === 'light' && fullscreen,
-                                'prose-sepia': theme === 'sepia' && fullscreen,
-                                'prose-invert': theme === 'dark' && fullscreen,
-                                'font-sans': font === 'sans' && fullscreen,
-                                'font-serif': font === 'serif' && fullscreen,
-                                'font-mono': font === 'mono' && fullscreen
+                                'prose dark:prose-invert': !$store.reader.fullscreen,
+                                'prose': $store.reader.theme === 'light' && $store.reader.fullscreen,
+                                'prose prose-sepia': $store.reader.theme === 'sepia' && $store.reader.fullscreen,
+                                'prose prose-invert': $store.reader.theme === 'dark' && $store.reader.fullscreen,
+                                'font-sans': $store.reader.font === 'sans' && $store.reader.fullscreen,
+                                'font-serif': $store.reader.font === 'serif' && $store.reader.fullscreen,
+                                'font-mono': $store.reader.font === 'mono' && $store.reader.fullscreen
                             }"
-                            x-bind:style="fullscreen ? `font-size: ${fontSize}%; max-width: ${maxWidth}ch;` : ''">
-                            <h1 x-show="fullscreen" class="mb-8 text-3xl font-bold text-center">{{ $story->title }}
+                            x-bind:style="$store.reader.fullscreen ?
+                                `font-size: ${$store.reader.fontSize}%; max-width: ${$store.reader.maxWidth}ch;` : ''">
+                            <h1 x-show="$store.reader.fullscreen" class="mb-8 text-3xl font-bold text-center">
+                                {{ $story->title }}
                             </h1>
 
                             {!! $story->content !!}
                         </div>
 
-                        <div x-show="fullscreen" class="h-24 md:hidden"></div>
+                        <div x-show="$store.reader.fullscreen" class="h-24 md:hidden"></div>
                     </x-filament::section>
 
-                    <div x-bind:class="fullscreen ? 'max-w-2xl mx-auto w-full pb-12' : ''">
-                        <x-filament::section x-bind:class="fullscreen ? '!bg-transparent border-0' : ''">
+                    <div x-bind:class="$store.reader.fullscreen ? 'max-w-2xl mx-auto w-full pb-12' : ''">
+                        <x-filament::section x-bind:class="$store.reader.fullscreen ? '!bg-transparent border-0' : ''">
                             <div class="flex flex-row space-x-2 justify-center">
                                 <livewire:story-vote.upvote-action :story="$story" />
                                 <livewire:story-vote.downvote-action :story="$story" />
                             </div>
                         </x-filament::section>
 
-                        <div x-show="!fullscreen">
+                        <div x-show="!$store.reader.fullscreen">
                             @if ($story->creator->can(\App\Constants\Permissions::ACT_AS_GUEST_USER))
                                 <x-filament::section class="">
                                     <div class="flex flex-row gap-x-2">
@@ -108,4 +110,6 @@
             </div>
         </section>
     </x-container>
+
+    <x-story.reader-controls :story="$story" />
 </div>
