@@ -34,11 +34,52 @@ Alpine.store("reader", {
     init() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
-            const prefs = JSON.parse(saved);
-            this.theme = prefs.theme || DEFAULTS.theme;
-            this.font = prefs.font || DEFAULTS.font;
-            this.fontSize = prefs.fontSize || DEFAULTS.fontSize;
-            this.maxWidth = prefs.maxWidth || DEFAULTS.maxWidth;
+            try {
+                const prefs = JSON.parse(saved);
+
+                // Validate theme
+                if (["light", "sepia", "dark"].includes(prefs.theme)) {
+                    this.theme = prefs.theme;
+                } else {
+                    this.theme = DEFAULTS.theme;
+                }
+
+                // Validate font
+                if (["sans", "serif", "mono"].includes(prefs.font)) {
+                    this.font = prefs.font;
+                } else {
+                    this.font = DEFAULTS.font;
+                }
+
+                // Validate fontSize
+                if (
+                    typeof prefs.fontSize === "number" &&
+                    prefs.fontSize >= 50 &&
+                    prefs.fontSize <= 200
+                ) {
+                    this.fontSize = prefs.fontSize;
+                } else {
+                    this.fontSize = DEFAULTS.fontSize;
+                }
+
+                // Validate maxWidth
+                if (
+                    typeof prefs.maxWidth === "number" &&
+                    prefs.maxWidth >= 30 &&
+                    prefs.maxWidth <= 100
+                ) {
+                    this.maxWidth = prefs.maxWidth;
+                } else {
+                    this.maxWidth = DEFAULTS.maxWidth;
+                }
+            } catch (e) {
+                console.error(
+                    "Failed to parse reader preferences from localStorage:",
+                    e
+                );
+                // Fallback to defaults if parsing fails
+                this.resetToDefaults();
+            }
         }
 
         Alpine.effect(() => {
@@ -67,5 +108,7 @@ Alpine.store("reader", {
         this.font = DEFAULTS.font;
         this.fontSize = DEFAULTS.fontSize;
         this.maxWidth = DEFAULTS.maxWidth;
+
+        this.persist();
     },
 } as ReaderStore);
