@@ -5,7 +5,10 @@ const Alpine = window.Alpine;
 Alpine.data("readerControls", () => ({
     showToolbar: true,
     lastScrollY: 0,
-    ticking: false, // For requestAnimationFrame optimization
+    ticking: false,
+
+    // Store reference to the handler for cleanup
+    _popstateHandler: null as ((event: PopStateEvent) => void) | null,
 
     getScrollbarWidth() {
         const outer = document.createElement("div");
@@ -23,6 +26,16 @@ Alpine.data("readerControls", () => ({
     },
 
     init() {
+        // Define and store the handler
+        this._popstateHandler = (event: PopStateEvent) => {
+            const readerStore = this.$store.reader as ReaderStore;
+            if (readerStore.fullscreen) {
+                readerStore.fullscreen = false;
+            }
+        };
+
+        window.addEventListener("popstate", this._popstateHandler);
+
         this.$watch("$store.reader.fullscreen", (value: boolean) => {
             if (value) {
                 const scrollbarWidth = this.getScrollbarWidth();
@@ -30,6 +43,8 @@ Alpine.data("readerControls", () => ({
                 document.body.classList.add("overflow-hidden");
                 this.lastScrollY = 0;
                 this.showToolbar = true;
+
+                window.history.pushState({ readerFullscreen: true }, "");
             } else {
                 document.body.classList.remove("overflow-hidden");
                 document.body.style.paddingRight = "";
@@ -38,9 +53,14 @@ Alpine.data("readerControls", () => ({
     },
 
     /**
-     * Optimized scroll handler
-     * Uses requestAnimationFrame to prevent layout thrashing
+     * Alpine.js lifecycle hook for cleanup
      */
+    destroy() {
+        if (this._popstateHandler) {
+            window.removeEventListener("popstate", this._popstateHandler);
+        }
+    },
+
     handleScroll(e: Event) {
         if (this.ticking) return;
 
@@ -49,14 +69,12 @@ Alpine.data("readerControls", () => ({
             const readerStore = this.$store.reader as ReaderStore;
             const isFullscreen = readerStore.fullscreen;
 
-            // Determine scroll source
             const target = isFullscreen
                 ? (e.target as HTMLElement)
                 : document.scrollingElement || document.documentElement;
 
             const currentScroll = target.scrollTop;
 
-            // Logic: Show if scrolling up or near top, hide if scrolling down
             if (currentScroll < this.lastScrollY || currentScroll < 100) {
                 this.showToolbar = true;
             } else if (
