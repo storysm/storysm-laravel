@@ -33,6 +33,8 @@ Alpine.store("reader", {
     maxWidth: DEFAULTS.maxWidth,
     fullscreen: false,
 
+    // Computed properties for class bindings
+
     init() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {

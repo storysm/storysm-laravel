@@ -1,4 +1,5 @@
-<div x-data @scroll.window.throttle.50ms="if(!$store.reader.fullscreen) $dispatch('reader-scroll', { event: $event })"
+<div x-data="viewStory"
+    @scroll.window.throttle.50ms="if(!$store.reader.fullscreen) $dispatch('reader-scroll', { event: $event })"
     class="relative">
     <div x-show="!$store.reader.fullscreen">
         <x-header :breadcrumbs="$this->getBreadcrumbs()" :actions="$this->getActions()">
@@ -51,29 +52,13 @@
         <section>
             <div class="grid items-start w-full grid-cols-1 gap-4 lg:grid-cols-12">
                 <div class="flex flex-col gap-4 transition-colors duration-300"
-                    x-bind:class="{
-                        'fixed inset-0 z-30 overflow-y-auto p-4 md:p-12 lg:col-span-12': $store.reader.fullscreen,
-                        'lg:col-start-3 lg:col-span-8': !$store.reader.fullscreen,
-                        'bg-white': $store.reader.theme === 'light' && $store.reader.fullscreen,
-                        'bg-sepia-100': $store.reader.theme === 'sepia' && $store.reader.fullscreen,
-                        'bg-gray-900': $store.reader.theme === 'dark' && $store.reader.fullscreen
-                    }"
+                    x-bind:class="getContainerDynamicClasses"
                     @scroll.throttle.50ms="if($store.reader.fullscreen) $dispatch('reader-scroll', { event: $event })">
                     <x-filament::section
                         x-bind:class="$store.reader.fullscreen ? 'shadow-none !bg-transparent border-0' : ''">
 
                         <div class="mx-auto transition-all duration-300 max-w-none"
-                            x-bind:class="{
-                                'prose dark:prose-invert': !$store.reader.fullscreen,
-                                'prose': $store.reader.theme === 'light' && $store.reader.fullscreen,
-                                'prose prose-sepia': $store.reader.theme === 'sepia' && $store.reader.fullscreen,
-                                'prose prose-invert': $store.reader.theme === 'dark' && $store.reader.fullscreen,
-                                'font-sans': $store.reader.font === 'sans' && $store.reader.fullscreen,
-                                'font-serif': $store.reader.font === 'serif' && $store.reader.fullscreen,
-                                'font-mono': $store.reader.font === 'mono' && $store.reader.fullscreen
-                            }"
-                            x-bind:style="$store.reader.fullscreen ?
-                                `font-size: ${$store.reader.fontSize}%; max-width: ${$store.reader.maxWidth}ch;` : ''">
+                            x-bind:class="getProseDynamicClasses" x-bind:style="getProseDynamicStyle">
                             <h1 x-show="$store.reader.fullscreen" class="mb-8 text-3xl font-bold text-center">
                                 {{ $story->title }}
                             </h1>
