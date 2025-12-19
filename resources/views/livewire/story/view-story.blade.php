@@ -1,4 +1,4 @@
-<div x-data @scroll.window.throttle.50ms="if(!$store.reader.fullscreen) $store.reader.handleScroll($event)"
+<div x-data @scroll.window.throttle.50ms="if(!$store.reader.fullscreen) $dispatch('reader-scroll', { event: $event })"
     class="relative">
     <div x-show="!$store.reader.fullscreen">
         <x-header :breadcrumbs="$this->getBreadcrumbs()" :actions="$this->getActions()">
@@ -58,7 +58,7 @@
                         'bg-sepia-100': $store.reader.theme === 'sepia' && $store.reader.fullscreen,
                         'bg-gray-900': $store.reader.theme === 'dark' && $store.reader.fullscreen
                     }"
-                    @scroll.throttle.50ms="if($store.reader.fullscreen) $store.reader.handleScroll($event)">
+                    @scroll.throttle.50ms="if($store.reader.fullscreen) $dispatch('reader-scroll', { event: $event })">
                     <x-filament::section
                         x-bind:class="$store.reader.fullscreen ? 'shadow-none !bg-transparent border-0' : ''">
 
