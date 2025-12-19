@@ -22,6 +22,8 @@ export interface ReaderStore {
     persist(): void;
     toggleFullscreen(): void;
     resetToDefaults(): void;
+    increaseFontSize(): void;
+    decreaseFontSize(): void;
 }
 
 Alpine.store("reader", {
@@ -110,5 +112,13 @@ Alpine.store("reader", {
         this.maxWidth = DEFAULTS.maxWidth;
 
         this.persist();
+    },
+
+    increaseFontSize() {
+        this.fontSize = Math.min(200, this.fontSize + 10);
+    },
+
+    decreaseFontSize() {
+        this.fontSize = Math.max(70, this.fontSize - 10);
     },
 } as ReaderStore);
