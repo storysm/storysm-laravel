@@ -2,14 +2,15 @@
 
 <div>
     {{-- Controls Toolbar --}}
-    <div x-cloak x-show="$store.reader.showToolbar" x-transition:enter="transition ease-out duration-300"
-        x-transition:enter-start="opacity-0 translate-y-8" x-transition:enter-end="opacity-100 translate-y-0"
-        x-transition:leave="transition ease-in duration-200" x-transition:leave-start="opacity-100 translate-y-0"
-        x-transition:leave-end="opacity-0 translate-y-8"
-        class="fixed z-[60] flex items-center gap-2 p-2 shadow-xl rounded-2xl border transition-all duration-300"
+    <div x-cloak x-show="$store.reader.showToolbar" x-transition:enter="transition-transform duration-500"
+        x-transition:enter-start="translate-y-24" x-transition:enter-end="translate-y-0"
+        x-transition:leave="transition-transform duration-500" x-transition:leave-start="translate-y-0"
+        x-transition:leave-end="translate-y-24"
+        class="fixed z-[60] flex items-center gap-2 p-2 shadow-xl rounded-2xl border transition-transform duration-500"
         :class="{
-            'bottom-6 left-1/2 -translate-x-1/2': true,
-            'sm:bottom-auto sm:left-auto sm:top-24 sm:right-8 sm:translate-x-0': !$store.reader.fullscreen,
+            'bottom-6 -translate-x-1/2 z-50': true,
+            'right-8 -translate-x-0': !$store.reader.fullscreen,
+            'left-1/2': $store.reader.fullscreen,
             'bg-white/90 border-gray-200 text-gray-700': $store.reader.theme === 'light' && $store.reader.fullscreen,
             'bg-sepia-200/90 border-sepia-300 text-sepia-900': $store.reader.theme === 'sepia' && $store.reader
                 .fullscreen,
