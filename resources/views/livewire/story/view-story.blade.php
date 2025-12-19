@@ -52,7 +52,7 @@
         <section class="flex flex-col gap-y-8">
             <div class="grid items-start w-full grid-cols-1 gap-4 lg:grid-cols-12">
                 <div class="flex flex-col gap-4 transition-colors duration-300"
-                    :class="{
+                    x-bind:class="{
                         'fixed inset-0 z-50 overflow-y-auto p-4 md:p-12 lg:col-span-12': fullscreen,
                         'lg:col-start-3 lg:col-span-8': !fullscreen,
                         'bg-white': theme === 'light' && fullscreen,
@@ -62,16 +62,17 @@
                     @scroll.throttle.50ms="if(fullscreen) handleScroll($event)">
                     <x-filament::section x-bind:class="fullscreen ? 'shadow-none !bg-transparent border-0' : ''">
 
-                        <div class="mx-auto transition-all duration-300 prose max-w-none"
-                            :class="{
-                                'prose-gray': theme === 'light',
-                                'prose-sepia': theme === 'sepia',
-                                'prose-invert': theme === 'dark',
-                                'font-sans': font === 'sans',
-                                'font-serif': font === 'serif',
-                                'font-mono': font === 'mono'
+                        <div class="mx-auto transition-all duration-300 max-w-none"
+                            x-bind:class="{
+                                'prose dark:prose-invert': !fullscreen,
+                                'prose': theme === 'light' && fullscreen,
+                                'prose-sepia': theme === 'sepia' && fullscreen,
+                                'prose-invert': theme === 'dark' && fullscreen,
+                                'font-sans': font === 'sans' && fullscreen,
+                                'font-serif': font === 'serif' && fullscreen,
+                                'font-mono': font === 'mono' && fullscreen
                             }"
-                            :style="`font-size: ${fontSize}%; max-width: ${maxWidth}ch;`">
+                            x-bind:style="fullscreen ? `font-size: ${fontSize}%; max-width: ${maxWidth}ch;` : ''">
                             <h1 x-show="fullscreen" class="mb-8 text-3xl font-bold text-center">{{ $story->title }}
                             </h1>
 
