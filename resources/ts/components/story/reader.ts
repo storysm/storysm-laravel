@@ -13,28 +13,43 @@ interface ReaderState {
     fullscreen: boolean;
     showToolbar: boolean;
     lastScrollY: number;
+    showResetModal: boolean;
     persist: () => void;
+    handleScroll: (e: Event) => void;
+    toggleFullscreen: () => void;
+    resetToDefaults: () => void;
+    confirmReset: () => void;
+    cancelReset: () => void;
 }
 
 const STORAGE_KEY = "story_reader_prefs";
 
-const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
-    theme: "light",
-    font: "sans",
+// Default values
+const DEFAULTS = {
+    theme: "light" as ReaderTheme,
+    font: "sans" as ReaderFont,
     fontSize: 100,
     maxWidth: 65,
+};
+
+const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
+    theme: DEFAULTS.theme,
+    font: DEFAULTS.font,
+    fontSize: DEFAULTS.fontSize,
+    maxWidth: DEFAULTS.maxWidth,
     fullscreen: false,
     showToolbar: true,
     lastScrollY: 0,
+    showResetModal: false,
 
     init() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             const prefs = JSON.parse(saved);
-            this.theme = prefs.theme || "light";
-            this.font = prefs.font || "sans";
-            this.fontSize = prefs.fontSize || 100;
-            this.maxWidth = prefs.maxWidth || 65;
+            this.theme = prefs.theme || DEFAULTS.theme;
+            this.font = prefs.font || DEFAULTS.font;
+            this.fontSize = prefs.fontSize || DEFAULTS.fontSize;
+            this.maxWidth = prefs.maxWidth || DEFAULTS.maxWidth;
         }
 
         this.$watch("theme", () => this.persist());
@@ -84,6 +99,23 @@ const readerComponentFactory: () => AlpineComponent<ReaderState> = () => ({
         this.fullscreen = !this.fullscreen;
         this.lastScrollY = 0;
         this.showToolbar = true;
+    },
+
+    resetToDefaults() {
+        this.showResetModal = true;
+    },
+
+    confirmReset() {
+        this.theme = DEFAULTS.theme;
+        this.font = DEFAULTS.font;
+        this.fontSize = DEFAULTS.fontSize;
+        this.maxWidth = DEFAULTS.maxWidth;
+        this.persist();
+        this.showResetModal = false;
+    },
+
+    cancelReset() {
+        this.showResetModal = false;
     },
 });
 
