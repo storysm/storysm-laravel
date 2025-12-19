@@ -22,7 +22,7 @@
 
         <template x-if="!$store.reader.fullscreen">
             <button @click="$store.reader.toggleFullscreen()" title="Enter focus mode"
-                class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-primary-600 dark:text-primary-400">
+                class="p-2 rounded-2xl hover:bg-black/10 dark:hover:bg-white/10 text-primary-600 dark:text-primary-400">
                 <x-heroicon-m-arrows-pointing-out class="w-5 h-5" />
             </button>
         </template>
@@ -31,14 +31,15 @@
             <div class="flex items-center gap-2">
                 <button
                     @click="$store.reader.theme = ($store.reader.theme === 'light' ? 'sepia' : ($store.reader.theme === 'sepia' ? 'dark' : 'light'))"
-                    title="Change theme" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
+                    title="Change theme" class="p-2 rounded-2xl hover:bg-black/10 dark:hover:bg-white/10">
                     <x-heroicon-m-swatch class="w-5 h-5" />
                 </button>
 
                 <button
                     @click="$store.reader.font = ($store.reader.font === 'sans' ? 'serif' : ($store.reader.font === 'serif' ? 'mono' : 'sans'))"
-                    title="Change font" class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
-                    <span x-text="$store.reader.font.toUpperCase().substring(0, 1)" class="text-xs font-bold"></span>
+                    title="Change font" class="p-2 rounded-2xl hover:bg-black/10 dark:hover:bg-white/10">
+                    <span x-text="$store.reader.font.charAt(0).toUpperCase() + $store.reader.font.slice(1)"
+                        class="text-xs font-bold"></span>
                 </button>
 
                 <div class="flex items-center border-l border-r px-1 mx-1"
@@ -48,22 +49,22 @@
                         'border-gray-600': $store.reader.theme === 'dark'
                     }">
                     <button @click="$store.reader.fontSize = Math.max(70, $store.reader.fontSize - 10)"
-                        title="Decrease font size" class="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded">
+                        title="Decrease font size" class="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-2xl">
                         <span class="text-sm font-semibold">A-</span>
                     </button>
                     <button @click="$store.reader.fontSize = Math.min(200, $store.reader.fontSize + 10)"
-                        title="Increase font size" class="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded">
+                        title="Increase font size" class="p-2 hover:bg-black/10 dark:hover:bg-white/10 rounded-2xl">
                         <span class="text-base font-semibold">A+</span>
                     </button>
                 </div>
 
                 <button @click="$dispatch('open-modal', { id: 'reset-reader-prefs' })" title="Reset to defaults"
-                    class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10">
+                    class="p-2 rounded-2xl hover:bg-black/10 dark:hover:bg-white/10">
                     <x-heroicon-m-arrow-path class="w-5 h-5" />
                 </button>
 
                 <button @click="$store.reader.toggleFullscreen()" title="Exit focus mode"
-                    class="p-2 rounded-full hover:bg-black/10 dark:hover:bg-white/10 text-primary-600 dark:text-primary-400">
+                    class="p-2 rounded-2xl hover:bg-black/10 dark:hover:bg-white/10 text-primary-600 dark:text-primary-400">
                     <x-heroicon-m-arrows-pointing-in class="w-5 h-5" />
                 </button>
             </div>
