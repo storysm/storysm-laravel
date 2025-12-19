@@ -85,7 +85,8 @@
                     </x-filament::section>
 
                     <div class="flex flex-col gap-4"
-                        x-bind:class="$store.reader.fullscreen ? 'max-w-2xl mx-auto w-full pb-12' : ''">
+                        x-bind:class="$store.reader.fullscreen ? 'max-w-2xl mx-auto w-full pb-12' : ''"
+                        x-show="!$store.reader.fullscreen">
                         <x-filament::section x-bind:class="$store.reader.fullscreen ? '!bg-transparent border-0' : ''">
                             <div class="flex flex-row space-x-2 justify-center">
                                 <livewire:story-vote.upvote-action :story="$story" />
@@ -93,7 +94,7 @@
                             </div>
                         </x-filament::section>
 
-                        <div class="flex flex-col gap-4" x-show="!$store.reader.fullscreen">
+                        <div class="flex flex-col gap-4">
                             @if ($story->creator->can(\App\Constants\Permissions::ACT_AS_GUEST_USER))
                                 <x-filament::section class="">
                                     <div class="flex flex-row gap-x-2">
