@@ -2,6 +2,26 @@ import { ReaderStore } from "../../stores/reader";
 
 const Alpine = window.Alpine;
 
+// Cache the scrollbar width globally to avoid repeated DOM manipulation
+let cachedScrollbarWidth: number | null = null;
+
+function getScrollbarWidth() {
+    if (cachedScrollbarWidth !== null) return cachedScrollbarWidth;
+
+    const outer = document.createElement("div");
+    outer.style.visibility = "hidden";
+    outer.style.overflow = "scroll";
+    document.body.appendChild(outer);
+
+    const inner = document.createElement("div");
+    outer.appendChild(inner);
+
+    cachedScrollbarWidth = outer.offsetWidth - inner.offsetWidth;
+    outer.remove();
+
+    return cachedScrollbarWidth;
+}
+
 Alpine.data("readerControls", () => ({
     showToolbar: true,
     lastScrollY: 0,
@@ -10,25 +30,11 @@ Alpine.data("readerControls", () => ({
     // Store reference to the handler for cleanup
     _popstateHandler: null as ((event: PopStateEvent) => void) | null,
 
-    getScrollbarWidth() {
-        const outer = document.createElement("div");
-        outer.style.visibility = "hidden";
-        outer.style.overflow = "scroll";
-        document.body.appendChild(outer);
-
-        const inner = document.createElement("div");
-        outer.appendChild(inner);
-
-        const scrollbarWidth = outer.offsetWidth - inner.offsetWidth;
-        outer.remove();
-
-        return scrollbarWidth;
-    },
-
     init() {
         // Define and store the handler
         this._popstateHandler = (event: PopStateEvent) => {
             const readerStore = this.$store.reader as ReaderStore;
+            // If we are in fullscreen and back is pressed, exit fullscreen
             if (readerStore.fullscreen) {
                 readerStore.fullscreen = false;
             }
@@ -38,16 +44,25 @@ Alpine.data("readerControls", () => ({
 
         this.$watch("$store.reader.fullscreen", (value: boolean) => {
             if (value) {
-                const scrollbarWidth = this.getScrollbarWidth();
+                const scrollbarWidth = getScrollbarWidth();
                 document.body.style.paddingRight = `${scrollbarWidth}px`;
                 document.body.classList.add("overflow-hidden");
                 this.lastScrollY = 0;
                 this.showToolbar = true;
 
-                window.history.pushState({ readerFullscreen: true }, "");
+                // Push state only if not already there (prevents duplicates)
+                if (window.history.state?.readerFullscreen !== true) {
+                    window.history.pushState({ readerFullscreen: true }, "");
+                }
             } else {
                 document.body.classList.remove("overflow-hidden");
                 document.body.style.paddingRight = "";
+
+                // If the user exited via UI (not back button), sync the history
+                // This prevents the user from having to press "Back" twice to leave the page
+                if (window.history.state?.readerFullscreen === true) {
+                    window.history.back();
+                }
             }
         });
     },
@@ -71,7 +86,8 @@ Alpine.data("readerControls", () => ({
 
             const target = isFullscreen
                 ? (e.target as HTMLElement)
-                : document.scrollingElement || document.documentElement;
+                : (document.scrollingElement as HTMLElement) ||
+                  document.documentElement;
 
             const currentScroll = target.scrollTop;
 
