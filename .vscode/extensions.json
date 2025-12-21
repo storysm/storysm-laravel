@@ -31,6 +31,7 @@
         "shufo.vscode-blade-formatter",
         "sperovita.alpinejs-syntax-highlight",
         "swordev.phpstan",
-        "timonwong.shellcheck"
+        "timonwong.shellcheck",
+        "vitest.explorer"
     ]
 }

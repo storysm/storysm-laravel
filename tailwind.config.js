@@ -1,3 +1,4 @@
+import typography from "@tailwindcss/typography";
 import defaultTheme from "tailwindcss/defaultTheme";
 import { colors } from "./colors";
 import preset from "./vendor/filament/support/tailwind.config.preset";
@@ -25,11 +26,42 @@ export default {
             colors: {
                 primary: colors.driftwood,
                 secondary: colors.terracotta,
+                sepia: colors.sepia,
             },
+            typography: (theme) => ({
+                sepia: {
+                    css: {
+                        "--tw-prose-body": theme("colors.sepia[800]"),
+                        "--tw-prose-headings": theme("colors.sepia[900]"),
+                        "--tw-prose-links": theme("colors.primary[600]"),
+                        "--tw-prose-bold": theme("colors.sepia[900]"),
+                        "--tw-prose-quotes": theme("colors.sepia[900]"),
+                        "--tw-prose-hr": theme("colors.sepia[300]"),
+                        "--tw-prose-captions": theme("colors.sepia[800]"),
+                    },
+                },
+            }),
             fontFamily: {
                 sans: ["Figtree", ...defaultTheme.fontFamily.sans],
                 logo: ["Grandstander", ...defaultTheme.fontFamily.serif],
+                serif: [
+                    "Georgia",
+                    "Cambria",
+                    "Times New Roman",
+                    "Times",
+                    "serif",
+                ],
+                mono: [
+                    "ui-monospace",
+                    "SFMono-Regular",
+                    "Menlo",
+                    "Monaco",
+                    "Consolas",
+                    "monospace",
+                ],
             },
         },
     },
+
+    plugins: [typography],
 };
