@@ -3,6 +3,14 @@ const Alpine = window.Alpine;
 export type ReaderTheme = "light" | "sepia" | "dark";
 export type ReaderFont = "sans" | "serif" | "mono";
 
+const THEMES: ReaderTheme[] = ["light", "sepia", "dark"];
+const FONTS: ReaderFont[] = ["sans", "serif", "mono"];
+
+const LIMITS = {
+    fontSize: { min: 70, max: 200, step: 10 },
+    maxWidth: { min: 30, max: 100 },
+};
+
 const STORAGE_KEY = "reader_prefs";
 
 const DEFAULTS = {
@@ -39,36 +47,42 @@ Alpine.store("reader", {
             try {
                 const prefs = JSON.parse(saved);
 
-                if (typeof prefs !== "object" || prefs === null) {
+                if (
+                    typeof prefs !== "object" ||
+                    prefs === null ||
+                    Array.isArray(prefs)
+                ) {
                     throw new Error("Invalid preferences format");
                 }
 
                 // Validate theme
-                if (["light", "sepia", "dark"].includes(prefs.theme)) {
+                if (THEMES.includes(prefs.theme)) {
                     this.theme = prefs.theme;
                 }
 
                 // Validate font
-                if (["sans", "serif", "mono"].includes(prefs.font)) {
+                if (FONTS.includes(prefs.font)) {
                     this.font = prefs.font;
                 }
 
                 // Validate fontSize
                 if (
                     typeof prefs.fontSize === "number" &&
-                    prefs.fontSize >= 70 &&
-                    prefs.fontSize <= 200
+                    Number.isFinite(prefs.fontSize) &&
+                    prefs.fontSize >= LIMITS.fontSize.min &&
+                    prefs.fontSize <= LIMITS.fontSize.max
                 ) {
-                    this.fontSize = prefs.fontSize;
+                    this.fontSize = Math.round(prefs.fontSize);
                 }
 
                 // Validate maxWidth
                 if (
                     typeof prefs.maxWidth === "number" &&
-                    prefs.maxWidth >= 30 &&
-                    prefs.maxWidth <= 100
+                    Number.isFinite(prefs.maxWidth) &&
+                    prefs.maxWidth >= LIMITS.maxWidth.min &&
+                    prefs.maxWidth <= LIMITS.maxWidth.max
                 ) {
-                    this.maxWidth = prefs.maxWidth;
+                    this.maxWidth = Math.round(prefs.maxWidth);
                 }
             } catch (e) {
                 console.error(
@@ -109,10 +123,16 @@ Alpine.store("reader", {
     },
 
     increaseFontSize() {
-        this.fontSize = Math.min(200, this.fontSize + 10);
+        this.fontSize = Math.min(
+            LIMITS.fontSize.max,
+            this.fontSize + LIMITS.fontSize.step
+        );
     },
 
     decreaseFontSize() {
-        this.fontSize = Math.max(70, this.fontSize - 10);
+        this.fontSize = Math.max(
+            LIMITS.fontSize.min,
+            this.fontSize - LIMITS.fontSize.step
+        );
     },
 } as ReaderStore);
