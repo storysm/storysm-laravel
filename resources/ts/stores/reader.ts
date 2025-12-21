@@ -33,37 +33,33 @@ Alpine.store("reader", {
     maxWidth: DEFAULTS.maxWidth,
     fullscreen: false,
 
-    // Computed properties for class bindings
-
     init() {
         const saved = localStorage.getItem(STORAGE_KEY);
         if (saved) {
             try {
                 const prefs = JSON.parse(saved);
 
+                if (typeof prefs !== "object" || prefs === null) {
+                    throw new Error("Invalid preferences format");
+                }
+
                 // Validate theme
                 if (["light", "sepia", "dark"].includes(prefs.theme)) {
                     this.theme = prefs.theme;
-                } else {
-                    this.theme = DEFAULTS.theme;
                 }
 
                 // Validate font
                 if (["sans", "serif", "mono"].includes(prefs.font)) {
                     this.font = prefs.font;
-                } else {
-                    this.font = DEFAULTS.font;
                 }
 
                 // Validate fontSize
                 if (
                     typeof prefs.fontSize === "number" &&
-                    prefs.fontSize >= 50 &&
+                    prefs.fontSize >= 70 &&
                     prefs.fontSize <= 200
                 ) {
                     this.fontSize = prefs.fontSize;
-                } else {
-                    this.fontSize = DEFAULTS.fontSize;
                 }
 
                 // Validate maxWidth
@@ -73,16 +69,12 @@ Alpine.store("reader", {
                     prefs.maxWidth <= 100
                 ) {
                     this.maxWidth = prefs.maxWidth;
-                } else {
-                    this.maxWidth = DEFAULTS.maxWidth;
                 }
             } catch (e) {
                 console.error(
                     "Failed to parse reader preferences from localStorage:",
                     e
                 );
-                // Fallback to defaults if parsing fails
-                this.resetToDefaults();
             }
         }
 
