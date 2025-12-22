@@ -11,6 +11,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -50,7 +51,36 @@ class ViewStory extends Component implements HasActions, HasForms
         }
 
         $this->story = $story;
-        $this->story->incrementViewCount();
+
+        if ($this->shouldIncrementViewCount()) {
+            $this->story->incrementViewCount();
+        }
+    }
+
+    /**
+     * Determine if the view count should be incremented based on user permissions and authorship.
+     */
+    protected function shouldIncrementViewCount(): bool
+    {
+        $user = Auth::user();
+
+        if (! $user) {
+            return true;
+        }
+
+        if ($user->is($this->story->creator)) {
+            return false;
+        }
+
+        if ($user->can('act_as_guest')) {
+            return false;
+        }
+
+        if ($user->can('view_all_story')) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
