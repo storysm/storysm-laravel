@@ -334,4 +334,61 @@ class ViewStoryTest extends TestCase
         Livewire::test(ViewStory::class, ['story' => $storyHighViews])
             ->assertSeeHtml('<p class="text-sm">'.$storyHighViews->formattedViewCount().'</p>');
     }
+
+    public function test_increments_view_count_for_guest_visitors(): void
+    {
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(1, $story->fresh()?->view_count);
+    }
+
+    public function test_does_not_increment_view_count_for_the_author(): void
+    {
+        $author = User::factory()->create();
+        $story = Story::factory()->ensurePublished()->create(['creator_id' => $author->id, 'view_count' => 0]);
+
+        $this->actingAs($author);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(0, $story->fresh()?->view_count);
+    }
+
+    public function test_does_not_increment_view_count_for_users_with_act_as_guest_permission(): void
+    {
+        $privilegedUser = User::factory()->create();
+        Permission::create(['name' => 'act_as_guest']);
+        $privilegedUser->givePermissionTo('act_as_guest');
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        $this->actingAs($privilegedUser);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(0, $story->fresh()?->view_count);
+    }
+
+    public function test_does_not_increment_view_count_for_users_with_view_all_story_permission(): void
+    {
+        $admin = User::factory()->create();
+        Permission::create(['name' => 'view_all_story']);
+        $admin->givePermissionTo('view_all_story');
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        $this->actingAs($admin);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(0, $story->fresh()?->view_count);
+    }
+
+    public function test_increments_view_count_for_regular_authenticated_users(): void
+    {
+        $user = User::factory()->create();
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        $this->actingAs($user);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(1, $story->fresh()?->view_count);
+    }
 }
