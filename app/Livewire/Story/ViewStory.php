@@ -5,7 +5,7 @@ namespace App\Livewire\Story;
 use App\Facades\AgeVerification;
 use App\Filament\Resources\StoryResource;
 use App\Models\Story;
-use App\Scopes\GuestStoryFilterScope;
+use App\Scopes\StoryFilterScope;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -29,8 +29,8 @@ class ViewStory extends Component implements HasActions, HasForms
 
     public function mount(Story $story): void
     {
-        // Load story without the GuestStoryFilterScope to prevent 404s on restricted stories
-        $this->story = Story::withoutGlobalScope(GuestStoryFilterScope::class)
+        // Load story without the StoryFilterScope to prevent 404s on restricted stories
+        $this->story = Story::withoutGlobalScope(StoryFilterScope::class)
             ->where('id', $story->id)
             ->firstOrFail();
 
