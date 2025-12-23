@@ -41,22 +41,22 @@ class ViewStory extends Component implements HasActions, HasForms
             abort(404);
         }
 
-        // Check if age is set in the service
-        if (! AgeVerification::hasAgeSet()) {
-            // Age not set, show age gate
-            $this->isAgeVerified = false;
+        $ageLimit = config('age_rating.limit_years', 16);
+        if ($this->story->age_rating_effective_value < $ageLimit) {
+            $this->isAgeVerified = true;
         } else {
-            // Age is set, check if user is old enough
-            $userAge = AgeVerification::getAge();
-            $storyAgeRating = $this->story->age_rating_effective_value;
-
-            if ($userAge < $storyAgeRating) {
-                // User is too young, redirect to forbidden page
-                redirect()->route('content.forbidden');
-
-                return;
+            if (! AgeVerification::hasAgeSet()) {
+                $this->isAgeVerified = false;
             } else {
-                // User is old enough, allow access
+                $userAge = AgeVerification::getAge();
+                $storyAgeRating = $this->story->age_rating_effective_value;
+
+                if ($userAge < $storyAgeRating) {
+                    redirect()->route('content.forbidden');
+
+                    return;
+                }
+
                 $this->isAgeVerified = true;
             }
         }
