@@ -1,5 +1,8 @@
 <div>
     <x-container>
-        {{ $this->table }}
+        <div class="flex flex-col gap-4">
+            <livewire:age-restricted-notification />
+            {{ $this->table }}
+        </div>
     </x-container>
 </div>
