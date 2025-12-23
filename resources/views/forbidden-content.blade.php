@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-header>
-        {{ __('forbidden-content.title') }}
+        {{ __('forbidden.title') }}
     </x-header>
 
     <x-container>
@@ -14,14 +14,14 @@
                             class="w-10 h-10 text-primary-600 dark:text-primary-400" />
                     </div>
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-4">
-                        {{ __('forbidden-content.heading') }}
+                        {{ __('forbidden.heading') }}
                     </h1>
                     <p class="text-lg text-gray-600 dark:text-gray-400 mb-6">
-                        {{ __('forbidden-content.message') }}
+                        {{ __('forbidden.message') }}
                     </p>
                     <x-filament::button :href="url('/')" tag="a" wire:navigate icon="heroicon-o-home"
                         class="no-underline">
-                        <span>{{ __('forbidden-content.return_home') }}</span>
+                        <span>{{ __('forbidden.return_home') }}</span>
                     </x-filament::button>
                 </div>
             </div>
