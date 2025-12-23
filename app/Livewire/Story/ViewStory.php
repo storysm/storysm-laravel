@@ -81,9 +81,9 @@ class ViewStory extends Component implements HasActions, HasForms
             SEOTools::jsonLd()->addImage($coverImageUrl);
         }
 
-        // Increment view count if allowed
-        if (Gate::allows('incrementViewCount', $this->story)) {
-            $this->story->incrementViewCount();
+        // Increment view count if already age verified and allowed
+        if ($this->isAgeVerified) {
+            $this->incrementViewCount();
         }
     }
 
@@ -125,6 +125,16 @@ class ViewStory extends Component implements HasActions, HasForms
     public function handleAgeVerified(): void
     {
         $this->isAgeVerified = true;
+
+        // Increment view count when age is verified
+        $this->incrementViewCount();
+    }
+
+    protected function incrementViewCount(): void
+    {
+        if (Gate::allows('incrementViewCount', $this->story)) {
+            $this->story->incrementViewCount();
+        }
     }
 
     public function render(): View
