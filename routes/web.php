@@ -51,6 +51,10 @@ if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
 
 Route::get('/restricted', ForbiddenContentController::class)->name('content.forbidden');
 
+Route::get('/age-not-allowed', fn () =>
+    view('age-not-allowed')
+)->name('age.not-allowed');
+
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
 Route::fallback(function () {
