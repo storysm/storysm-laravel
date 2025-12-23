@@ -25,14 +25,6 @@ class ViewStory extends Component implements HasActions, HasForms
 
     public Story $story;
 
-    public ?int $dob_day = null;
-
-    public ?int $dob_month = null;
-
-    public ?int $dob_year = null;
-
-    public bool $remember_me = false;
-
     public bool $isAgeVerified = false;
 
     public function mount(Story $story): void
@@ -129,54 +121,10 @@ class ViewStory extends Component implements HasActions, HasForms
         $this->story->refresh();
     }
 
-    /**
-     * Verify the user's age and handle age gate bypass
-     */
-    public function verifyAge(): void
+    #[On('ageVerified')]
+    public function handleAgeVerified(): void
     {
-        $this->validate([
-            'dob_day' => ['required', 'integer', 'min:1', 'max:31'],
-            'dob_month' => ['required', 'integer', 'min:1', 'max:12'],
-            'dob_year' => ['required', 'integer', 'min:1900', 'max:'.date('Y')],
-            'remember_me' => ['boolean'],
-        ]);
-
-        // Validate that the date is valid
-        $dateString = sprintf('%04d-%02d-%02d', $this->dob_year, $this->dob_month, $this->dob_day);
-
-        try {
-            $date = new \DateTime($dateString);
-            $now = new \DateTime;
-
-            if ($date > $now) {
-                $this->addError('dob_year', 'Date of birth cannot be in the future.');
-
-                return;
-            }
-        } catch (\Exception $e) {
-            $this->addError('dob_day', 'Invalid date provided.');
-
-            return;
-        }
-
-        // Calculate age using the service
-        $age = AgeVerification::calculateAge($dateString);
-
-        // Store the age using the service
-        AgeVerification::setAge($age, $this->remember_me);
-
-        // Re-run the age comparison check
-        $storyAgeRating = $this->story->age_rating_effective_value;
-
-        if ($age < $storyAgeRating) {
-            // User is too young, redirect to forbidden page
-            redirect()->route('content.forbidden');
-
-            return;
-        } else {
-            // User is old enough, allow access
-            $this->isAgeVerified = true;
-        }
+        $this->isAgeVerified = true;
     }
 
     public function render(): View
