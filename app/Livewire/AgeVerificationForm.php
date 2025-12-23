@@ -90,8 +90,14 @@ class AgeVerificationForm extends Component implements HasForms
         // Calculate age using the service
         $age = AgeVerification::calculateAge($dateString);
 
-        // Store the age using the service
-        AgeVerification::setAge($age, $data['remember_me'] ?? false);
+        // Set age in session/cookie (will throw DomainException if age < 13)
+        try {
+            AgeVerification::setAge($age, $data['remember_me'] ?? false);
+        } catch (\DomainException $e) { // @phpstan-ignore-line
+            redirect()->route('age.not-allowed');
+
+            return;
+        }
 
         if ($age < $this->requiredAge) {
             // User is too young, redirect to forbidden page
