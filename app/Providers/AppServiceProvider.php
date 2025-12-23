@@ -8,6 +8,7 @@ use App\Filament\Components\Modals\CuratorPanel;
 use App\Models\Export;
 use App\Models\FailedImportRow;
 use App\Models\Import;
+use App\Services\AgeVerificationService;
 use App\Services\AhcJwtService;
 use App\Services\DeviceService;
 use Exception;
@@ -32,6 +33,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register(): void
     {
+        $this->app->singleton(AgeVerificationService::class, function ($app) {
+            return new AgeVerificationService;
+        });
         $this->app->singleton(DeviceService::class, function ($app) {
             return new DeviceService;
         });
@@ -73,5 +77,17 @@ class AppServiceProvider extends ServiceProvider
             throw new Exception('Supported locales are null.');
         }
         FilamentTranslateField::defaultLocales($locales);
+
+        $this->registerFacades();
+    }
+
+    protected function registerFacades(): void
+    {
+        /** @var array<string, string> $facades */
+        $facades = config('facade.aliases', []);
+
+        foreach ($facades as $alias => $class) {
+            $this->app->alias($alias, $class);
+        }
     }
 }
