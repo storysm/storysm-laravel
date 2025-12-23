@@ -102,7 +102,7 @@
             <x-story.reader-controls :story="$story" />
         @else
             <div class="py-12 flex justify-center">
-                <livewire:age-verification-form :requiredAge="$story->age_rating_effective_value" />
+                <livewire:age-verification-form :requiredAge="$story->age_rating_effective_value ?? 18" />
             </div>
         @endif
     </x-container>
