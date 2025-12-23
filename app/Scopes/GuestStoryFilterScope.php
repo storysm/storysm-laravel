@@ -6,7 +6,6 @@ use App\Facades\AgeVerification;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
-use Illuminate\Support\Facades\Auth;
 
 class GuestStoryFilterScope implements Scope
 {
@@ -17,14 +16,12 @@ class GuestStoryFilterScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        if (Auth::guest()) {
-            // If age is not set, return early (show all stories)
-            if (! AgeVerification::hasAgeSet()) {
-                return;
-            }
-
-            // If age is set, filter by age rating
-            $builder->where('age_rating_effective_value', '<=', AgeVerification::getAge());
+        // If age is not set, return early (show all stories)
+        if (! AgeVerification::hasAgeSet()) {
+            return;
         }
+
+        // If age is set, filter by age rating
+        $builder->where('age_rating_effective_value', '<=', AgeVerification::getAge());
     }
 }
