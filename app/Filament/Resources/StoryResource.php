@@ -116,7 +116,18 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ->preload()
                                 ->searchable()
                                 ->label(trans_choice('age_rating.resource.model_label', 2))
-                                ->hidden(! static::canViewAll()),
+                                ->hidden(! static::canViewAll())
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    if (empty($state)) {
+                                        $set('age_rating_effective_value', null);
+
+                                        return;
+                                    }
+                                    $maxAge = \App\Models\AgeRating::whereIn('id', $state)->max('age_representation');
+                                    $set('age_rating_effective_value', $maxAge);
+                                }),
+
+                            Forms\Components\Hidden::make('age_rating_effective_value'),
                         ]),
                         Creator::getComponent(static::canViewAll()),
                     ])->columnSpan([
@@ -199,6 +210,7 @@ class StoryResource extends Resource implements HasShieldPermissions
                         if ($record->age_rating_effective_value === null) {
                             return '';
                         }
+
                         return "{$record->age_rating_effective_value}+";
                     }),
                 Tables\Columns\TextColumn::make('upvote_count')
