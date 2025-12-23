@@ -42,14 +42,15 @@ class ViewStory extends Component implements HasActions, HasForms
         }
 
         $ageLimit = config('age_rating.limit_years', 16);
-        if ($this->story->age_rating_effective_value < $ageLimit) {
-            $this->isAgeVerified = true;
-        } else {
+        $storyRating = $this->story->age_rating_effective_value;
+
+        // Treat null ratings as requiring age verification
+        if ($storyRating === null || $storyRating >= $ageLimit) {
             if (! AgeVerification::hasAgeSet()) {
                 $this->isAgeVerified = false;
             } else {
                 $userAge = AgeVerification::getAge();
-                $storyAgeRating = $this->story->age_rating_effective_value;
+                $storyAgeRating = $storyRating ?? 18; // Default to high value if null
 
                 if ($userAge < $storyAgeRating) {
                     redirect()->route('content.forbidden');
@@ -59,6 +60,8 @@ class ViewStory extends Component implements HasActions, HasForms
 
                 $this->isAgeVerified = true;
             }
+        } else {
+            $this->isAgeVerified = true;
         }
 
         // Set up SEO metadata
