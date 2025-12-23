@@ -11,6 +11,7 @@ class AgeRestrictedNotification extends Component
     public function resetAge(): void
     {
         AgeVerification::clearAge();
+        $this->dispatch('resetAge');
     }
 
     /**

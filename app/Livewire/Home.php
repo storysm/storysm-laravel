@@ -22,6 +22,15 @@ class Home extends Component implements HasForms, HasTable
     use InteractsWithForms;
     use InteractsWithTable;
 
+    /**
+     * The component's listeners.
+     *
+     * @var array<string, string>
+     */
+    protected $listeners = [
+        'resetAge' => '$refresh',
+    ];
+
     public function table(Table $table): Table
     {
         $table = $this->getStoryTable($table);
