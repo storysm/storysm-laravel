@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Story;
 
+use App\Facades\AgeVerification;
 use App\Filament\Resources\StoryResource;
 use App\Models\Story;
+use App\Scopes\GuestStoryFilterScope;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Filament\Actions\Action;
 use Filament\Actions\Concerns\InteractsWithActions;
@@ -23,35 +25,71 @@ class ViewStory extends Component implements HasActions, HasForms
 
     public Story $story;
 
+    public ?int $dob_day = null;
+
+    public ?int $dob_month = null;
+
+    public ?int $dob_year = null;
+
+    public bool $remember_me = false;
+
+    public bool $isAgeVerified = false;
+
     public function mount(Story $story): void
     {
+        // Load story without the GuestStoryFilterScope to prevent 404s on restricted stories
+        $this->story = Story::withoutGlobalScope(GuestStoryFilterScope::class)
+            ->where('id', $story->id)
+            ->firstOrFail();
+
+        // Check if user is authorized to view the story
         try {
-            $this->authorize('viewPublic', $story);
+            $this->authorize('viewPublic', $this->story);
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
             abort(404);
         }
 
-        $description = Str::limit(strip_tags($story->content), 160);
+        // Check if age is set in the service
+        if (! AgeVerification::hasAgeSet()) {
+            // Age not set, show age gate
+            $this->isAgeVerified = false;
+        } else {
+            // Age is set, check if user is old enough
+            $userAge = AgeVerification::getAge();
+            $storyAgeRating = $this->story->age_rating_effective_value;
 
-        SEOTools::setTitle($story->title);
+            if ($userAge < $storyAgeRating) {
+                // User is too young, redirect to forbidden page
+                redirect()->route('content.forbidden');
+
+                return;
+            } else {
+                // User is old enough, allow access
+                $this->isAgeVerified = true;
+            }
+        }
+
+        // Set up SEO metadata
+        $description = Str::limit(strip_tags($this->story->content), 160);
+
+        SEOTools::setTitle($this->story->title);
         SEOTools::setDescription($description);
-        SEOTools::opengraph()->setTitle($story->title);
+        SEOTools::opengraph()->setTitle($this->story->title);
         SEOTools::opengraph()->setDescription($description);
-        SEOTools::twitter()->setTitle($story->title);
+        SEOTools::twitter()->setTitle($this->story->title);
         SEOTools::twitter()->setDescription($description);
-        SEOTools::jsonLd()->setTitle($story->title);
+        SEOTools::jsonLd()->setTitle($this->story->title);
         SEOTools::jsonLd()->setDescription($description);
         SEOTools::jsonLd()->setType('Article');
 
-        $coverImageUrl = $story->coverMedia?->url;
+        $coverImageUrl = $this->story->coverMedia?->url;
         if ($coverImageUrl) {
             SEOTools::opengraph()->addImage($coverImageUrl);
             SEOTools::twitter()->addImage($coverImageUrl);
             SEOTools::jsonLd()->addImage($coverImageUrl);
         }
 
-        $this->story = $story;
-
+        // Increment view count if allowed
         if (Gate::allows('incrementViewCount', $this->story)) {
             $this->story->incrementViewCount();
         }
@@ -89,6 +127,56 @@ class ViewStory extends Component implements HasActions, HasForms
     public function refreshStory(): void
     {
         $this->story->refresh();
+    }
+
+    /**
+     * Verify the user's age and handle age gate bypass
+     */
+    public function verifyAge(): void
+    {
+        $this->validate([
+            'dob_day' => ['required', 'integer', 'min:1', 'max:31'],
+            'dob_month' => ['required', 'integer', 'min:1', 'max:12'],
+            'dob_year' => ['required', 'integer', 'min:1900', 'max:'.date('Y')],
+            'remember_me' => ['boolean'],
+        ]);
+
+        // Validate that the date is valid
+        $dateString = sprintf('%04d-%02d-%02d', $this->dob_year, $this->dob_month, $this->dob_day);
+
+        try {
+            $date = new \DateTime($dateString);
+            $now = new \DateTime;
+
+            if ($date > $now) {
+                $this->addError('dob_year', 'Date of birth cannot be in the future.');
+
+                return;
+            }
+        } catch (\Exception $e) {
+            $this->addError('dob_day', 'Invalid date provided.');
+
+            return;
+        }
+
+        // Calculate age using the service
+        $age = AgeVerification::calculateAge($dateString);
+
+        // Store the age using the service
+        AgeVerification::setAge($age, $this->remember_me);
+
+        // Re-run the age comparison check
+        $storyAgeRating = $this->story->age_rating_effective_value;
+
+        if ($age < $storyAgeRating) {
+            // User is too young, redirect to forbidden page
+            redirect()->route('content.forbidden');
+
+            return;
+        } else {
+            // User is old enough, allow access
+            $this->isAgeVerified = true;
+        }
     }
 
     public function render(): View
