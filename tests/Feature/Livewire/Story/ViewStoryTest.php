@@ -10,7 +10,7 @@ use App\Models\Permission;
 use App\Models\Story;
 use App\Models\StoryComment;
 use App\Models\User;
-use App\Scopes\GuestStoryFilterScope;
+use App\Scopes\StoryFilterScope;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -499,7 +499,7 @@ class ViewStoryTest extends TestCase
     {
         Story::factory()->ensurePublished()->count(3)->ensureHasAgeRating(18)->create();
 
-        $count = Story::withGlobalScope('guest_filter', new GuestStoryFilterScope)->count();
+        $count = Story::withGlobalScope('filter', new StoryFilterScope)->count();
         $this->assertEquals(3, $count);
     }
 
@@ -513,7 +513,7 @@ class ViewStoryTest extends TestCase
         // Forbidden
         Story::factory()->ensurePublished()->ensureHasAgeRating(18)->create();
 
-        $stories = Story::withGlobalScope('guest_filter', new GuestStoryFilterScope)->get();
+        $stories = Story::withGlobalScope('filter', new StoryFilterScope)->get();
 
         $this->assertCount(1, $stories);
         $this->assertEquals(12, $stories->first()?->age_rating_effective_value);
