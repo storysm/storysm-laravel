@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\Page\Status;
+use App\Http\Controllers\ForbiddenContentController;
 use App\Http\Controllers\SitemapController;
 use App\Livewire\Home;
 use App\Models\Page;
@@ -47,6 +48,8 @@ if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
         return view('privacy-policy', ['record' => $record]);
     })->name('policy.show');
 }
+
+Route::get('/restricted', ForbiddenContentController::class)->name('content.forbidden');
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
