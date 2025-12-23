@@ -12,6 +12,7 @@ use App\Models\User;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -333,5 +334,122 @@ class ViewStoryTest extends TestCase
 
         Livewire::test(ViewStory::class, ['story' => $storyHighViews])
             ->assertSeeHtml('<p class="text-sm">'.$storyHighViews->formattedViewCount().'</p>');
+    }
+
+    public function test_increments_view_count_for_guest_visitors(): void
+    {
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(1, $story->fresh()?->view_count);
+    }
+
+    public function test_does_not_increment_view_count_for_the_author(): void
+    {
+        $author = User::factory()->create();
+        $story = Story::factory()->ensurePublished()->create(['creator_id' => $author->id, 'view_count' => 0]);
+
+        $this->actingAs($author);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(0, $story->fresh()?->view_count);
+    }
+
+    public function test_does_not_increment_view_count_for_users_with_act_as_guest_permission(): void
+    {
+        $privilegedUser = User::factory()->create();
+        Permission::create(['name' => 'act_as_guest']);
+        $privilegedUser->givePermissionTo('act_as_guest');
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        $this->actingAs($privilegedUser);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(0, $story->fresh()?->view_count);
+    }
+
+    public function test_does_not_increment_view_count_for_users_with_view_all_story_permission(): void
+    {
+        $admin = User::factory()->create();
+        Permission::create(['name' => 'view_all_story']);
+        $admin->givePermissionTo('view_all_story');
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        $this->actingAs($admin);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(0, $story->fresh()?->view_count);
+    }
+
+    public function test_increments_view_count_for_regular_authenticated_users(): void
+    {
+        $user = User::factory()->create();
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+
+        $this->actingAs($user);
+        Livewire::test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(1, $story->fresh()?->view_count);
+    }
+
+    public function test_view_count_session_persistence_and_multi_role_logic(): void
+    {
+        // Setup a user who is both the creator and has admin permissions
+        $adminCreator = User::factory()->create();
+        Permission::firstOrCreate(['name' => 'view_all_story']);
+        $adminCreator->givePermissionTo('view_all_story');
+
+        $story = Story::factory()->ensurePublished()->create([
+            'creator_id' => $adminCreator->id,
+            'view_count' => 0,
+        ]);
+
+        // Multi-role check: Creator + Admin should not increment
+        Livewire::actingAs($adminCreator)
+            ->test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(0, $story->fresh()?->view_count);
+
+        // Session Persistence check for regular user
+        $user = User::factory()->create();
+        Livewire::actingAs($user)
+            ->test(ViewStory::class, ['story' => $story]);
+
+        $this->assertEquals(1, $story->fresh()?->view_count);
+
+        // Verify session structure: [id => timestamp]
+        /** @var array<int, mixed> $viewedStories */
+        $viewedStories = session()->get('viewed_stories');
+        $this->assertArrayHasKey($story->id, $viewedStories);
+        $this->assertIsInt($viewedStories[$story->id]);
+    }
+
+    public function test_view_count_throttle_integration_with_time_travel(): void
+    {
+        $user = User::factory()->create();
+        $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
+        $startTime = Carbon::now()->startOfMinute();
+
+        Carbon::setTestNow($startTime);
+
+        // First view at T+0s: Increment to 1
+        Livewire::actingAs($user)
+            ->test(ViewStory::class, ['story' => $story]);
+        $this->assertEquals(1, $story->fresh()?->view_count);
+
+        // Second view at T+30s: Should NOT increment
+        Carbon::setTestNow($startTime->copy()->addSeconds(30));
+        Livewire::actingAs($user)
+            ->test(ViewStory::class, ['story' => $story]);
+        $this->assertEquals(1, $story->fresh()?->view_count);
+
+        // Third view at T+61s: Should increment to 2
+        Carbon::setTestNow($startTime->copy()->addSeconds(61));
+        Livewire::actingAs($user)
+            ->test(ViewStory::class, ['story' => $story]);
+        $this->assertEquals(2, $story->fresh()?->view_count);
+
+        Carbon::setTestNow(); // Reset mock time
     }
 }

@@ -66,4 +66,31 @@ class StoryPolicy
 
         return true;
     }
+
+    /**
+     * Determine whether the user can trigger a view count increment.
+     */
+    public function incrementViewCount(?User $user, Story $story): bool
+    {
+        // Guests (unauthenticated) always trigger an increment
+        if (! $user) {
+            return true;
+        }
+
+        // The creator of the story never triggers an increment
+        if ($user->is($story->creator)) {
+            return false;
+        }
+
+        // Users with specific "silent" permissions never trigger an increment
+        if ($user->can('act_as_guest')) {
+            return false;
+        }
+
+        if ($user->can('view_all_story')) {
+            return false;
+        }
+
+        return true;
+    }
 }

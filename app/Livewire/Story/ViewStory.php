@@ -11,6 +11,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;
 use Filament\Forms\Contracts\HasForms;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\Component;
@@ -50,7 +51,10 @@ class ViewStory extends Component implements HasActions, HasForms
         }
 
         $this->story = $story;
-        $this->story->incrementViewCount();
+
+        if (Gate::allows('incrementViewCount', $this->story)) {
+            $this->story->incrementViewCount();
+        }
     }
 
     /**
