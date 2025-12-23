@@ -69,7 +69,19 @@ class AgeVerificationForm extends Component implements HasForms
         /** @var array{dob_day: string, dob_month: string, dob_year: string, remember_me: ?bool} $data */
         $data = $this->form->getState();
 
-        $dateString = sprintf('%04d-%02d-%02d', $data['dob_year'], $data['dob_month'], $data['dob_day']);
+        // First, validate the date components are within reasonable ranges
+        $day = (int) $data['dob_day'];
+        $month = (int) $data['dob_month'];
+        $year = (int) $data['dob_year'];
+
+        // Basic validation for impossible dates
+        if (! checkdate($month, $day, $year)) {
+            $this->addError('data.dob_day', __('Invalid date provided.'));
+
+            return;
+        }
+
+        $dateString = sprintf('%04d-%02d-%02d', $year, $month, $day);
 
         try {
             $date = new \DateTime($dateString);
@@ -77,12 +89,12 @@ class AgeVerificationForm extends Component implements HasForms
 
             if ($date > $now) {
                 // Using addError on the form state path
-                $this->addError('data.dob_year', 'Date of birth cannot be in the future.');
+                $this->addError('data.dob_year', __('Date of birth cannot be in the future.'));
 
                 return;
             }
         } catch (\Exception $e) {
-            $this->addError('data.dob_day', 'Invalid date provided.');
+            $this->addError('data.dob_day', __('Invalid date provided.'));
 
             return;
         }
