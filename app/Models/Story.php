@@ -98,6 +98,18 @@ class Story extends Model
         return $this->belongsToMany(AgeRating::class, 'age_rating_story');
     }
 
+    /**
+     * Sync age ratings and refresh the effective age rating value.
+     *
+     * @param  array<int>  $ratingIds
+     */
+    public function syncAgeRatings(array $ratingIds): void
+    {
+        $this->ageRatings()->sync($ratingIds);
+        $this->refreshEffectiveAgeRating();
+        $this->save();
+    }
+
     public function refreshEffectiveAgeRating(): void
     {
         // Load age ratings if not already loaded, or if the relationship might have changed
