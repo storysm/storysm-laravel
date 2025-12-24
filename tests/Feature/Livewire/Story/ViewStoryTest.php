@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Livewire\Story;
 
+use App\Constants\Permissions;
 use App\Enums\Story\Status;
 use App\Facades\AgeVerification;
 use App\Livewire\Story\ViewStory;
@@ -30,6 +31,7 @@ class ViewStoryTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
+        AgeVerification::setAge(18);
     }
 
     public function test_view_story_component_renders_with_story(): void
@@ -364,8 +366,8 @@ class ViewStoryTest extends TestCase
     public function test_does_not_increment_view_count_for_users_with_act_as_guest_permission(): void
     {
         $privilegedUser = User::factory()->create();
-        Permission::create(['name' => 'act_as_guest']);
-        $privilegedUser->givePermissionTo('act_as_guest');
+        Permission::create(['name' => Permissions::ACT_AS_GUEST_USER]);
+        $privilegedUser->givePermissionTo(Permissions::ACT_AS_GUEST_USER);
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
 
         $this->actingAs($privilegedUser);
@@ -460,6 +462,8 @@ class ViewStoryTest extends TestCase
 
     public function test_guest_without_age_sees_age_gate(): void
     {
+        AgeVerification::clearAge();
+
         $story = Story::factory()->ensurePublished()->ensureHasAgeRating(18)->create();
 
         $component = Livewire::test(ViewStory::class, ['story' => $story]);
