@@ -107,25 +107,25 @@ class Story extends Model
     {
         $this->ageRatings()->sync($ratingIds);
 
-        // We only call save(); the StoryObserver @saving will
-        // handle the refreshEffectiveAgeRating() call.
-        $this->save();
+        if ($this->refreshEffectiveAgeRating()) {
+            // Use saveQuietly to avoid re-triggering the saving/saved observer events
+            $this->saveQuietly();
+        }
     }
 
-    public function refreshEffectiveAgeRating(): void
+    public function refreshEffectiveAgeRating(): bool
     {
-        // Only load the relationship if it's missing or empty to ensure we have the data
-        if (! $this->relationLoaded('ageRatings')) {
-            $this->load('ageRatings');
-        }
-
         /** @var ?int */
-        $maxAgeRepresentation = $this->ageRatings->max('age_representation');
+        $maxAgeRepresentation = $this->ageRatings()->max('age_representation');
 
         // Only set the attribute if it differs from the current value
         if ($this->age_rating_effective_value !== $maxAgeRepresentation) {
             $this->age_rating_effective_value = $maxAgeRepresentation;
+
+            return true;
         }
+
+        return false;
     }
 
     /**
