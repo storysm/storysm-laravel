@@ -6,7 +6,6 @@ use App\Models\Story;
 use App\Scopes\StoryFilterScope;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Auth;
 
 trait HasStoryTable
 {
@@ -15,11 +14,7 @@ trait HasStoryTable
      */
     protected function getStoryTable(Table $table): Table
     {
-        $query = Story::published();
-
-        if (Auth::guest()) {
-            $query->withGlobalScope('filter', new StoryFilterScope);
-        }
+        $query = Story::published()->withGlobalScope('filter', new StoryFilterScope);
 
         return $table
             ->query($query)
