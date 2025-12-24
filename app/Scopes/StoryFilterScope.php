@@ -16,7 +16,8 @@ class StoryFilterScope implements Scope
      */
     public function apply(Builder $builder, Model $model)
     {
-        // If age is not set, return early (show all stories)
+        // Show all stories if age is not set. Access to restricted content
+        // will trigger a verification prompt at the point of access.
         if (! AgeVerification::hasAgeSet()) {
             return;
         }
