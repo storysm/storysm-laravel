@@ -77,4 +77,21 @@ class AgeVerificationServiceTest extends TestCase
         $this->assertFalse($this->ageService->hasAgeSet());
         $this->assertNull($this->ageService->getAge());
     }
+
+    public function test_calculate_age_boundary_today(): void
+    {
+        $service = app(AgeVerificationService::class);
+        $dob = now()->subYears(18)->format('Y-m-d');
+
+        $this->assertEquals(18, $service->calculateAge($dob));
+    }
+
+    public function test_calculate_age_boundary_tomorrow(): void
+    {
+        $service = app(AgeVerificationService::class);
+        // Birthday is tomorrow, should still be 17
+        $dob = now()->subYears(18)->addDay()->format('Y-m-d');
+
+        $this->assertEquals(17, $service->calculateAge($dob));
+    }
 }
