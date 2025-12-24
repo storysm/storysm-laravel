@@ -22,9 +22,10 @@ return [
     |--------------------------------------------------------------------------
     |
     | This value determines the number of minutes that the 'user_age' cookie
-    | should be valid for. By default, this is set to 30 days.
+    | should be valid for. By default, this is set to 30 days. Override this
+    | via the AGE_RATING_COOKIE_DURATION environment variable.
     |
     */
 
-    'cookie_duration_minutes' => 60 * 24 * 30, // 30 days
+    'cookie_duration_minutes' => env('AGE_RATING_COOKIE_DURATION', 60 * 24 * 30),
 ];
