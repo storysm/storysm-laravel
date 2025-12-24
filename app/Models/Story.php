@@ -101,7 +101,7 @@ class Story extends Model
     /**
      * Sync age ratings and refresh the effective age rating value.
      *
-     * @param  array<int>  $ratingIds
+     * @param  array<string>  $ratingIds
      */
     public function syncAgeRatings(array $ratingIds): void
     {
@@ -112,9 +112,10 @@ class Story extends Model
 
     public function refreshEffectiveAgeRating(): void
     {
-        // Load age ratings if not already loaded, or if the relationship might have changed
-        // This ensures we have the latest ratings, especially if they were just synced.
-        $this->load('ageRatings');
+        // Only load the relationship if it's missing or empty to ensure we have the data
+        if (! $this->relationLoaded('ageRatings')) {
+            $this->load('ageRatings');
+        }
 
         /** @var ?int */
         $maxAgeRepresentation = $this->ageRatings->max('age_representation');
