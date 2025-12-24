@@ -16,7 +16,8 @@ class AgeVerificationService
         /** @var string $timezone */
         $timezone = config('app.timezone');
 
-        return Carbon::parse($dob, $timezone)->age;
+        // Use startOfDay to ensure consistent age calculation regardless of the current time
+        return Carbon::parse($dob, $timezone)->startOfDay()->age;
     }
 
     public function setAge(int $age, bool $remember = false): void

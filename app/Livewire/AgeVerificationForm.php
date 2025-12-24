@@ -50,30 +50,11 @@ class AgeVerificationForm extends Component implements HasForms
 
     public function verify(): void
     {
-        /** @var array{dob: ?string, remember_me: ?bool} $data */
+        /** @var array{dob: string, remember_me: ?bool} $data */
         $data = $this->form->getState();
 
-        if (! $data['dob']) {
-            return; // Required validation already handled by DatePicker
-        }
-
-        $dateString = $data['dob']; // Already in 'Y-m-d' format
-
-        try {
-            $date = new \DateTime($dateString);
-            $now = new \DateTime;
-            if ($date > $now) {
-                $this->addError('data.dob', __('Date of birth cannot be in the future.'));
-
-                return;
-            }
-        } catch (\Exception $e) {
-            $this->addError('data.dob', __('Invalid date provided.'));
-
-            return;
-        }
-
-        $age = AgeVerification::calculateAge($dateString);
+        // The DatePicker already ensures 'dob' is a valid date string and not in the future.
+        $age = AgeVerification::calculateAge($data['dob']);
 
         try {
             AgeVerification::setAge($age, $data['remember_me'] ?? false);
