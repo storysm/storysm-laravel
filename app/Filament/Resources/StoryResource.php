@@ -186,7 +186,8 @@ class StoryResource extends Resource implements HasShieldPermissions
 
     public static function afterSave(Story $record): void
     {
-        $record->refreshEffectiveAgeRating();
+        // This triggers StoryObserver::saving() which performs
+        // the refreshEffectiveAgeRating() call.
         $record->save();
     }
 

@@ -106,7 +106,9 @@ class Story extends Model
     public function syncAgeRatings(array $ratingIds): void
     {
         $this->ageRatings()->sync($ratingIds);
-        $this->refreshEffectiveAgeRating();
+
+        // We only call save(); the StoryObserver @saving will
+        // handle the refreshEffectiveAgeRating() call.
         $this->save();
     }
 
@@ -120,8 +122,10 @@ class Story extends Model
         /** @var ?int */
         $maxAgeRepresentation = $this->ageRatings->max('age_representation');
 
-        // Set the effective value. If no ratings, max() returns null.
-        $this->age_rating_effective_value = $maxAgeRepresentation;
+        // Only set the attribute if it differs from the current value
+        if ($this->age_rating_effective_value !== $maxAgeRepresentation) {
+            $this->age_rating_effective_value = $maxAgeRepresentation;
+        }
     }
 
     /**
