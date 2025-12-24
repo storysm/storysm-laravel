@@ -6,6 +6,7 @@ return [
     'day' => 'Hari',
     'month' => 'Bulan',
     'year' => 'Tahun',
+    'date_of_birth' => 'Tanggal lahir',
     'remember_me' => 'Ingat saya di perangkat ini',
     'info' => 'Info',
     'some_contents_are_hidden' => 'Beberapa konten disembunyikan berdasarkan pengaturan usia Anda.',

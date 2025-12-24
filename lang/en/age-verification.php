@@ -6,6 +6,7 @@ return [
     'day' => 'Day',
     'month' => 'Month',
     'year' => 'Year',
+    'date_of_birth' => 'Date of birth',
     'remember_me' => 'Remember me on this device',
     'info' => 'Info',
     'some_contents_are_hidden' => 'Some contents are hidden based on your age settings.',
