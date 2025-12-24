@@ -12,7 +12,11 @@ class AgeVerificationService
 
     public function calculateAge(string $dob): int
     {
-        return Carbon::parse($dob)->age;
+        // Use application timezone for consistent boundary checks
+        /** @var string $timezone */
+        $timezone = config('app.timezone');
+
+        return Carbon::parse($dob, $timezone)->age;
     }
 
     public function setAge(int $age, bool $remember = false): void
@@ -27,8 +31,10 @@ class AgeVerificationService
         Session::put('user_age', $age);
 
         if ($remember) {
+            /** @var int $minutes */
+            $minutes = config('age_rating.cookie_duration_minutes');
             Cookie::queue(
-                Cookie::make('user_age', (string) $age, 60 * 24 * 30)
+                Cookie::make('user_age', (string) $age, $minutes)
             );
         }
     }

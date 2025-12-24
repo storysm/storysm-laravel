@@ -15,4 +15,16 @@ return [
     */
 
     'limit_years' => env('AGE_RATING_LIMIT_YEARS', 16),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Cookie Duration Minutes
+    |--------------------------------------------------------------------------
+    |
+    | This value determines the number of minutes that the 'user_age' cookie
+    | should be valid for. By default, this is set to 30 days.
+    |
+    */
+
+    'cookie_duration_minutes' => 60 * 24 * 30, // 30 days
 ];
