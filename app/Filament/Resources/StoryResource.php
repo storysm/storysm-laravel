@@ -184,6 +184,12 @@ class StoryResource extends Resource implements HasShieldPermissions
         return trans_choice('story.resource.model_label', 2);
     }
 
+    public static function afterSave(Story $record): void
+    {
+        $record->refreshEffectiveAgeRating();
+        $record->save();
+    }
+
     public static function table(Table $table): Table
     {
         return $table
