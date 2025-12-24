@@ -29,4 +29,24 @@ class AgeVerificationFormTest extends TestCase
             ->call('verify')
             ->assertDispatched('ageVerified');
     }
+
+    public function test_it_fails_validation_if_date_is_in_future(): void
+    {
+        $dob = now()->addDay()->format('Y-m-d');
+
+        Livewire::test(AgeVerificationForm::class)
+            ->fillForm(['dob' => $dob])
+            ->call('verify')
+            ->assertHasFormErrors(['dob']);
+    }
+
+    public function test_it_fails_validation_if_date_is_before_1900(): void
+    {
+        $dob = '1899-12-31';
+
+        Livewire::test(AgeVerificationForm::class)
+            ->fillForm(['dob' => $dob])
+            ->call('verify')
+            ->assertHasFormErrors(['dob']);
+    }
 }
