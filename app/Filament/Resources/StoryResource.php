@@ -118,13 +118,11 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ->label(trans_choice('age_rating.resource.model_label', 2))
                                 ->hidden(! static::canViewAll())
                                 ->afterStateUpdated(function ($state, Forms\Set $set) {
-                                    if (empty($state)) {
-                                        $set('age_rating_effective_value', null);
-
-                                        return;
-                                    }
-                                    $maxAge = \App\Models\AgeRating::whereIn('id', $state)->max('age_representation');
-                                    $set('age_rating_effective_value', $maxAge);
+                                    // Provide immediate UI feedback while editing
+                                    // Server-side calculation in StoryObserver::saving() ensures data integrity
+                                    $set('age_rating_effective_value',
+                                        empty($state) ? null : \App\Models\AgeRating::whereIn('id', $state)->max('age_representation')
+                                    );
                                 }),
 
                             Forms\Components\Hidden::make('age_rating_effective_value'),

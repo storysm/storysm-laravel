@@ -98,6 +98,19 @@ class Story extends Model
         return $this->belongsToMany(AgeRating::class, 'age_rating_story');
     }
 
+    public function refreshEffectiveAgeRating(): void
+    {
+        // Load age ratings if not already loaded, or if the relationship might have changed
+        // This ensures we have the latest ratings, especially if they were just synced.
+        $this->load('ageRatings');
+
+        /** @var ?int */
+        $maxAgeRepresentation = $this->ageRatings->max('age_representation');
+
+        // Set the effective value. If no ratings, max() returns null.
+        $this->age_rating_effective_value = $maxAgeRepresentation;
+    }
+
     /**
      * Get the storyComments for the story.
      *
