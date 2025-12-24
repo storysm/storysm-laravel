@@ -31,7 +31,6 @@ class ViewStoryTest extends TestCase
     {
         parent::setUp();
         Storage::fake('public');
-        AgeVerification::setAge(18);
     }
 
     public function test_view_story_component_renders_with_story(): void
@@ -345,6 +344,7 @@ class ViewStoryTest extends TestCase
 
     public function test_increments_view_count_for_guest_visitors(): void
     {
+        AgeVerification::setAge(18);
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
 
         Livewire::test(ViewStory::class, ['story' => $story]);
@@ -391,6 +391,7 @@ class ViewStoryTest extends TestCase
 
     public function test_increments_view_count_for_regular_authenticated_users(): void
     {
+        AgeVerification::setAge(18);
         $user = User::factory()->create();
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
 
@@ -402,6 +403,7 @@ class ViewStoryTest extends TestCase
 
     public function test_view_count_session_persistence_and_multi_role_logic(): void
     {
+        AgeVerification::setAge(18);
         // Setup a user who is both the creator and has admin permissions
         $adminCreator = User::factory()->create();
         Permission::firstOrCreate(['name' => 'view_all_story']);
@@ -434,6 +436,7 @@ class ViewStoryTest extends TestCase
 
     public function test_view_count_throttle_integration_with_time_travel(): void
     {
+        AgeVerification::setAge(18);
         $user = User::factory()->create();
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
         $startTime = Carbon::now()->startOfMinute();
