@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\E2E;
 
+use App\Facades\AgeVerification;
 use App\Filament\Resources\AgeRatingResource;
 use App\Filament\Resources\StoryResource;
 use App\Models\AgeRating;
@@ -10,7 +11,6 @@ use App\Models\Role;
 use App\Models\Story;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Livewire\Livewire;
 use Tests\TestCase;
@@ -54,7 +54,7 @@ class AgeRatingWorkflowTest extends TestCase
         $story = Story::factory()->create([
             'creator_id' => $this->adminUser->id, // Admin is creator for simplicity
         ]);
-        Config::set('age_rating.guest_limit_years', 17);
+        Config::set('age_rating.limit_years', 16);
 
         // --- 1. Admin creates a new age rating ---
         $this->actingAs($this->adminUser);
@@ -90,18 +90,15 @@ class AgeRatingWorkflowTest extends TestCase
         $story->refresh();
         $this->assertCount(1, $story->ageRatings);
 
-        // --- 3. Guest user verification: Story with age rating above limit years should be inaccessible ---
-        Auth::logout();
-        $this->assertGuest(); // Ensure no user is authenticated
+        // --- 3. User verification: Story with age rating above limit years should be inaccessible ---
+        AgeVerification::setAge(13);
 
         // Attempt to access the story's public URL (assuming a 'story.show' route exists)
         // This part needs to be adapted based on how stories are publicly viewed.
         // For now, we'll simulate a direct HTTP GET request.
         $response = $this->get(route('stories.show', $story)); // Assuming 'story.show' route
 
-        // Assert redirection to login page
-        $response->assertRedirect(route('login', [
-            'next' => route('stories.show', $story),
-        ])); // Assuming Filament's login route
+        // Assert redirection to forbidden page
+        $response->assertRedirect(route('content.forbidden'));
     }
 }

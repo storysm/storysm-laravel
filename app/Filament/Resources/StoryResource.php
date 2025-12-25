@@ -116,7 +116,16 @@ class StoryResource extends Resource implements HasShieldPermissions
                                 ->preload()
                                 ->searchable()
                                 ->label(trans_choice('age_rating.resource.model_label', 2))
-                                ->hidden(! static::canViewAll()),
+                                ->hidden(! static::canViewAll())
+                                ->afterStateUpdated(function ($state, Forms\Set $set) {
+                                    // Provide immediate UI feedback while editing
+                                    // Server-side calculation in StoryObserver::saving() ensures data integrity
+                                    $set('age_rating_effective_value',
+                                        empty($state) ? null : \App\Models\AgeRating::whereIn('id', $state)->max('age_representation')
+                                    );
+                                }),
+
+                            Forms\Components\Hidden::make('age_rating_effective_value'),
                         ]),
                         Creator::getComponent(static::canViewAll()),
                     ])->columnSpan([
@@ -175,6 +184,16 @@ class StoryResource extends Resource implements HasShieldPermissions
         return trans_choice('story.resource.model_label', 2);
     }
 
+    public static function afterSave(Story $record): void
+    {
+        // Reload relationship to ensure max() is calculated on fresh sync data
+        $record->unsetRelation('ageRatings');
+
+        if ($record->refreshEffectiveAgeRating()) {
+            $record->saveQuietly();
+        }
+    }
+
     public static function table(Table $table): Table
     {
         return $table
@@ -199,6 +218,7 @@ class StoryResource extends Resource implements HasShieldPermissions
                         if ($record->age_rating_effective_value === null) {
                             return '';
                         }
+
                         return "{$record->age_rating_effective_value}+";
                     }),
                 Tables\Columns\TextColumn::make('upvote_count')

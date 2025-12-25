@@ -14,23 +14,7 @@ class StoryObserver
      */
     public function saving(Story $story): void
     {
-        $this->calculateEffectiveAgeRating($story);
-    }
-
-    /**
-     * Calculate the effective age rating for the story.
-     */
-    protected function calculateEffectiveAgeRating(Story $story): void
-    {
-        // Load age ratings if not already loaded, or if the relationship might have changed
-        // This ensures we have the latest ratings, especially if they were just synced.
-        $story->load('ageRatings');
-
-        /** @var ?int */
-        $maxAgeRepresentation = $story->ageRatings->max('age_representation');
-
-        // Set the effective value. If no ratings, max() returns null.
-        $story->age_rating_effective_value = $maxAgeRepresentation;
+        $story->refreshEffectiveAgeRating();
     }
 
     public function saved(Story $story): void

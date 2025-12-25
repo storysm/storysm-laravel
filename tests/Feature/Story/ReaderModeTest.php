@@ -22,7 +22,7 @@ class ReaderModeTest extends TestCase
 
     public function test_story_page_contains_reader_controls(): void
     {
-        $story = Story::factory()->ensurePublished()->create();
+        $story = Story::factory()->ensurePublished()->ensureHasAgeRating(13)->create();
 
         Livewire::test(ViewStory::class, ['story' => $story])
             ->assertSuccessful()

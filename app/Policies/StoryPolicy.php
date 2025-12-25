@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Constants\Permissions;
 use App\Enums\Story\Status;
 use App\Models\Story;
 use App\Models\User;
@@ -83,7 +84,7 @@ class StoryPolicy
         }
 
         // Users with specific "silent" permissions never trigger an increment
-        if ($user->can('act_as_guest')) {
+        if ($user->can(Permissions::ACT_AS_GUEST_USER)) {
             return false;
         }
 

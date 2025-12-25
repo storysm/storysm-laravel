@@ -2,15 +2,15 @@
 
 namespace Tests\Unit\Scopes;
 
+use App\Facades\AgeVerification;
 use App\Models\AgeRating;
 use App\Models\Story;
-use App\Scopes\GuestStoryFilterScope;
+use App\Scopes\StoryFilterScope;
 use Illuminate\Foundation\Testing\RefreshDatabase;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
-class GuestStoryFilterScopeTest extends TestCase
+class StoryFilterScopeTest extends TestCase
 {
     use RefreshDatabase;
 
@@ -21,9 +21,9 @@ class GuestStoryFilterScopeTest extends TestCase
         Config::set('age_rating.guest_limit_years', 16);
     }
 
-    public function test_filters_stories_for_guest_users(): void
+    public function test_filters_stories_when_user_age_is_lower_than_story_age(): void
     {
-        Auth::shouldReceive('guest')->andReturn(true);
+        AgeVerification::setAge(15);
 
         // Create stories with different age ratings
         // Create AgeRating instances
@@ -48,17 +48,17 @@ class GuestStoryFilterScopeTest extends TestCase
         $storyNull = Story::factory()->create();
         $storyNull->save(); // Trigger observer (will set age_rating_effective_value to null)
 
-        $filteredStories = Story::withoutGlobalScope(GuestStoryFilterScope::class)
-            ->withGlobalScope('guest_filter', new GuestStoryFilterScope)
+        $filteredStories = Story::withoutGlobalScope(StoryFilterScope::class)
+            ->withGlobalScope('filter', new StoryFilterScope)
             ->get();
 
         $this->assertCount(1, $filteredStories);
         $this->assertTrue($filteredStories->contains($story15));
     }
 
-    public function test_does_not_filter_stories_for_authenticated_users(): void
+    public function test_does_not_filter_stories_for_users_who_are_above_age_limit(): void
     {
-        Auth::shouldReceive('guest')->andReturn(false);
+        AgeVerification::setAge(18);
 
         // Create AgeRating instances
         $ageRating15 = AgeRating::factory()->create(['age_representation' => 15]);
@@ -82,8 +82,8 @@ class GuestStoryFilterScopeTest extends TestCase
         $storyNull = Story::factory()->create();
         $storyNull->save();
 
-        $filteredStories = Story::withoutGlobalScope(GuestStoryFilterScope::class)
-            ->withGlobalScope('guest_filter', new GuestStoryFilterScope)
+        $filteredStories = Story::withoutGlobalScope(StoryFilterScope::class)
+            ->withGlobalScope('filter', new StoryFilterScope)
             ->get();
 
         $this->assertCount(4, $filteredStories); // All stories should be returned

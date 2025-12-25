@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Enums\Story\Status;
+use App\Models\AgeRating;
 use App\Models\Media;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -48,5 +49,18 @@ class StoryFactory extends Factory
             'status' => Status::Publish,
             'published_at' => Carbon::now(),
         ]);
+    }
+
+    /**
+     * Indicate that the story has an age rating.
+     */
+    public function ensureHasAgeRating(int $age): static
+    {
+        return $this->afterCreating(function ($story) use ($age) {
+            $story->ageRatings()->attach(
+                AgeRating::factory()->create(['age_representation' => $age])
+            );
+            $story->save();
+        });
     }
 }

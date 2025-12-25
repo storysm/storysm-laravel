@@ -99,6 +99,36 @@ class Story extends Model
     }
 
     /**
+     * Sync age ratings and refresh the effective age rating value.
+     *
+     * @param  array<string>  $ratingIds
+     */
+    public function syncAgeRatings(array $ratingIds): void
+    {
+        $this->ageRatings()->sync($ratingIds);
+
+        if ($this->refreshEffectiveAgeRating()) {
+            // Use saveQuietly to avoid re-triggering the saving/saved observer events
+            $this->saveQuietly();
+        }
+    }
+
+    public function refreshEffectiveAgeRating(): bool
+    {
+        /** @var ?int */
+        $maxAgeRepresentation = $this->ageRatings()->max('age_representation');
+
+        // Only set the attribute if it differs from the current value
+        if ($this->age_rating_effective_value !== $maxAgeRepresentation) {
+            $this->age_rating_effective_value = $maxAgeRepresentation;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get the storyComments for the story.
      *
      * @return HasMany<StoryComment, $this>

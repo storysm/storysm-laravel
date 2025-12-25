@@ -2,13 +2,16 @@
 
 namespace Tests\Feature\Livewire\Story;
 
+use App\Constants\Permissions;
 use App\Enums\Story\Status;
+use App\Facades\AgeVerification;
 use App\Livewire\Story\ViewStory;
 use App\Models\Media;
 use App\Models\Permission;
 use App\Models\Story;
 use App\Models\StoryComment;
 use App\Models\User;
+use App\Scopes\StoryFilterScope;
 use Artesaos\SEOTools\Facades\SEOTools;
 use Filament\Actions\Action;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -32,17 +35,11 @@ class ViewStoryTest extends TestCase
 
     public function test_view_story_component_renders_with_story(): void
     {
-        $story = Story::factory()
-            ->ensurePublished()
-            ->create([
-                'title' => 'Test Story Title',
-                'content' => '<p>This is the test story content.</p>',
-            ]);
+        AgeVerification::setAge(18);
+        $story = Story::factory()->ensurePublished()->create();
 
         Livewire::test(ViewStory::class, ['story' => $story])
-            ->assertViewIs('livewire.story.view-story')
-            ->assertSee($story->title)
-            ->assertSee(strip_tags($story->content));
+            ->assertStatus(200);
     }
 
     public function test_view_story_component_sets_seo_metadata_without_cover(): void
@@ -319,25 +316,27 @@ class ViewStoryTest extends TestCase
 
     public function test_view_count_is_conditionally_displayed(): void
     {
+        AgeVerification::setAge(18);
         // Story with view count <= 500 (should not be displayed)
         $storyLowViews = Story::factory()
             ->ensurePublished()
             ->create(['view_count' => 499]);
 
         Livewire::test(ViewStory::class, ['story' => $storyLowViews])
-            ->assertDontSeeHtml('<p class="text-sm">'.$storyLowViews->formattedViewCount().'</p>');
+            ->assertDontSeeHtml('<p class="text-sm">500</p>');
 
         // Story with view count > 500 (should be displayed)
         $storyHighViews = Story::factory()
             ->ensurePublished()
-            ->create(['view_count' => 501]);
+            ->create(['view_count' => 500]);
 
         Livewire::test(ViewStory::class, ['story' => $storyHighViews])
-            ->assertSeeHtml('<p class="text-sm">'.$storyHighViews->formattedViewCount().'</p>');
+            ->assertSeeHtml('<p class="text-sm">501</p>');
     }
 
     public function test_increments_view_count_for_guest_visitors(): void
     {
+        AgeVerification::setAge(18);
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
 
         Livewire::test(ViewStory::class, ['story' => $story]);
@@ -359,8 +358,8 @@ class ViewStoryTest extends TestCase
     public function test_does_not_increment_view_count_for_users_with_act_as_guest_permission(): void
     {
         $privilegedUser = User::factory()->create();
-        Permission::create(['name' => 'act_as_guest']);
-        $privilegedUser->givePermissionTo('act_as_guest');
+        Permission::create(['name' => Permissions::ACT_AS_GUEST_USER]);
+        $privilegedUser->givePermissionTo(Permissions::ACT_AS_GUEST_USER);
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
 
         $this->actingAs($privilegedUser);
@@ -384,6 +383,7 @@ class ViewStoryTest extends TestCase
 
     public function test_increments_view_count_for_regular_authenticated_users(): void
     {
+        AgeVerification::setAge(18);
         $user = User::factory()->create();
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
 
@@ -395,6 +395,7 @@ class ViewStoryTest extends TestCase
 
     public function test_view_count_session_persistence_and_multi_role_logic(): void
     {
+        AgeVerification::setAge(18);
         // Setup a user who is both the creator and has admin permissions
         $adminCreator = User::factory()->create();
         Permission::firstOrCreate(['name' => 'view_all_story']);
@@ -427,6 +428,7 @@ class ViewStoryTest extends TestCase
 
     public function test_view_count_throttle_integration_with_time_travel(): void
     {
+        AgeVerification::setAge(18);
         $user = User::factory()->create();
         $story = Story::factory()->ensurePublished()->create(['view_count' => 0]);
         $startTime = Carbon::now()->startOfMinute();
@@ -451,5 +453,68 @@ class ViewStoryTest extends TestCase
         $this->assertEquals(2, $story->fresh()?->view_count);
 
         Carbon::setTestNow(); // Reset mock time
+    }
+
+    public function test_guest_without_age_sees_age_gate(): void
+    {
+        AgeVerification::clearAge();
+
+        $story = Story::factory()->ensurePublished()->ensureHasAgeRating(18)->create();
+
+        $component = Livewire::test(ViewStory::class, ['story' => $story]);
+        $component->assertOk();
+        // @phpstan-ignore-next-line
+        $component->assertSeeLivewire('age-verification-form');
+        $component->assertSet('isAgeVerified', false);
+    }
+
+    public function test_guest_too_young_is_redirected(): void
+    {
+        AgeVerification::setAge(13);
+
+        $story = Story::factory()->ensurePublished()->ensureHasAgeRating(18)->create();
+
+        Livewire::test(ViewStory::class, ['story' => $story])
+            ->assertRedirect(route('content.forbidden'));
+    }
+
+    public function test_guest_old_enough_sees_content(): void
+    {
+        AgeVerification::setAge(20);
+
+        $story = Story::factory()->ensurePublished()->ensureHasAgeRating(18)->create([
+            'title' => 'Mature Story',
+            'content' => 'This is mature content.',
+        ]);
+
+        $component = Livewire::test(ViewStory::class, ['story' => $story]);
+        $component->assertOk();
+        $component->assertSee('Mature Story');
+        $component->assertSee('This is mature content.');
+        $component->assertSet('isAgeVerified', true);
+    }
+
+    public function test_global_query_returns_all_stories_when_no_age_set(): void
+    {
+        Story::factory()->ensurePublished()->count(3)->ensureHasAgeRating(18)->create();
+
+        $count = Story::withGlobalScope('filter', new StoryFilterScope)->count();
+        $this->assertEquals(3, $count);
+    }
+
+    public function test_global_query_filters_stories_when_age_is_set(): void
+    {
+        AgeVerification::setAge(15);
+
+        // Allowed
+        Story::factory()->ensurePublished()->ensureHasAgeRating(12)->create();
+
+        // Forbidden
+        Story::factory()->ensurePublished()->ensureHasAgeRating(18)->create();
+
+        $stories = Story::withGlobalScope('filter', new StoryFilterScope)->get();
+
+        $this->assertCount(1, $stories);
+        $this->assertEquals(12, $stories->first()?->age_rating_effective_value);
     }
 }

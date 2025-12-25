@@ -49,54 +49,61 @@
     </div>
 
     <x-container>
-        <section>
-            <div class="grid items-start w-full grid-cols-1 gap-4 lg:grid-cols-12">
-                <div class="flex flex-col gap-4 transition-colors duration-300"
-                    x-bind:class="getContainerDynamicClasses"
-                    @scroll.throttle.50ms="if($store.reader.fullscreen) $dispatch('reader-scroll', { event: $event })">
-                    <x-filament::section
-                        x-bind:class="$store.reader.fullscreen ? 'shadow-none !bg-transparent border-0' : ''">
+        @if ($isAgeVerified)
+            <section>
+                <div class="grid items-start w-full grid-cols-1 gap-4 lg:grid-cols-12">
+                    <div class="flex flex-col gap-4 transition-colors duration-300"
+                        x-bind:class="getContainerDynamicClasses"
+                        @scroll.throttle.50ms="if($store.reader.fullscreen) $dispatch('reader-scroll', { event: $event })">
+                        <x-filament::section
+                            x-bind:class="$store.reader.fullscreen ? 'shadow-none !bg-transparent border-0' : ''">
 
-                        <div class="mx-auto transition-all duration-300 max-w-none"
-                            x-bind:class="getProseDynamicClasses" x-bind:style="getProseDynamicStyle">
-                            <h1 x-show="$store.reader.fullscreen" class="mb-8 text-3xl font-bold text-center">
-                                {{ $story->title }}
-                            </h1>
+                            <div class="mx-auto transition-all duration-300 max-w-none"
+                                x-bind:class="getProseDynamicClasses" x-bind:style="getProseDynamicStyle">
+                                <h1 x-show="$store.reader.fullscreen" class="mb-8 text-3xl font-bold text-center">
+                                    {{ $story->title }}
+                                </h1>
 
-                            {!! $story->content !!}
-                        </div>
-
-                        <div x-show="$store.reader.fullscreen" class="h-24 md:hidden"></div>
-                    </x-filament::section>
-
-                    <div class="flex flex-col gap-4"
-                        x-bind:class="$store.reader.fullscreen ? 'max-w-2xl mx-auto w-full pb-12' : ''"
-                        x-show="!$store.reader.fullscreen">
-                        <x-filament::section x-bind:class="$store.reader.fullscreen ? '!bg-transparent border-0' : ''">
-                            <div class="flex flex-row space-x-2 justify-center">
-                                <livewire:story-vote.upvote-action :story="$story" />
-                                <livewire:story-vote.downvote-action :story="$story" />
+                                {!! $story->content !!}
                             </div>
+
+                            <div x-show="$store.reader.fullscreen" class="h-24 md:hidden"></div>
                         </x-filament::section>
 
-                        <div class="flex flex-col gap-4">
-                            @if ($story->creator->can(\App\Constants\Permissions::ACT_AS_GUEST_USER))
-                                <x-filament::section class="">
-                                    <div class="flex flex-row gap-x-2">
-                                        <x-filament::icon icon="heroicon-o-information-circle"
-                                            class="w-5 h-5 mt-1 text-warning-500 dark:text-warning-400" />
-                                        <p>{{ __('user.resource.guest_user_notice') }}</p>
-                                    </div>
-                                </x-filament::section>
-                            @endif
-                            <livewire:story-comment.create-story-comment :story="$story" />
-                            <livewire:story-comment.story-comments-table :story="$story" />
+                        <div class="flex flex-col gap-4"
+                            x-bind:class="$store.reader.fullscreen ? 'max-w-2xl mx-auto w-full pb-12' : ''"
+                            x-show="!$store.reader.fullscreen">
+                            <x-filament::section
+                                x-bind:class="$store.reader.fullscreen ? '!bg-transparent border-0' : ''">
+                                <div class="flex flex-row space-x-2 justify-center">
+                                    <livewire:story-vote.upvote-action :story="$story" />
+                                    <livewire:story-vote.downvote-action :story="$story" />
+                                </div>
+                            </x-filament::section>
+
+                            <div class="flex flex-col gap-4">
+                                @if ($story->creator->can(\App\Constants\Permissions::ACT_AS_GUEST_USER))
+                                    <x-filament::section class="">
+                                        <div class="flex flex-row gap-x-2">
+                                            <x-filament::icon icon="heroicon-o-information-circle"
+                                                class="w-5 h-5 mt-1 text-warning-500 dark:text-warning-400" />
+                                            <p>{{ __('user.resource.guest_user_notice') }}</p>
+                                        </div>
+                                    </x-filament::section>
+                                @endif
+                                <livewire:story-comment.create-story-comment :story="$story" />
+                                <livewire:story-comment.story-comments-table :story="$story" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </section>
-    </x-container>
+            </section>
 
-    <x-story.reader-controls :story="$story" />
+            <x-story.reader-controls :story="$story" />
+        @else
+            <div class="py-12 flex justify-center">
+                <livewire:age-verification-form :requiredAge="$story->age_rating_effective_value ?? 18" />
+            </div>
+        @endif
+    </x-container>
 </div>

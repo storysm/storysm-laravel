@@ -11,7 +11,6 @@ use App\Models\User;
 use Database\Seeders\GuestRoleAndPermissionSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 use Tests\TestCase;
 
 class GuestUserNoticeTest extends TestCase
@@ -38,8 +37,6 @@ class GuestUserNoticeTest extends TestCase
         $this->guestUser->assignRole($guestRole);
 
         $this->regularUser = User::factory()->create();
-
-        Config::set('age_rating.guest_limit_years', 16);
 
         $this->ageRating = AgeRating::factory()->create([
             'age_representation' => 7,
