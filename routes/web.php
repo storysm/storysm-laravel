@@ -28,8 +28,13 @@ Route::get('/age-rating-guidelines', function () {
     return view('age-ratings', ['record' => $record]);
 })->name('age-ratings.show');
 Route::get('/cookie-policy', function () {
-    $record = Page::whereStatus(Status::Publish)
-        ->find(config('page.cookie'));
+    $pageId = config('page.cookie');
+
+    if (! $pageId) {
+        abort(404);
+    }
+
+    $record = Page::whereStatus(Status::Publish)->findOrFail($pageId);
 
     return view('cookie', ['record' => $record]);
 })->name('cookie.show');
@@ -51,8 +56,7 @@ if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
 
 Route::get('/restricted', ForbiddenContentController::class)->name('content.forbidden');
 
-Route::get('/age-not-allowed', fn () =>
-    view('age-not-allowed')
+Route::get('/age-not-allowed', fn () => view('age-not-allowed')
 )->name('age.not-allowed');
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
