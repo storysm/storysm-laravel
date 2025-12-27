@@ -2,6 +2,7 @@
 
 use App\Enums\Page\Status;
 use App\Http\Controllers\ForbiddenContentController;
+use App\Http\Controllers\PageController;
 use App\Http\Controllers\SitemapController;
 use App\Livewire\Home;
 use App\Models\Page;
@@ -40,18 +41,8 @@ Route::get('/cookie-policy', function () {
 })->name('cookie.show');
 
 if (Jetstream::hasTermsAndPrivacyPolicyFeature()) {
-    Route::get('/terms-of-service', function () {
-        $record = Page::whereStatus(Status::Publish)
-            ->find(config('page.terms'));
-
-        return view('terms-of-service', ['record' => $record]);
-    })->name('terms.show');
-    Route::get('/privacy-policy', function () {
-        $record = Page::whereStatus(Status::Publish)
-            ->find(config('page.privacy'));
-
-        return view('privacy-policy', ['record' => $record]);
-    })->name('policy.show');
+    Route::get('/terms-of-service', [PageController::class, 'terms'])->name('terms.show');
+    Route::get('/privacy-policy', [PageController::class, 'policy'])->name('policy.show');
 }
 
 Route::get('/restricted', ForbiddenContentController::class)->name('content.forbidden');
@@ -61,6 +52,4 @@ Route::get('/age-not-allowed', fn () => view('age-not-allowed')
 
 Route::get('/sitemap.xml', [SitemapController::class, 'index']);
 
-Route::fallback(function () {
-    return response()->view('errors.404', [], 404);
-});
+Route::fallback([PageController::class, 'fallback']);
