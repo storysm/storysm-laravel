@@ -1,24 +1,37 @@
-@if ($visible)
-    <div
-        class="fixed inset-x-0 bottom-0 z-50 border-t border-gray-200 bg-white px-6 py-4 shadow-lg dark:border-gray-800 dark:bg-gray-900">
-        <div class="mx-auto flex max-w-7xl flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div class="text-sm text-gray-700 dark:text-gray-300">
-                <p class="font-medium">
-                    {{ __('cookie-consent.title') }}
-                </p>
-                <p class="mt-1">
-                    {{ __('cookie-consent.description') }}
-                    <a href="{{ route('cookie.show') }}" class="underline">
-                        {{ __('cookie-consent.learn_more') }}
-                    </a>
-                </p>
-            </div>
+<div>
+    @if ($visible)
+        <div class="fixed inset-x-0 bottom-0 z-50 bottom-2 right-2 left-2 sm:left-auto sm:w-full sm:max-w-md">
+            <x-filament::section>
+                <div class="mx-auto flex max-w-7xl flex-col gap-4">
+                    <div class="text-sm text-gray-700 dark:text-gray-300">
+                        <p class="font-bold text-lg">
+                            {{ __('cookie-consent.title') }}
+                        </p>
+                        <p class="mt-1">
+                            {{ __('cookie-consent.description') }}
+                            <a href="{{ route('cookie.show') }}" class="underline">
+                                {{ __('cookie-consent.learn_more') }}
+                            </a>
+                        </p>
+                    </div>
 
-            <div class="flex items-center gap-2">
-                {{ \Filament\Actions\Action::make('preferences')->label(__('cookie-consent.preferences'))->color('gray')->outlined()->modalHeading(__('cookie-consent.cookie_preferences'))->modalSubmitAction(false)->modalCancelActionLabel(__('cookie-consent.close'))->modalContent(view('cookie-consent.preferences')) }}
+                    <div class="flex items-center gap-2">
+                        <x-filament::modal icon="heroicon-o-information-circle" icon-color="info">
+                            <x-slot name="trigger">
+                                <x-filament::button color="gray" outlined>
+                                    {{ __('cookie-consent.preferences') }}
+                                </x-filament::button>
+                            </x-slot>
+                            <x-slot name="heading">
+                                {{ __('cookie-consent.preferences') }}
+                            </x-slot>
+                            <x-cookie-consent-preferences />
+                        </x-filament::modal>
 
-                {{ \Filament\Actions\Action::make('accept')->label(__('cookie-consent.accept'))->color('primary')->action('accept') }}
-            </div>
+                        {{ $this->acceptAction }}
+                    </div>
+                </div>
+            </x-filament::section>
         </div>
-    </div>
-@endif
+    @endif
+</div>
