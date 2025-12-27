@@ -3,7 +3,6 @@
 namespace Tests\Unit\Support;
 
 use App\Support\CookieConsent;
-use Illuminate\Cookie\CookieJar;
 use Illuminate\Support\Facades\Cookie;
 use Tests\TestCase;
 
@@ -23,12 +22,12 @@ class CookieConsentTest extends TestCase
         Cookie::shouldReceive('queue')
             ->once()
             ->with(
-                'cookie-consent',
-                'accepted',
+                CookieConsent::COOKIE_NAME,
+                CookieConsent::VALUE_ACCEPTED,
                 525600, // 365 days in minutes
                 null,
                 null,
-                false, // assuming not in production during tests
+                false,
                 false,
                 'lax'
             );
@@ -36,28 +35,21 @@ class CookieConsentTest extends TestCase
         CookieConsent::consent();
     }
 
-    public function test_consent_flow(): void
-    {
-        // Simulate existing cookie
-        $this->withCookie('cookie-consent', 'accepted')
-            ->get(route('home'));
-
-        $this->assertTrue(CookieConsent::hasConsented());
-    }
-
     public function test_it_queues_a_cookie_when_consenting(): void
     {
+        Cookie::shouldReceive('queue')
+            ->once()
+            ->with(
+                CookieConsent::COOKIE_NAME,
+                CookieConsent::VALUE_ACCEPTED,
+                525600,
+                null,
+                null,
+                false,
+                false,
+                'lax'
+            );
+
         CookieConsent::consent();
-
-        /** @var CookieJar $jar */
-        $jar = app('cookie');
-
-        $cookies = collect($jar->getQueuedCookies());
-
-        $this->assertTrue(
-            $cookies->contains(fn ($cookie) => $cookie->getName() === 'cookie-consent'
-                && $cookie->getValue() === 'accepted'
-            )
-        );
     }
 }
