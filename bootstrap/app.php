@@ -4,7 +4,6 @@ use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\EnsureJsonRequest;
 use App\Http\Middleware\SetDeviceFromHeader;
 use App\Http\Middleware\SetLocaleFromHeader;
-use App\Http\Middleware\SetLocaleFromQueryAndSession;
 use App\Http\Middleware\VerifyApiArtisan;
 use App\Http\Middleware\VerifyApiKey;
 use Illuminate\Foundation\Application;
@@ -23,8 +22,12 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(ProtectAgainstSpam::class);
         $middleware->append(SetDeviceFromHeader::class);
         $middleware->append(SetLocaleFromHeader::class);
+        $middleware->web(replace: [
+            \Illuminate\Cookie\Middleware\EncryptCookies::class => \App\Http\Middleware\EncryptCookies::class,
+        ]);
+
         $middleware->web(append: [
-            SetLocaleFromQueryAndSession::class,
+            \App\Http\Middleware\SetLocaleFromQueryAndSession::class,
         ]);
         $middleware->statefulApi();
 

@@ -26,6 +26,7 @@
 
     <main class="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-950">
         <x-banner />
+        @livewire('cookie-consent-banner')
         <div class="flex-grow">{{ $slot }}</div>
     </main>
 
