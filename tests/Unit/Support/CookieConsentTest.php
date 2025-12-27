@@ -8,15 +8,6 @@ use Tests\TestCase;
 
 class CookieConsentTest extends TestCase
 {
-    public function test_it_identifies_when_consent_has_not_been_given(): void
-    {
-        Cookie::shouldReceive('get')
-            ->with('cookie-consent')
-            ->andReturn(null);
-
-        $this->assertFalse(CookieConsent::hasConsented());
-    }
-
     public function test_it_queues_consent_cookie(): void
     {
         Cookie::shouldReceive('queue')
@@ -35,21 +26,16 @@ class CookieConsentTest extends TestCase
         CookieConsent::consent();
     }
 
-    public function test_it_queues_a_cookie_when_consenting(): void
+    public function test_it_checks_if_user_has_consented(): void
     {
-        Cookie::shouldReceive('queue')
-            ->once()
-            ->with(
-                CookieConsent::COOKIE_NAME,
-                CookieConsent::VALUE_ACCEPTED,
-                525600,
-                null,
-                null,
-                false,
-                false,
-                'lax'
-            );
+        // Simulate the cookie being present in the request
+        request()->cookies->set(CookieConsent::COOKIE_NAME, CookieConsent::VALUE_ACCEPTED);
 
-        CookieConsent::consent();
+        $this->assertTrue(CookieConsent::hasConsented());
+
+        // Simulate cookie absence
+        request()->cookies->remove(CookieConsent::COOKIE_NAME);
+
+        $this->assertFalse(CookieConsent::hasConsented());
     }
 }
