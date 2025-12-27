@@ -1,6 +1,7 @@
 <div>
     @if ($visible)
-        <div class="fixed inset-x-0 bottom-0 z-50 bottom-2 right-2 left-2 sm:left-auto sm:w-full sm:max-w-md">
+        <div role="region" aria-label="{{ __('cookie-consent.cookie_preferences') }}"
+            class="fixed bottom-4 right-4 left-4 z-50 sm:left-auto sm:w-full sm:max-w-md">
             <x-filament::section>
                 <div class="mx-auto flex max-w-7xl flex-col gap-4">
                     <div class="text-sm text-gray-700 dark:text-gray-300">
