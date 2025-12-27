@@ -85,6 +85,80 @@ class PageControllerTest extends TestCase
         $response->assertStatus(404);
     }
 
+    public function test_age_ratings_returns_200_when_configured_and_published(): void
+    {
+        $page = Page::factory()->create([
+            'status' => Status::Publish,
+        ]);
+
+        config(['page.age_ratings' => $page->id]);
+
+        $response = $this->get('/age-rating-guidelines');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('age-ratings');
+        $response->assertViewHas('record', $page);
+    }
+
+    public function test_age_ratings_returns_404_when_not_configured(): void
+    {
+        config(['page.age_ratings' => null]);
+
+        $response = $this->get('/age-rating-guidelines');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_age_ratings_returns_404_when_page_is_not_published(): void
+    {
+        $page = Page::factory()->create([
+            'status' => Status::Draft,
+        ]);
+
+        config(['page.age_ratings' => $page->id]);
+
+        $response = $this->get('/age-rating-guidelines');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_cookie_returns_200_when_configured_and_published(): void
+    {
+        $page = Page::factory()->create([
+            'status' => Status::Publish,
+        ]);
+
+        config(['page.cookie' => $page->id]);
+
+        $response = $this->get('/cookie-policy');
+
+        $response->assertStatus(200);
+        $response->assertViewIs('cookie');
+        $response->assertViewHas('record', $page);
+    }
+
+    public function test_cookie_returns_404_when_not_configured(): void
+    {
+        config(['page.cookie' => null]);
+
+        $response = $this->get('/cookie-policy');
+
+        $response->assertStatus(404);
+    }
+
+    public function test_cookie_returns_404_when_page_is_not_published(): void
+    {
+        $page = Page::factory()->create([
+            'status' => Status::Draft,
+        ]);
+
+        config(['page.cookie' => $page->id]);
+
+        $response = $this->get('/cookie-policy');
+
+        $response->assertStatus(404);
+    }
+
     public function test_fallback_route_returns_404_and_correct_view(): void
     {
         $response = $this->get('/this-route-does-not-exist');

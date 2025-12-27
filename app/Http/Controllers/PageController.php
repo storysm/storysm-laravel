@@ -40,6 +40,36 @@ class PageController extends Controller
     }
 
     /**
+     * Display the age rating guidelines page.
+     */
+    public function ageRatings(): View
+    {
+        $pageId = config('page.age_ratings');
+        if (! $pageId) {
+            abort(404);
+        }
+        $record = Page::whereStatus(Status::Publish)
+            ->findOrFail($pageId);
+
+        return view('age-ratings', ['record' => $record]);
+    }
+
+    /**
+     * Display the cookie policy page.
+     */
+    public function cookie(): View
+    {
+        $pageId = config('page.cookie');
+        if (! $pageId) {
+            abort(404);
+        }
+        $record = Page::whereStatus(Status::Publish)
+            ->findOrFail($pageId);
+
+        return view('cookie', ['record' => $record]);
+    }
+
+    /**
      * Handle the fallback route.
      */
     public function fallback(): Response
