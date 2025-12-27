@@ -15,9 +15,9 @@
             </div>
 
             <div class="flex items-center gap-2">
-                {{ \Filament\Actions\Action::make('preferences')->label(__('cookie-consent::preferences'))->color('gray')->outlined()->modalHeading(__('cookie-consent::cookie_preferences'))->modalSubmitAction(false)->modalCancelActionLabel(__('cookie-consent::close'))->modalContent(view('cookie-consent.preferences')) }}
+                {{ \Filament\Actions\Action::make('preferences')->label(__('cookie-consent.preferences'))->color('gray')->outlined()->modalHeading(__('cookie-consent.cookie_preferences'))->modalSubmitAction(false)->modalCancelActionLabel(__('cookie-consent.close'))->modalContent(view('cookie-consent.preferences')) }}
 
-                {{ \Filament\Actions\Action::make('accept')->label(__('cookie-consent::accept'))->color('primary')->action('accept') }}
+                {{ \Filament\Actions\Action::make('accept')->label(__('cookie-consent.accept'))->color('primary')->action('accept') }}
             </div>
         </div>
     </div>
