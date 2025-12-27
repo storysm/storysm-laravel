@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Middleware\EncryptCookies;
 use App\Http\Middleware\EnsureEmailIsVerifiedWithFortify;
 use App\Http\Middleware\EnsureJsonRequest;
 use App\Http\Middleware\SetDeviceFromHeader;
@@ -24,6 +25,7 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->append(SetDeviceFromHeader::class);
         $middleware->append(SetLocaleFromHeader::class);
         $middleware->web(append: [
+            EncryptCookies::class,
             SetLocaleFromQueryAndSession::class,
         ]);
         $middleware->statefulApi();
