@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Cookie;
 
 final class CookieConsent
 {
-    public const COOKIE_NAME = 'cookie_consent';
+    public const COOKIE_NAME = 'cookie-consent';
 
     public const VALUE_ACCEPTED = 'accepted';
 
@@ -23,7 +23,7 @@ final class CookieConsent
             $days * 24 * 60,
             null,
             null,
-            true,
+            app()->environment('production'),
             false,
             'lax'
         );
