@@ -14,12 +14,12 @@
         "filament/filament": "^3.3.45",
         "intervention/image": "^2.7.2",
         "laravel-lang/common": "^6.7.1",
-        "laravel/framework": "^12.43.1",
+        "laravel/framework": "^12.44.0",
         "laravel/jetstream": "^5.4.0",
         "laravel/sanctum": "^4.2.1",
         "laravel/tinker": "^2.10.2",
         "lasserafn/php-initial-avatar-generator": "^4.5",
-        "livewire/livewire": "^3.7.2",
+        "livewire/livewire": "^3.7.3",
         "shuvroroy/filament-spatie-laravel-backup": "^2.2.4",
         "solution-forest/filament-translate-field": "^1.4.1",
         "spatie/color": "^1.8.0",
@@ -31,7 +31,7 @@
         "verschuur/laravel-robotstxt": "^5.2"
     },
     "require-dev": {
-        "barryvdh/laravel-debugbar": "^3.16.2",
+        "barryvdh/laravel-debugbar": "^3.16.3",
         "barryvdh/laravel-ide-helper": "^3.6.1",
         "fakerphp/faker": "^1.24.1",
         "larastan/larastan": "^3.8.1",

@@ -117,7 +117,7 @@ To develop a universal app, follow the additional instructions below:
 
 ## Upstream
 
-Apply any changes available from the Starter Kit Laravel [main branch](https://github.com/spektasoft/starter-kit-laravel/compare/182db993c9bfbea46c455c9f8f0ce63f7833fde2..main).
+Apply any changes available from the Starter Kit Laravel [main branch](https://github.com/spektasoft/starter-kit-laravel/compare/f7363a0a680410aebe5553dfd2e290f89141d57e..main).
 
 ## License
 
